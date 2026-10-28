@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TradeLinker Provider Workflow & Service Listings Test Suite</title>
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    body { padding: 40px; background: #F8FAFC; }
+    .test-card { background: #FFF; border: 1px solid var(--tl-border-subtle); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .test-pass { color: #059669; font-weight: 700; }
+    .test-fail { color: #DC2626; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="tl-container">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+      <div>
+        <h1 style="font-size: 2rem; color: var(--tl-navy-800);">Provider Workflow & Services Test Suite</h1>
+        <p style="color: var(--tl-text-secondary);">Validates SRS FR-11 to FR-18, FR-31, FR-33, BR-03, BR-07, and UC-03.</p>
+      </div>
+      <button class="tl-btn tl-btn-primary" onclick="runProviderTests()">Run All Provider Tests</button>
+    </div>
+
+    <div id="testResults">
+      <div style="padding: 20px; background: #FFF; border-radius: 12px; border: 1px solid var(--tl-border-subtle);">
+        Running test suite...
+      </div>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script>
+    async function runProviderTests() {
+      const container = document.getElementById('testResults');
+      container.innerHTML = '<div style="padding: 20px;"><span class="tl-spinner tl-spinner-sm"></span> Running 9 automated provider tests...</div>';
+
+      const results = [];
+
+      // Test 1: Register New Provider (Fresh Account)
+      const provEmail = "new_pro_" + Date.now() + "@example.com";
+      let newProvUser = null;
+      try {
+        const reg = await TLAuth.registerProvider({
+          fullName: "Muhammad Bilal",
+          businessName: "Bilal Master Woodcraft",
+          categoryId: "carpentry",
+          email: provEmail,
+          phone: "0321-9876543",
+          city: "Rawalpindi",
+          experienceYears: 6,
+          skills: "Solid Teak Doors, Frame Fittings",
+          password: "ProPassword2026!"
+        });
+        newProvUser = reg.user;
+        results.push({
+          name: "1. Provider Onboarding & Profile Initialization (FR-11, FR-12)",
+          passed: reg.success && reg.user.role === 'provider',
+          details: `Registered provider '${newProvUser.fullName}' in carpentry category.`
+        });
+      } catch (e) {
+        results.push({ name: "1. Provider Onboarding", passed: false, details: e.message });
+      }
+
+      // Test 2: Unverified Status Rule (BR-07)
+      try {
+        const profile = TLServices.getProviderProfile(newProvUser.id);
+        const isNotVerified = profile.verificationStatus !== 'verified';
+        results.push({
+          name: "2. Unverified Status Safeguard (BR-07)",
+          passed: isNotVerified && profile.verificationStatus === 'pending',
+          details: `Initial status is '${profile.verificationStatus}'. Unverified provider cannot display 'Verified' badge without admin approval.`
+        });
+      } catch (e) {
+        results.push({ name: "2. Unverified Status Safeguard", passed: false, details: e.message });
+      }
+
+      // Test 3: Empty State for New Provider (0 Services Initially)
+      let profile = null;
+      try {
+        profile = TLServices.getProviderProfile(newProvUser.id);
+        const services = TLServices.getProviderServices(profile.id);
+        results.push({
+          name: "3. Service Listing Empty State (FR-14)",
+          passed: services.length === 0,
+          details: `New provider starts with 0 services, displaying empty state with create action.`
+        });
+      } catch (e) {
+        results.push({ name: "3. Service Listing Empty State", passed: false, details: e.message });
+      }
+
+      // Test 4: Create Service Listing with Fixed Pricing (FR-14, FR-15)
+      let createdService = null;
+      try {
+        const srvRes = TLServices.createService({
+          providerId: profile.id,
+          categoryId: "carpentry",
+          title: "Custom Solid Teak Main Entrance Door Crafting",
+          description: "Handcrafted 1.75 inch seasoned teak wood door including mortise lock cutout and weather seals.",
+          pricingType: "fixed",
+          priceAmount: 45000,
+          isAvailable: true
+        });
+        createdService = srvRes.service;
+        results.push({
+          name: "4. Create Service Listing with Fixed Rate (FR-14, FR-15)",
+          passed: srvRes.success && createdService.priceAmount === 45000 && createdService.isAvailable === true,
+          details: `Created listing '${createdService.title}' with price PKR ${createdService.priceAmount}.`
+        });
+      } catch (e) {
+        results.push({ name: "4. Create Service Listing", passed: false, details: e.message });
+      }
+
+      // Test 5: Create Service Listing with "Upon Request" Pricing (FR-15)
+      try {
+        const quoteSrv = TLServices.createService({
+          providerId: profile.id,
+          categoryId: "carpentry",
+          title: "Architectural Wood Wall Panelling & Cladding",
+          description: "Custom decorative fluted wall panels for residential drawing rooms and executive offices.",
+          pricingType: "upon_request",
+          priceAmount: null,
+          isAvailable: true
+        });
+        results.push({
+          name: "5. Create Service with 'Upon Request' Pricing (FR-15)",
+          passed: quoteSrv.success && quoteSrv.service.pricingType === 'upon_request' && quoteSrv.service.priceAmount === null,
+          details: `Successfully published quotation-based service without fixed pricing requirement.`
+        });
+      } catch (e) {
+        results.push({ name: "5. Upon Request Pricing", passed: false, details: e.message });
+      }
+
+      // Test 6: Edit & Toggle Availability (FR-14)
+      try {
+        const editRes = TLServices.updateService(createdService.id, profile.id, {
+          title: "Custom Solid Teak Main Entrance Door (Premium Series)",
+          priceAmount: 48000
+        });
+        const toggleRes = TLServices.toggleServiceAvailability(createdService.id, profile.id);
+        results.push({
+          name: "6. Edit Service & Availability Toggle (FR-14)",
+          passed: editRes.success && editRes.service.priceAmount === 48000 && toggleRes.isAvailable === false,
+          details: `Updated title, revised price to PKR 48,000, and paused availability.`
+        });
+      } catch (e) {
+        results.push({ name: "6. Edit Service & Availability", passed: false, details: e.message });
+      }
+
+      // Test 7: Booking Acceptance & Workflow Progression (FR-16, FR-17, FR-31, FR-33, UC-03)
+      const bookingId = "TL-BK-" + Math.floor(1000 + Math.random() * 9000);
+      try {
+        // Customer places booking
+        const allBookings = TLServices.getAllBookings();
+        allBookings.push({
+          id: bookingId,
+          providerId: profile.id,
+          customerId: "usr-cust-001",
+          customerName: "Hamad Ullah",
+          customerPhone: "0300-1112233",
+          serviceId: createdService.id,
+          serviceTitle: createdService.title,
+          problemDescription: "Require front double door crafting in Bahria Town Rawalpindi.",
+          serviceAddress: "Phase 4, Bahria Town, Rawalpindi",
+          scheduledDate: "2026-11-02",
+          scheduledTimeSlot: "Morning",
+          status: "pending",
+          createdAt: new Date().toISOString()
+        });
+        localStorage.setItem(TLServices.STORAGE_KEYS.BOOKINGS, JSON.stringify(allBookings));
+
+        // Provider accepts request (FR-31)
+        const acceptRes = TLServices.updateBookingStatus(bookingId, profile.id, "accepted");
+        // Provider starts job
+        const progressRes = TLServices.updateBookingStatus(bookingId, profile.id, "in_progress");
+        // Provider completes job (FR-17)
+        const completeRes = TLServices.updateBookingStatus(bookingId, profile.id, "completed");
+
+        results.push({
+          name: "7. Full Booking Status Lifecycle (FR-17, FR-31, FR-33)",
+          passed: acceptRes.success && progressRes.success && completeRes.success && completeRes.booking.status === "completed",
+          details: `Progressed booking #${bookingId}: pending -> accepted -> in_progress -> completed.`
+        });
+      } catch (e) {
+        results.push({ name: "7. Booking Status Lifecycle", passed: false, details: e.message });
+      }
+
+      // Test 8: Document Submission for Verification (FR-13, FR-18)
+      try {
+        const docRes = TLServices.submitVerificationDoc(profile.id, {
+          docType: "Vocational Carpentry Trade Diploma",
+          docName: "TEVTA_Carpentry_Cert.pdf",
+          notes: "Government TEVTA Master Certificate Reg # 88219"
+        });
+        const docs = TLServices.getProviderDocuments(profile.id);
+        results.push({
+          name: "8. Supporting Document Upload for Verification (FR-13, FR-18)",
+          passed: docRes.success && docs.length > 0,
+          details: `Submitted '${docRes.document.docName}' to administrator review queue.`
+        });
+      } catch (e) {
+        results.push({ name: "8. Document Upload", passed: false, details: e.message });
+      }
+
+      // Test 9: Provider Data Ownership Security
+      try {
+        // Attempt to edit another provider's service (should fail)
+        const hijackAttempt = TLServices.updateService("srv-001", profile.id, { title: "Hijacked Service" });
+        results.push({
+          name: "9. Cross-Provider Data Protection Guard",
+          passed: !hijackAttempt.success && hijackAttempt.error.includes("not authorized"),
+          details: `Blocked attempt to edit another provider's listing: "${hijackAttempt.error}"`
+        });
+      } catch (e) {
+        results.push({ name: "9. Data Protection Guard", passed: false, details: e.message });
+      }
+
+      // Render
+      container.innerHTML = `
+        <div style="margin-bottom: 16px; padding: 14px; background: #D1FAE5; border: 1px solid #A7F3D0; border-radius: 10px; font-weight: 700; color: #065F46;">
+          ✓ Provider Operations Test Suite: ${results.filter(r => r.passed).length} / ${results.length} Tests Passed
+        </div>
+        ${results.map(r => `
+          <div class="test-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <h3 style="font-size: 1.05rem; color: var(--tl-navy-800);">${r.name}</h3>
+              <span class="${r.passed ? 'test-pass' : 'test-fail'}">${r.passed ? 'PASSED ✓' : 'FAILED ✗'}</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin: 0;">${r.details}</p>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      runProviderTests();
+    });
+  </script>
+</body>
+</html>

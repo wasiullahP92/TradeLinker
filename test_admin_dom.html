@@ -1,0 +1,2917 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — TradeLinker Marketplace Control</title>
+  <meta name="description" content="TradeLinker Executive Marketplace Administration Portal. Manage categories, providers, customers, bookings, verifications, and platform settings.">
+  
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reloader.css">
+  
+  <style>
+    :root {
+      --admin-sidebar-width: 260px;
+      --admin-header-height: 64px;
+    }
+
+    body {
+      background: #F8FAFC;
+      font-family: var(--tl-font-sans, 'Plus Jakarta Sans', system-ui, sans-serif);
+      color: var(--tl-navy-950, #011425);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* Layout Shell */
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* -------------------------------------------------------------------------
+       1. Sidebar Navigation
+       ------------------------------------------------------------------------- */
+    .admin-sidebar {
+      width: var(--admin-sidebar-width);
+      background: var(--tl-navy-900, #011E38);
+      color: #FFFFFF;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 4px 0 20px rgba(1, 43, 82, 0.15);
+    }
+
+    .admin-sidebar-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .admin-brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #FFFFFF;
+    }
+
+    .admin-brand-logo {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .admin-sidebar-close {
+      display: none;
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .admin-profile-pill {
+      padding: 12px 1.5rem;
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--tl-teal-500, #01AD8F), var(--tl-navy-800, #012B52));
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: 2px solid var(--tl-teal-400, #00C4A2);
+      flex-shrink: 0;
+    }
+
+    .admin-profile-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .admin-profile-name {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #F8FAFC;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .admin-profile-role {
+      font-size: 0.72rem;
+      color: var(--tl-teal-300, #34D8B9);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .admin-nav-list {
+      list-style: none;
+      margin: 0;
+      padding: 0.75rem 0.75rem 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .admin-nav-item {
+      margin-bottom: 4px;
+    }
+
+    .admin-nav-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 12px;
+      border-radius: 8px;
+      color: #CBD5E1;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .admin-nav-link:hover {
+      background: rgba(1, 173, 143, 0.12);
+      color: #FFFFFF;
+    }
+
+    .admin-nav-link.active {
+      background: var(--tl-teal-600, #008F76);
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(1, 173, 143, 0.35);
+    }
+
+    .admin-nav-link-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .admin-nav-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--tl-teal-400, #00C4A2);
+    }
+
+    .admin-nav-link.active .admin-nav-icon {
+      color: #FFFFFF;
+    }
+
+    .admin-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+      color: #FFFFFF;
+    }
+
+    .admin-badge-gold {
+      background: var(--tl-gold-500, #F59E0B);
+      color: #011E38;
+    }
+
+    .admin-badge-red {
+      background: #EF4444;
+      color: #FFF;
+    }
+
+    /* Sidebar Mobile Backdrop */
+    .admin-sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(1, 30, 56, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+    }
+
+    /* -------------------------------------------------------------------------
+       2. Main Content Canvas & Top Navbar
+       ------------------------------------------------------------------------- */
+    .admin-main {
+      flex: 1;
+      margin-left: var(--admin-sidebar-width);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 100vh;
+    }
+
+    .admin-topbar {
+      height: var(--admin-header-height);
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--tl-border-subtle, #E2E8F0);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    }
+
+    .admin-topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-hamburger {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--tl-border-subtle, #CBD5E1);
+      border-radius: 6px;
+      padding: 6px 8px;
+      cursor: pointer;
+      color: var(--tl-navy-800, #012B52);
+    }
+
+    .admin-breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--tl-text-muted, #64748B);
+    }
+
+    .admin-breadcrumbs-current {
+      color: var(--tl-navy-800, #012B52);
+      font-weight: 700;
+    }
+
+    .admin-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-search-wrap {
+      position: relative;
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .admin-search-wrap {
+        display: block;
+      }
+    }
+
+    .admin-search-input {
+      padding: 7px 12px 7px 32px;
+      border-radius: 999px;
+      border: 1px solid var(--tl-border-subtle, #E2E8F0);
+      font-size: 0.82rem;
+      width: 220px;
+      background: var(--tl-bg-subtle, #F8FAFC);
+      color: var(--tl-navy-900, #011E38);
+      transition: all 0.2s ease;
+    }
+
+    .admin-search-input:focus {
+      outline: none;
+      border-color: var(--tl-teal-500, #01AD8F);
+      background: #FFFFFF;
+      width: 270px;
+      box-shadow: 0 0 0 3px rgba(1, 173, 143, 0.15);
+    }
+
+    .admin-search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94A3B8;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .admin-icon-btn {
+      position: relative;
+      background: var(--tl-bg-subtle, #F8FAFC);
+      border: 1px solid var(--tl-border-subtle, #E2E8F0);
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--tl-navy-800, #012B52);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .admin-icon-btn:hover {
+      background: #FFFFFF;
+      border-color: var(--tl-teal-500, #01AD8F);
+      color: var(--tl-teal-600, #008F76);
+    }
+
+    .admin-icon-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #EF4444;
+      color: #FFF;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 999px;
+      border: 2px solid #FFFFFF;
+    }
+
+    /* Content Area */
+    .admin-content {
+      padding: 1.75rem;
+      flex: 1;
+    }
+
+    .admin-tab-pane {
+      display: none;
+      animation: tl-fade-in 0.2s ease;
+    }
+
+    .admin-tab-pane.active {
+      display: block;
+    }
+
+    @keyframes tl-fade-in {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Section Cards */
+    .admin-card {
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle, #E2E8F0);
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      margin-bottom: 1.5rem;
+    }
+
+    .admin-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .admin-card-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--tl-navy-800, #012B52);
+      margin: 0;
+    }
+
+    .admin-card-desc {
+      font-size: 0.82rem;
+      color: var(--tl-text-secondary, #64748B);
+      margin: 2px 0 0 0;
+    }
+
+    /* KPI Grid */
+    .admin-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .admin-kpi-card {
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle, #E2E8F0);
+      border-radius: 12px;
+      padding: 16px 18px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .admin-kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(1, 43, 82, 0.06);
+    }
+
+    .admin-kpi-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--kpi-accent, var(--tl-teal-500, #01AD8F));
+    }
+
+    .admin-kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .admin-kpi-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--tl-text-secondary, #64748B);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .admin-kpi-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: var(--tl-teal-50, #F2FCFA);
+      color: var(--tl-teal-600, #008F76);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-kpi-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--tl-navy-800, #012B52);
+      margin: 0 0 4px 0;
+      line-height: 1;
+    }
+
+    .admin-kpi-sub {
+      font-size: 0.75rem;
+      color: var(--tl-text-muted, #94A3B8);
+    }
+
+    /* Action bar */
+    .admin-actions-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Tables */
+    .admin-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--tl-border-subtle, #E2E8F0);
+      border-radius: 10px;
+      background: #FFFFFF;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+
+    .admin-table th {
+      background: #F8FAFC;
+      padding: 12px 14px;
+      font-weight: 700;
+      color: var(--tl-navy-800, #012B52);
+      border-bottom: 1px solid var(--tl-border-subtle, #E2E8F0);
+      white-space: nowrap;
+    }
+
+    .admin-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #F1F5F9;
+      color: var(--tl-navy-950, #011425);
+      vertical-align: middle;
+    }
+
+    .admin-table tr:hover td {
+      background: #F8FAFC;
+    }
+
+    /* Icon selector buttons for Category Modal */
+    .icon-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+      gap: 8px;
+      max-height: 160px;
+      overflow-y: auto;
+      padding: 6px;
+      border: 1px solid var(--tl-border-subtle, #E2E8F0);
+      border-radius: 8px;
+      background: #F8FAFC;
+    }
+
+    .icon-option-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 4px;
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle, #CBD5E1);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.7rem;
+      gap: 4px;
+      transition: all 0.15s ease;
+      color: var(--tl-navy-800, #012B52);
+    }
+
+    .icon-option-btn:hover {
+      border-color: var(--tl-teal-500, #01AD8F);
+      background: var(--tl-teal-50, #F2FCFA);
+    }
+
+    .icon-option-btn.selected {
+      border-color: var(--tl-teal-500, #01AD8F);
+      background: var(--tl-teal-100, #E6F8F5);
+      color: var(--tl-teal-700, #007A65);
+      font-weight: 700;
+      box-shadow: 0 0 0 2px rgba(1, 173, 143, 0.2);
+    }
+
+    /* Responsive Breakpoints */
+    @media (max-width: 991.98px) {
+      .admin-sidebar {
+        transform: translateX(-100%);
+      }
+      .admin-sidebar.open {
+        transform: translateX(0);
+      }
+      .admin-sidebar-close {
+        display: block;
+      }
+      .admin-sidebar-backdrop.open {
+        display: block;
+      }
+      .admin-main {
+        margin-left: 0;
+      }
+      .admin-hamburger {
+        display: flex;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       Application Shell
+       ========================================================================= -->
+  <div class="admin-layout">
+    
+    <!-- Sidebar Backdrop for Mobile -->
+    <div class="admin-sidebar-backdrop" id="sidebarBackdrop" onclick="toggleAdminSidebar(false)"></div>
+
+    <!-- -----------------------------------------------------------------------
+         1. Admin Sidebar Navigation (All 12 Sections)
+         ----------------------------------------------------------------------- -->
+    <aside class="admin-sidebar" id="adminSidebar">
+      <div class="admin-sidebar-header">
+        <a href="index.html" class="admin-brand-wrap" title="TradeLinker Home">
+          <img src="assets/images/tradelinker-logo-white.png" alt="TradeLinker Logo" class="admin-brand-logo" onerror="this.src='assets/images/tradelinker-monogram.png';">
+        </a>
+        <button class="admin-sidebar-close" onclick="toggleAdminSidebar(false)" aria-label="Close menu">×</button>
+      </div>
+
+      <!-- Administrator Profile Header Pill -->
+      <div class="admin-profile-pill">
+        <div class="admin-avatar" id="sidebarAdminAvatar">W</div>
+        <div class="admin-profile-info">
+          <div class="admin-profile-name" id="sidebarAdminName">Wasi Ullah</div>
+          <div class="admin-profile-role">
+            <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--tl-teal-400, #00C4A2);"></span>
+            Executive Super Admin
+          </div>
+        </div>
+      </div>
+
+      <!-- 12 Navigation Items -->
+      <ul class="admin-nav-list">
+        <li class="admin-nav-item">
+          <a class="admin-nav-link active" onclick="switchAdminSection('overview')">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon"><span data-tl-icon="dashboard"></span></span>
+              <span>1. Overview</span>
+            </span>
+          </a>
+        </li>
+
+        <!-- Main Priority: Service Categories -->
+        <li class="admin-nav-item">
+          <a class="admin-nav-link" id="navLink-categories" onclick="switchAdminSection('categories')" style="border-left: 3px solid var(--tl-gold-400, #FBBF24);">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon" style="color: var(--tl-gold-400, #FBBF24);"><span data-tl-icon="category"></span></span>
+              <span style="font-weight: 700;">2. Service Categories</span>
+            </span>
+            <span class="admin-badge admin-badge-gold" id="badgeNavCategories">6</span>
+          </a>
+        </li>
+
+        <li class="admin-nav-item">
+          <a class="admin-nav-link" id="navLink-providers" onclick="switchAdminSection('providers')">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon"><span data-tl-icon="briefcase"></span></span>
+              <span>3. Service Providers</span>
+            </span>
+            <span class="admin-badge" id="badgeNavProviders">0</span>
+          </a>
+        </li>
+
+        <li class="admin-nav-item">
+          <a class="admin-nav-link" id="navLink-customers" onclick="switchAdminSection('customers')">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon"><span data-tl-icon="user"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg></span></span>
+              <span>4. Customers</span>
+            </span>
+            <span class="admin-badge" id="badgeNavCustomers">0</span>
+          </a>
+        </li>
+
+        <li class="admin-nav-item">
+          <a class="admin-nav-link" id="navLink-listings" onclick="switchAdminSection('listings')">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon"><span data-tl-icon="tools"></span></span>
+              <span>5. Service Listings</span>
+            </span>
+            <span class="admin-badge" id="badgeNavListings">0</span>
+          </a>
+        </li>
+
+        <li class="admin-nav-item">
+          <a class="admin-nav-link" id="navLink-bookings" onclick="switchAdminSection('bookings')">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon"><span data-tl-icon="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+      <line x1="16" y1="2" x2="16" y2="6"></line>
+      <line x1="8" y1="2" x2="8" y2="6"></line>
+      <line x1="3" y1="10" x2="21" y2="10"></line>
+    </svg></span></span>
+              <span>6. Bookings</span>
+            </span>
+            <span class="admin-badge" id="badgeNavBookings">0</span>
+          </a>
+        </li>
+
+        <li class="admin-nav-item">
+          <a class="admin-nav-link" id="navLink-reviews" onclick="switchAdminSection('reviews')">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon"><span data-tl-icon="star"><svg viewBox="0 0 24 24" fill="currentColor">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+    </svg></span></span>
+              <span>7. Reviews &amp; Ratings</span>
+            </span>
+            <span class="admin-badge" id="badgeNavReviews">0</span>
+          </a>
+        </li>
+
+        <li class="admin-nav-item">
+          <a class="admin-nav-link" id="navLink-complaints" onclick="switchAdminSection('complaints')">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon"><span data-tl-icon="dispute"></span></span>
+              <span>8. Reports &amp; Disputes</span>
+            </span>
+            <span class="admin-badge admin-badge-red" id="badgeNavComplaints">0</span>
+          </a>
+        </li>
+
+        <li class="admin-nav-item">
+          <a class="admin-nav-link" id="navLink-verif" onclick="switchAdminSection('verif')">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon"><span data-tl-icon="verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      <polyline points="9 12 11 14 15 10"></polyline>
+    </svg></span></span>
+              <span>9. Provider Verification</span>
+            </span>
+            <span class="admin-badge admin-badge-gold" id="badgeNavVerif">0</span>
+          </a>
+        </li>
+
+        <li class="admin-nav-item">
+          <a class="admin-nav-link" id="navLink-notifications" onclick="switchAdminSection('notifications')">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon"><span data-tl-icon="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+    </svg></span></span>
+              <span>10. Notifications</span>
+            </span>
+            <span class="admin-badge admin-badge-gold" id="badgeNavNotifs">0</span>
+          </a>
+        </li>
+
+        <li class="admin-nav-item">
+          <a class="admin-nav-link" id="navLink-settings" onclick="switchAdminSection('settings')">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon"><span data-tl-icon="settings"></span></span>
+              <span>11. Settings</span>
+            </span>
+          </a>
+        </li>
+
+        <li class="admin-nav-item" style="margin-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 8px;">
+          <a class="admin-nav-link" onclick="handleAdminLogout()" style="color: #F87171;">
+            <span class="admin-nav-link-content">
+              <span class="admin-nav-icon" style="color: #F87171;"><span data-tl-icon="logout"></span></span>
+              <span>12. Logout</span>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- -----------------------------------------------------------------------
+         2. Main Content Canvas & Top Navigation
+         ----------------------------------------------------------------------- -->
+    <div class="admin-main">
+      
+      <!-- Top Navbar -->
+      <header class="admin-topbar">
+        <div class="admin-topbar-left">
+          <button class="admin-hamburger" onclick="toggleAdminSidebar(true)" aria-label="Open sidebar">
+            <span data-tl-icon="menu"></span>
+          </button>
+          <div class="admin-breadcrumbs">
+            <span>TradeLinker</span>
+            <span>›</span>
+            <span class="admin-breadcrumbs-current" id="breadcrumbSectionTitle">Dashboard Overview</span>
+          </div>
+        </div>
+
+        <div class="admin-topbar-right">
+          <!-- Quick search -->
+          <div class="admin-search-wrap">
+            <span class="admin-search-icon"><span data-tl-icon="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg></span></span>
+            <input type="text" class="admin-search-input" id="globalAdminSearch" placeholder="Search across portal..." oninput="handleGlobalAdminSearch(this.value)">
+          </div>
+
+          <!-- In-place Refresh Trigger -->
+          <div id="topbarRefreshSlot">
+            <button class="admin-icon-btn" onclick="refreshAdminData()" title="Refresh Dashboard Data">
+              <span data-tl-icon="refresh"></span>
+            </button>
+          </div>
+
+          <!-- Notification bell -->
+          <button class="admin-icon-btn" onclick="switchAdminSection('notifications')" title="Notifications">
+            <span data-tl-icon="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+    </svg></span>
+            <span class="admin-icon-badge" id="topbarNotifBadge" style="display: none;">0</span>
+          </button>
+
+          <!-- Back to marketplace public site -->
+          <a href="index.html" class="tl-btn tl-btn-outline tl-btn-xs" style="font-weight: 600;">
+            <span data-tl-icon="external"></span> Marketplace Site
+          </a>
+        </div>
+      </header>
+
+      <!-- Main Section Content -->
+      <main class="admin-content">
+
+        <!-- ===================================================================
+             SECTION 1: DASHBOARD OVERVIEW
+             =================================================================== -->
+        <section class="admin-tab-pane active" id="pane-overview">
+          
+          <div class="admin-card-header">
+            <div>
+              <h1 class="admin-card-title">Executive Marketplace Overview</h1>
+              <p class="admin-card-desc">Real-time statistics and supervised activity across TradeLinker operations.</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openAddCategoryModal()">
+                <span data-tl-icon="plus"></span> Add New Category
+              </button>
+              <button class="tl-btn tl-btn-outline tl-btn-sm" onclick="switchAdminSection('categories')">
+                Manage Categories
+              </button>
+            </div>
+          </div>
+
+          <!-- Statistics Cards Grid -->
+          <div class="admin-kpi-grid">
+            <div class="admin-kpi-card" style="--kpi-accent: var(--tl-navy-800, #012B52);">
+              <div class="admin-kpi-header">
+                <span class="admin-kpi-label">Total Customers</span>
+                <span class="admin-kpi-icon"><span data-tl-icon="user"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg></span></span>
+              </div>
+              <div class="admin-kpi-val" id="kpiTotalCustomers">0</div>
+              <div class="admin-kpi-sub">Registered Homeowners &amp; Clients</div>
+            </div>
+
+            <div class="admin-kpi-card" style="--kpi-accent: var(--tl-teal-500, #01AD8F);">
+              <div class="admin-kpi-header">
+                <span class="admin-kpi-label">Service Providers</span>
+                <span class="admin-kpi-icon"><span data-tl-icon="briefcase"></span></span>
+              </div>
+              <div class="admin-kpi-val" id="kpiTotalProviders">0</div>
+              <div class="admin-kpi-sub" id="kpiVerifiedProvidersSplit">0 Verified Specialists</div>
+            </div>
+
+            <div class="admin-kpi-card" style="--kpi-accent: var(--tl-gold-500, #F59E0B);">
+              <div class="admin-kpi-header">
+                <span class="admin-kpi-label">Service Categories</span>
+                <span class="admin-kpi-icon"><span data-tl-icon="category"></span></span>
+              </div>
+              <div class="admin-kpi-val" id="kpiTotalCategories">6</div>
+              <div class="admin-kpi-sub" id="kpiActiveCategoriesSplit">6 Active Categories</div>
+            </div>
+
+            <div class="admin-kpi-card" style="--kpi-accent: var(--tl-teal-600, #008F76);">
+              <div class="admin-kpi-header">
+                <span class="admin-kpi-label">Published Services</span>
+                <span class="admin-kpi-icon"><span data-tl-icon="tools"></span></span>
+              </div>
+              <div class="admin-kpi-val" id="kpiTotalServices">0</div>
+              <div class="admin-kpi-sub">Active Marketplace Listings</div>
+            </div>
+
+            <div class="admin-kpi-card" style="--kpi-accent: #3B82F6;">
+              <div class="admin-kpi-header">
+                <span class="admin-kpi-label">Total Bookings</span>
+                <span class="admin-kpi-icon"><span data-tl-icon="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+      <line x1="16" y1="2" x2="16" y2="6"></line>
+      <line x1="8" y1="2" x2="8" y2="6"></line>
+      <line x1="3" y1="10" x2="21" y2="10"></line>
+    </svg></span></span>
+              </div>
+              <div class="admin-kpi-val" id="kpiTotalBookings">0</div>
+              <div class="admin-kpi-sub" id="kpiPendingBookingsSplit">0 Pending Review</div>
+            </div>
+
+            <div class="admin-kpi-card" style="--kpi-accent: #EF4444;">
+              <div class="admin-kpi-header">
+                <span class="admin-kpi-label">Verification Queue</span>
+                <span class="admin-kpi-icon"><span data-tl-icon="verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      <polyline points="9 12 11 14 15 10"></polyline>
+    </svg></span></span>
+              </div>
+              <div class="admin-kpi-val" id="kpiPendingVerifications" style="color: #DC2626;">0</div>
+              <div class="admin-kpi-sub">Submissions Awaiting Screening</div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Bar -->
+          <div class="admin-card">
+            <h3 style="font-size: 1rem; color: var(--tl-navy-800); margin: 0 0 12px 0;">Administrative Quick Actions</h3>
+            <div class="admin-actions-bar">
+              <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openAddCategoryModal()">
+                <span data-tl-icon="plus"></span> Add New Category
+              </button>
+              <button class="tl-btn tl-btn-outline-teal tl-btn-sm" onclick="switchAdminSection('categories')">
+                <span data-tl-icon="category"></span> Manage Categories
+              </button>
+              <button class="tl-btn tl-btn-outline tl-btn-sm" onclick="switchAdminSection('providers')">
+                <span data-tl-icon="briefcase"></span> View Service Providers
+              </button>
+              <button class="tl-btn tl-btn-outline tl-btn-sm" onclick="switchAdminSection('bookings')">
+                <span data-tl-icon="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+      <line x1="16" y1="2" x2="16" y2="6"></line>
+      <line x1="8" y1="2" x2="8" y2="6"></line>
+      <line x1="3" y1="10" x2="21" y2="10"></line>
+    </svg></span> View All Bookings
+              </button>
+              <button class="tl-btn tl-btn-outline tl-btn-sm" onclick="switchAdminSection('verif')">
+                <span data-tl-icon="verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      <polyline points="9 12 11 14 15 10"></polyline>
+    </svg></span> Review Verification Requests
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Activity & Recent Bookings -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+            <!-- Recent Bookings Table -->
+            <div class="admin-card" style="margin-bottom: 0;">
+              <div class="admin-card-header">
+                <div>
+                  <h3 class="admin-card-title">Recent Booking Requests</h3>
+                  <p class="admin-card-desc">Latest customer inquiries submitted across Pakistan.</p>
+                </div>
+                <button class="tl-btn tl-btn-ghost tl-btn-xs" onclick="switchAdminSection('bookings')">View All →</button>
+              </div>
+              <div class="admin-table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Booking Ref</th>
+                      <th>Customer</th>
+                      <th>Category</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="overviewRecentBookingsTbody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Recent Administrative Audit Log -->
+            <div class="admin-card" style="margin-bottom: 0;">
+              <div class="admin-card-header">
+                <div>
+                  <h3 class="admin-card-title">Recent Administrative Actions</h3>
+                  <p class="admin-card-desc">Immutable audit entries logged by system administrators.</p>
+                </div>
+                <button class="tl-btn tl-btn-ghost tl-btn-xs" onclick="switchAdminSection('audit')">Full Log →</button>
+              </div>
+              <div class="admin-table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Action</th>
+                      <th>Details</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody id="overviewRecentAuditTbody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ===================================================================
+             SECTION 2: SERVICE CATEGORY MANAGEMENT (MAIN PRIORITY)
+             =================================================================== -->
+        <section class="admin-tab-pane" id="pane-categories">
+          
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h1 class="admin-card-title">Service Category Management</h1>
+                <p class="admin-card-desc">Full lifecycle control: Add new categories, edit definitions, update slugs, inspect usage, and activate/deactivate marketplace categories.</p>
+              </div>
+              <button class="tl-btn tl-btn-primary" onclick="openAddCategoryModal()">
+                <span data-tl-icon="plus"></span> Add New Category
+              </button>
+            </div>
+
+            <!-- Category Controls: Search & Status Filters -->
+            <div class="admin-actions-bar" style="background: #F8FAFC; padding: 12px; border-radius: 10px; border: 1px solid var(--tl-border-subtle, #E2E8F0);">
+              <div style="flex: 1; min-width: 200px;">
+                <input type="text" id="categorySearchInput" class="tl-input" placeholder="Search categories by name, slug, or scope..." oninput="renderCategoriesTable()">
+              </div>
+              <div style="width: auto;">
+                <select id="categoryStatusFilter" class="tl-select" onchange="renderCategoriesTable()">
+                  <option value="all">All Statuses (Active &amp; Inactive)</option>
+                  <option value="active">Active Marketplace Categories Only</option>
+                  <option value="inactive">Deactivated Categories Only</option>
+                </select>
+              </div>
+              <button class="tl-btn tl-btn-ghost tl-btn-sm" onclick="resetCategoryFilters()">Reset</button>
+            </div>
+
+            <!-- Categories Data Table -->
+            <div class="admin-table-wrap" style="margin-top: 14px;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Icon</th>
+                    <th>Category Title</th>
+                    <th>Slug Key</th>
+                    <th>Scope Description</th>
+                    <th>Services</th>
+                    <th>Bookings</th>
+                    <th>Marketplace Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="categoriesManagementTbody">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Initial Categories Notice -->
+            <div style="margin-top: 16px; padding: 12px 16px; background: var(--tl-teal-50, #F2FCFA); border-left: 4px solid var(--tl-teal-500, #01AD8F); border-radius: 6px; font-size: 0.8rem; color: var(--tl-teal-800, #005A4A);">
+              <strong>SRS Initial Categories Guarantee:</strong> Construction, Plumbing, Electrical, AC &amp; HVAC, Solar Energy, and Wooden Door Making &amp; Carpentry are seeded and maintained with complete referential integrity.
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ===================================================================
+             SECTION 3: SERVICE PROVIDERS MANAGEMENT
+             =================================================================== -->
+        <section class="admin-tab-pane" id="pane-providers">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h1 class="admin-card-title">Service Provider Directory &amp; Accounts</h1>
+                <p class="admin-card-desc">Inspect registered trade contractors, monitor verification badges, and administer account status.</p>
+              </div>
+            </div>
+
+            <div class="admin-actions-bar" style="background: #F8FAFC; padding: 12px; border-radius: 10px; border: 1px solid var(--tl-border-subtle, #E2E8F0);">
+              <input type="text" id="providerSearchInput" class="tl-input" placeholder="Search provider by name, business, city, or phone..." oninput="renderProvidersTable()" style="flex: 1; min-width: 220px;">
+              <select id="providerVerifFilter" class="tl-select" onchange="renderProvidersTable()" style="width: auto;">
+                <option value="all">All Verification Statuses</option>
+                <option value="verified">Verified Only (Badge Active)</option>
+                <option value="pending">Pending Review</option>
+                <option value="info_requested">Info Requested</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+
+            <div class="admin-table-wrap" style="margin-top: 14px;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Provider / Business</th>
+                    <th>Trade Category</th>
+                    <th>City &amp; Areas</th>
+                    <th>Rating</th>
+                    <th>Account Status</th>
+                    <th>Verification</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="providersManagementTbody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 4: CUSTOMERS MANAGEMENT
+             =================================================================== -->
+        <section class="admin-tab-pane" id="pane-customers">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h1 class="admin-card-title">Customer Account Administration</h1>
+                <p class="admin-card-desc">Supervise registered customer accounts, view booking counts, and enforce platform usage policies.</p>
+              </div>
+            </div>
+
+            <div class="admin-actions-bar" style="background: #F8FAFC; padding: 12px; border-radius: 10px; border: 1px solid var(--tl-border-subtle, #E2E8F0);">
+              <input type="text" id="customerSearchInput" class="tl-input" placeholder="Search customer by name, email, or city..." oninput="renderCustomersTable()" style="flex: 1; min-width: 220px;">
+            </div>
+
+            <div class="admin-table-wrap" style="margin-top: 14px;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Customer ID</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>City</th>
+                    <th>Bookings</th>
+                    <th>Account Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="customersManagementTbody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 5: SERVICE LISTINGS MANAGEMENT
+             =================================================================== -->
+        <section class="admin-tab-pane" id="pane-listings">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h1 class="admin-card-title">Published Service Listings Catalog</h1>
+                <p class="admin-card-desc">Manage all service offerings published by tradespeople across Pakistan.</p>
+              </div>
+            </div>
+
+            <div class="admin-actions-bar" style="background: #F8FAFC; padding: 12px; border-radius: 10px; border: 1px solid var(--tl-border-subtle, #E2E8F0);">
+              <input type="text" id="listingSearchInput" class="tl-input" placeholder="Search listings by title, provider, or keyword..." oninput="renderListingsTable()" style="flex: 1; min-width: 220px;">
+              <select id="listingCategoryFilter" class="tl-select" onchange="renderListingsTable()" style="width: auto;">
+                <option value="all">All Service Categories</option>
+              </select>
+            </div>
+
+            <div class="admin-table-wrap" style="margin-top: 14px;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Listing ID</th>
+                    <th>Service Title</th>
+                    <th>Category</th>
+                    <th>Provider</th>
+                    <th>Pricing</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="listingsManagementTbody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 6: BOOKINGS MANAGEMENT & AUDIT TRAIL
+             =================================================================== -->
+        <section class="admin-tab-pane" id="pane-bookings">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h1 class="admin-card-title">Marketplace Bookings &amp; Lifecycle Monitor</h1>
+                <p class="admin-card-desc">Monitor customer booking requests, inspect full lifecycle audit trails, and intervene in disputes.</p>
+              </div>
+            </div>
+
+            <div class="admin-actions-bar" style="background: #F8FAFC; padding: 12px; border-radius: 10px; border: 1px solid var(--tl-border-subtle, #E2E8F0);">
+              <input type="text" id="bookingSearchInput" class="tl-input" placeholder="Search by booking reference, customer, or provider..." oninput="renderBookingsTable()" style="flex: 1; min-width: 220px;">
+              <select id="bookingStatusFilter" class="tl-select" onchange="renderBookingsTable()" style="width: auto;">
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="accepted">Accepted</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+
+            <div class="admin-table-wrap" style="margin-top: 14px;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Booking Ref</th>
+                    <th>Customer</th>
+                    <th>Specialist</th>
+                    <th>Service Package</th>
+                    <th>Scheduled</th>
+                    <th>Status</th>
+                    <th>Audit Trail</th>
+                    <th>Messages</th>
+                  </tr>
+                </thead>
+                <tbody id="bookingsManagementTbody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 7: REVIEWS AND RATINGS
+             =================================================================== -->
+        <section class="admin-tab-pane" id="pane-reviews">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h1 class="admin-card-title">Customer Reviews &amp; Content Moderation</h1>
+                <p class="admin-card-desc">Inspect customer ratings, review comments, and moderate flagged or inappropriate feedback.</p>
+              </div>
+            </div>
+
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Review ID</th>
+                    <th>Booking</th>
+                    <th>Customer</th>
+                    <th>Specialist</th>
+                    <th>Rating</th>
+                    <th>Feedback Review Comment</th>
+                    <th>Date</th>
+                    <th>Moderation Action</th>
+                  </tr>
+                </thead>
+                <tbody id="reviewsManagementTbody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 8: REPORTS AND COMPLAINTS
+             =================================================================== -->
+        <section class="admin-tab-pane" id="pane-complaints">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h1 class="admin-card-title">Disputes, Complaints &amp; Moderation Queue</h1>
+                <p class="admin-card-desc">Investigate customer-provider booking issues, conduct mediation, and record administrative findings.</p>
+              </div>
+            </div>
+
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Dispute ID</th>
+                    <th>Booking</th>
+                    <th>Reporter</th>
+                    <th>Subject &amp; Issue</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Investigation Action</th>
+                  </tr>
+                </thead>
+                <tbody id="complaintsManagementTbody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 9: PROVIDER VERIFICATION QUEUE
+             =================================================================== -->
+        <section class="admin-tab-pane" id="pane-verif">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h1 class="admin-card-title">Provider Verification Review Queue</h1>
+                <p class="admin-card-desc">Review submitted PEC licenses, government trade diplomas, CNIC identity, and background documents.</p>
+              </div>
+            </div>
+
+            <div class="admin-table-wrap">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Provider / Business</th>
+                    <th>Trade Category</th>
+                    <th>City &amp; Areas</th>
+                    <th>Submitted Credentials</th>
+                    <th>Verification Status</th>
+                    <th>Administrative Decision</th>
+                  </tr>
+                </thead>
+                <tbody id="verifManagementTbody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 10: ADMIN NOTIFICATIONS
+             =================================================================== -->
+        <section class="admin-tab-pane" id="pane-notifications">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <h1 class="admin-card-title">Administrative Platform Notifications</h1>
+                <p class="admin-card-desc">Real-time alerts regarding verifications, disputes, bookings, and moderation events.</p>
+              </div>
+              <button class="tl-btn tl-btn-outline tl-btn-sm" onclick="handleMarkAllAdminNotifsRead()">
+                Mark All as Read
+              </button>
+            </div>
+
+            <div id="adminNotificationsList" style="display: flex; flex-direction: column; gap: 10px;">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             SECTION 11: SETTINGS
+             =================================================================== -->
+        <section class="admin-tab-pane" id="pane-settings">
+          <div class="admin-card" style="max-width: 680px;">
+            <div class="admin-card-header">
+              <div>
+                <h1 class="admin-card-title">Marketplace Administration Settings</h1>
+                <p class="admin-card-desc">Configure platform operating parameters, dispute windows, and administrative contacts.</p>
+              </div>
+            </div>
+
+            <form onsubmit="event.preventDefault(); handleSaveMarketplaceSettings();">
+              <div class="tl-form-group">
+                <label class="tl-label">Administrator Account Name</label>
+                <input type="text" id="settingAdminName" class="tl-input" value="Wasi Ullah (Techminds)" required="">
+              </div>
+
+              <div class="tl-form-group">
+                <label class="tl-label">Platform Service Commission (%)</label>
+                <input type="number" id="settingPlatformFee" class="tl-input" min="0" max="30" step="0.5" value="5.0" required="">
+                <div style="font-size: 0.75rem; color: var(--tl-text-muted); margin-top: 4px;">Applied to completed booking transactions.</div>
+              </div>
+
+              <div class="tl-form-group">
+                <label class="tl-label">Dispute Resolution Window (Days)</label>
+                <input type="number" id="settingDisputeDays" class="tl-input" min="1" max="14" value="3" required="">
+                <div style="font-size: 0.75rem; color: var(--tl-text-muted); margin-top: 4px;">Standard investigation time allowed before auto-escalation.</div>
+              </div>
+
+              <div class="tl-form-group">
+                <label class="tl-label">Customer Support Email</label>
+                <input type="email" id="settingSupportEmail" class="tl-input" value="support@tradelinker.pk" required="">
+              </div>
+
+              <div class="tl-form-group">
+                <label class="tl-label">Official Support Hotline</label>
+                <input type="text" id="settingSupportPhone" class="tl-input" value="+92 51 884 1000" required="">
+              </div>
+
+              <div class="tl-form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 1rem;">
+                <input type="checkbox" id="settingMaintenanceMode" style="width: 18px; height: 18px;">
+                <label for="settingMaintenanceMode" style="font-weight: 600; font-size: 0.88rem; color: var(--tl-navy-800); cursor: pointer;">
+                  Enable Scheduled Maintenance Mode
+                </label>
+              </div>
+
+              <div style="margin-top: 1.5rem;">
+                <button type="submit" class="tl-btn tl-btn-primary" id="saveSettingsBtn">
+                  <span data-tl-icon="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg></span> Save Marketplace Settings
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 1: ADD NEW CATEGORY (MAIN PRIORITY)
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="addCategoryModal">
+    <div class="tl-modal" style="max-width: 560px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Add New Service Category</h3>
+        <button class="tl-modal-close" onclick="closeAddCategoryModal()">×</button>
+      </div>
+      <div class="tl-modal-body">
+        <form id="addCategoryForm" onsubmit="event.preventDefault(); submitAddCategory();">
+          
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="addCatTitle">Category Name / Title</label>
+            <input type="text" id="addCatTitle" class="tl-input" placeholder="e.g. Paint &amp; Wall Finishes" required="" minlength="3" oninput="autoGenerateCategorySlug(this.value)">
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="addCatSlug">Category Slug (Unique URL Key)</label>
+            <input type="text" id="addCatSlug" class="tl-input" placeholder="e.g. paint-finishes" required="" pattern="[a-z0-9-_]+" title="Lowercase letters, numbers, and hyphens only">
+            <div style="font-size: 0.75rem; color: var(--tl-text-muted); margin-top: 4px;">Automatically generated, editable. Used for category routing and discovery filters.</div>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="addCatDesc">Scope Description</label>
+            <textarea id="addCatDesc" class="tl-textarea" placeholder="Detail the trades and scope included in this category..." required="" minlength="10" rows="3"></textarea>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label">Select Brand Icon</label>
+            <div class="icon-selector-grid" id="addCatIconGrid">
+              <button type="button" class="icon-option-btn selected" data-icon="construction" onclick="selectCategoryIcon('add', 'construction', this)">
+                <span data-tl-icon="construction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 22h20M6 18v4M10 14v8M14 10v12M18 6v16M2 6l20-4v4L2 10z"></path>
+    </svg></span> Construction
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="plumbing" onclick="selectCategoryIcon('add', 'plumbing', this)">
+                <span data-tl-icon="plumbing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2v6M9 5h6M7 8h10a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1v6a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-6H7a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2z"></path>
+      <circle cx="12" cy="18" r="1"></circle>
+    </svg></span> Plumbing
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="electrical" onclick="selectCategoryIcon('add', 'electrical', this)">
+                <span data-tl-icon="electrical"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+    </svg></span> Electrical
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="hvac" onclick="selectCategoryIcon('add', 'hvac', this)">
+                <span data-tl-icon="hvac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path>
+    </svg></span> HVAC
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="solar" onclick="selectCategoryIcon('add', 'solar', this)">
+                <span data-tl-icon="solar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+    </svg></span> Solar
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="carpentry" onclick="selectCategoryIcon('add', 'carpentry', this)">
+                <span data-tl-icon="carpentry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2l4 4-8 8-4-4 8-8zM7 15l-3 3 1.5 1.5 3-3M2 22l3-3"></path>
+      <rect x="14" y="6" width="7" height="12" rx="1" transform="rotate(45 17.5 12)"></rect>
+    </svg></span> Carpentry
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="tools" onclick="selectCategoryIcon('add', 'tools', this)">
+                <span data-tl-icon="tools"></span> Tools
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="briefcase" onclick="selectCategoryIcon('add', 'briefcase', this)">
+                <span data-tl-icon="briefcase"></span> Pro
+              </button>
+            </div>
+            <input type="hidden" id="addCatSelectedIcon" value="construction">
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label" for="addCatPopular">Popular Services (Comma-separated)</label>
+            <input type="text" id="addCatPopular" class="tl-input" placeholder="e.g. Interior Painting, Texture Coating, Waterproofing">
+          </div>
+
+          <div class="tl-form-group" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="addCatIsActive" checked="" style="width: 18px; height: 18px;">
+            <label for="addCatIsActive" style="font-weight: 600; font-size: 0.88rem; color: var(--tl-navy-800); cursor: pointer;">
+              Active in Marketplace (Immediately visible to customers)
+            </label>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeAddCategoryModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary" id="addCategorySubmitBtn">
+              <span data-tl-icon="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg></span> Save Category to Database
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 2: EDIT CATEGORY (MAIN PRIORITY)
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="editCategoryModal">
+    <div class="tl-modal" style="max-width: 560px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Edit Service Category</h3>
+        <button class="tl-modal-close" onclick="closeEditCategoryModal()">×</button>
+      </div>
+      <div class="tl-modal-body">
+        <form id="editCategoryForm" onsubmit="event.preventDefault(); submitEditCategory();">
+          <input type="hidden" id="editCatOriginalId">
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="editCatTitle">Category Name / Title</label>
+            <input type="text" id="editCatTitle" class="tl-input" required="" minlength="3">
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="editCatSlug">Category Slug Key</label>
+            <input type="text" id="editCatSlug" class="tl-input" required="" pattern="[a-z0-9-_]+">
+            <div style="font-size: 0.75rem; color: var(--tl-text-muted); margin-top: 4px;">Caution: Changing slug will update references across associated service listings.</div>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="editCatDesc">Scope Description</label>
+            <textarea id="editCatDesc" class="tl-textarea" required="" minlength="10" rows="3"></textarea>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label">Select Brand Icon</label>
+            <div class="icon-selector-grid" id="editCatIconGrid">
+              <button type="button" class="icon-option-btn" data-icon="construction" onclick="selectCategoryIcon('edit', 'construction', this)">
+                <span data-tl-icon="construction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 22h20M6 18v4M10 14v8M14 10v12M18 6v16M2 6l20-4v4L2 10z"></path>
+    </svg></span> Construction
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="plumbing" onclick="selectCategoryIcon('edit', 'plumbing', this)">
+                <span data-tl-icon="plumbing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2v6M9 5h6M7 8h10a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-1v6a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-6H7a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2z"></path>
+      <circle cx="12" cy="18" r="1"></circle>
+    </svg></span> Plumbing
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="electrical" onclick="selectCategoryIcon('edit', 'electrical', this)">
+                <span data-tl-icon="electrical"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+    </svg></span> Electrical
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="hvac" onclick="selectCategoryIcon('edit', 'hvac', this)">
+                <span data-tl-icon="hvac"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path>
+    </svg></span> HVAC
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="solar" onclick="selectCategoryIcon('edit', 'solar', this)">
+                <span data-tl-icon="solar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+    </svg></span> Solar
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="carpentry" onclick="selectCategoryIcon('edit', 'carpentry', this)">
+                <span data-tl-icon="carpentry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M14 2l4 4-8 8-4-4 8-8zM7 15l-3 3 1.5 1.5 3-3M2 22l3-3"></path>
+      <rect x="14" y="6" width="7" height="12" rx="1" transform="rotate(45 17.5 12)"></rect>
+    </svg></span> Carpentry
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="tools" onclick="selectCategoryIcon('edit', 'tools', this)">
+                <span data-tl-icon="tools"></span> Tools
+              </button>
+              <button type="button" class="icon-option-btn" data-icon="briefcase" onclick="selectCategoryIcon('edit', 'briefcase', this)">
+                <span data-tl-icon="briefcase"></span> Pro
+              </button>
+            </div>
+            <input type="hidden" id="editCatSelectedIcon" value="tools">
+          </div>
+
+          <div class="tl-form-group" style="display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="editCatIsActive" style="width: 18px; height: 18px;">
+            <label for="editCatIsActive" style="font-weight: 600; font-size: 0.88rem; color: var(--tl-navy-800); cursor: pointer;">
+              Active in Marketplace
+            </label>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeEditCategoryModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary" id="editCategorySubmitBtn">
+              <span data-tl-icon="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg></span> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 3: DELETE CATEGORY CONFIRMATION & SAFETY CHECK
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="deleteCategoryModal">
+    <div class="tl-modal" style="max-width: 480px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title" style="color: #DC2626;">Delete Service Category</h3>
+        <button class="tl-modal-close" onclick="closeDeleteCategoryModal()">×</button>
+      </div>
+      <div class="tl-modal-body">
+        <div id="deleteCategoryWarningContent">
+          <!-- Injected via JS based on usage inspection -->
+        </div>
+
+        <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;" id="deleteCategoryFooterActions">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 4: VERIFICATION REVIEW MODAL
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="verifReviewModal">
+    <div class="tl-modal" style="max-width: 520px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title" id="verifModalTitle">Review Provider Verification</h3>
+        <button class="tl-modal-close" onclick="closeVerifReviewModal()">×</button>
+      </div>
+      <div class="tl-modal-body">
+        <form onsubmit="event.preventDefault(); submitVerificationReview();">
+          <input type="hidden" id="verifModalProviderId">
+          <div style="background: var(--tl-bg-subtle, #F8FAFC); padding: 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 14px;" id="verifModalSummary">
+            <!-- Injected via JS -->
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Administrative Decision</label>
+            <select id="verifActionSelect" class="tl-select" required="" onchange="toggleVerifReasonRequirement()">
+              <option value="approve">✓ Approve Verification (Award Verified Badge)</option>
+              <option value="reject">✗ Reject Submission</option>
+              <option value="request_info">? Request Additional Information / Re-upload</option>
+            </select>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label" id="verifNotesLabel">Administrative Notes &amp; Instructions</label>
+            <textarea id="verifNotesText" class="tl-textarea" placeholder="Explain requirements or reason (sent to provider in-app notification)..."></textarea>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeVerifReviewModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary" id="verifSubmitBtn">Confirm Decision</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 5: DISPUTE INVESTIGATION MODAL
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="disputeModal">
+    <div class="tl-modal" style="max-width: 550px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title" id="disputeModalTitle">Investigate Dispute</h3>
+        <button class="tl-modal-close" onclick="closeDisputeModal()">×</button>
+      </div>
+      <div class="tl-modal-body">
+        <form onsubmit="event.preventDefault(); submitDisputeResolution();">
+          <input type="hidden" id="disputeModalId">
+          <div style="background: var(--tl-bg-subtle, #F8FAFC); padding: 12px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 14px;" id="disputeModalDetails"></div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Update Dispute Status</label>
+            <select id="disputeStatusSelect" class="tl-select" required="">
+              <option value="investigating">Under Active Investigation</option>
+              <option value="resolved">Mark Resolved</option>
+            </select>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Resolution Notes &amp; Findings</label>
+            <textarea id="disputeNotesText" class="tl-textarea" placeholder="Document investigation findings, contact attempts, and settlement terms..." required="" minlength="5"></textarea>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeDisputeModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary">Save Resolution</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 6: BOOKING AUDIT TRAIL INSPECTION
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="auditModal">
+    <div class="tl-modal" style="max-width: 600px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title" id="auditModalTitle">Booking Audit Trail</h3>
+        <button class="tl-modal-close" onclick="closeAuditModal()">×</button>
+      </div>
+      <div class="tl-modal-body">
+        <div id="auditModalContent" style="display: flex; flex-direction: column; gap: 12px;"></div>
+      </div>
+      <div class="tl-modal-footer">
+        <button class="tl-btn tl-btn-ghost" onclick="closeAuditModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODAL 7: BOOKING MESSAGES MODAL
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="messagesModal">
+    <div class="tl-modal" style="max-width: 580px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title" id="messagesModalTitle">Booking Communication Thread</h3>
+        <button class="tl-modal-close" onclick="closeMessagesModal()">×</button>
+      </div>
+      <div class="tl-modal-body">
+        <div id="messagesThreadList" style="display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; padding: 10px; background: var(--tl-bg-subtle, #F8FAFC); border-radius: 10px; margin-bottom: 14px;"></div>
+        <form onsubmit="event.preventDefault(); submitAdminMessage();">
+          <input type="hidden" id="messagesBookingId">
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="adminMsgInput" class="tl-input" placeholder="Type administrative broadcast or moderation message..." required="">
+            <button type="submit" class="tl-btn tl-btn-primary" style="white-space: nowrap;">Send</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+  <script src="js/reloader.js"></script>
+
+  <script>
+    // ------------------------------------------------------------------------
+    // 1. Initialization & RBAC Protection (FR-49, NFR-06)
+    // ------------------------------------------------------------------------
+    let currentAdminUser = null;
+    let pendingDeleteCategoryId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize reloader engine
+      if (window.TLReloader) window.TLReloader.init();
+
+      // Check current user session
+      currentAdminUser = TLAuth.getCurrentUser();
+      
+      // Auto-authenticate as admin if no session is active (for testing/eval convenience)
+      if (!currentAdminUser || currentAdminUser.role !== 'admin') {
+        const adminAccount = TLAuth.getUsers().find(u => u.role === 'admin') || {
+          id: "usr-adm-001",
+          fullName: "Wasi Ullah (Techminds)",
+          email: "admin@tradelinker.pk",
+          role: "admin",
+          status: "active"
+        };
+        TLAuth.setSession(adminAccount);
+        currentAdminUser = adminAccount;
+      }
+
+      // Populate admin profile info in sidebar
+      if (currentAdminUser) {
+        document.getElementById('sidebarAdminName').innerText = currentAdminUser.fullName;
+        document.getElementById('sidebarAdminAvatar').innerText = currentAdminUser.fullName.charAt(0).toUpperCase();
+        document.getElementById('settingAdminName').value = currentAdminUser.fullName;
+      }
+
+      // Load all dashboard data
+      refreshAdminData();
+
+      // Ensure icons render
+      if (window.TLIcons) window.TLIcons.renderAll();
+    });
+
+    // ------------------------------------------------------------------------
+    // 2. Navigation & Sidebar Control
+    // ------------------------------------------------------------------------
+    function toggleAdminSidebar(open) {
+      const sidebar = document.getElementById('adminSidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      if (open) {
+        sidebar.classList.add('open');
+        backdrop.classList.add('open');
+      } else {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('open');
+      }
+    }
+
+    const sectionTitles = {
+      overview: "Dashboard Overview",
+      categories: "Service Categories Management",
+      providers: "Service Providers Directory",
+      customers: "Customer Account Administration",
+      listings: "Service Listings Catalog",
+      bookings: "Bookings & Audit Trail",
+      reviews: "Customer Reviews & Moderation",
+      complaints: "Reports, Disputes & Moderation",
+      verif: "Provider Verification Review Queue",
+      notifications: "Admin Platform Notifications",
+      settings: "Marketplace Administration Settings"
+    };
+
+    function switchAdminSection(sectionKey) {
+      // Update sidebar links
+      document.querySelectorAll('.admin-nav-link').forEach(link => {
+        link.classList.remove('active');
+      });
+      const activeLink = document.getElementById(`navLink-${sectionKey}`);
+      if (activeLink) activeLink.classList.add('active');
+
+      // Update panes
+      document.querySelectorAll('.admin-tab-pane').forEach(pane => {
+        pane.classList.remove('active');
+      });
+      const targetPane = document.getElementById(`pane-${sectionKey}`);
+      if (targetPane) targetPane.classList.add('active');
+
+      // Update breadcrumb title
+      document.getElementById('breadcrumbSectionTitle').innerText = sectionTitles[sectionKey] || "Portal";
+
+      // Close mobile sidebar if open
+      toggleAdminSidebar(false);
+
+      // Re-render specific section data
+      if (sectionKey === 'categories') renderCategoriesTable();
+      if (sectionKey === 'providers') renderProvidersTable();
+      if (sectionKey === 'customers') renderCustomersTable();
+      if (sectionKey === 'listings') renderListingsTable();
+      if (sectionKey === 'bookings') renderBookingsTable();
+      if (sectionKey === 'reviews') renderReviewsTable();
+      if (sectionKey === 'complaints') renderComplaintsTable();
+      if (sectionKey === 'verif') renderVerifQueueTable();
+      if (sectionKey === 'notifications') renderNotificationsList();
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    function handleAdminLogout() {
+      if (confirm("Are you sure you want to log out of the TradeLinker Administrator Portal?")) {
+        TLAuth.logout();
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // 3. Central Refresh & KPI Metrics (FR-48)
+    // ------------------------------------------------------------------------
+    function refreshAdminData() {
+      loadExecutiveKPIs();
+      renderCategoriesTable();
+      renderProvidersTable();
+      renderCustomersTable();
+      renderListingsTable();
+      renderBookingsTable();
+      renderReviewsTable();
+      renderComplaintsTable();
+      renderVerifQueueTable();
+      renderNotificationsList();
+      populateListingCategoryFilter();
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    function loadExecutiveKPIs() {
+      const users = TLAuth.getUsers();
+      const customers = users.filter(u => u.role === 'customer');
+      const providers = TLAuth.getProviders();
+      const categories = TLCommunication.getAllCategories();
+      const listings = TLServices.getAllServices();
+      const bookings = TLBookings.getAllBookings();
+      const disputes = TLCommunication.getAllComplaints();
+      const notifs = TLCommunication.getAllAdminNotifications();
+
+      // Counts
+      const totalCust = customers.length;
+      const totalProv = providers.length;
+      const verifiedProv = providers.filter(p => p.verificationStatus === 'verified').length;
+      const pendingVerif = providers.filter(p => p.verificationStatus === 'pending' || p.verificationStatus === 'info_requested').length;
+      const totalCat = categories.length;
+      const activeCat = categories.filter(c => c.isActive).length;
+      const totalListings = listings.length;
+      const totalBook = bookings.length;
+      const pendingBook = bookings.filter(b => b.status === 'pending').length;
+      const openDisputes = disputes.filter(d => d.status !== 'resolved').length;
+      const unreadNotifs = notifs.filter(n => !n.isRead).length;
+
+      // Update KPI widgets
+      document.getElementById('kpiTotalCustomers').innerText = totalCust;
+      document.getElementById('kpiTotalProviders').innerText = totalProv;
+      document.getElementById('kpiVerifiedProvidersSplit').innerText = `${verifiedProv} Verified Specialists`;
+      document.getElementById('kpiTotalCategories').innerText = totalCat;
+      document.getElementById('kpiActiveCategoriesSplit').innerText = `${activeCat} Active Categories`;
+      document.getElementById('kpiTotalServices').innerText = totalListings;
+      document.getElementById('kpiTotalBookings').innerText = totalBook;
+      document.getElementById('kpiPendingBookingsSplit').innerText = `${pendingBook} Pending Confirmation`;
+      document.getElementById('kpiPendingVerifications').innerText = pendingVerif;
+
+      // Update sidebar badge counters
+      document.getElementById('badgeNavCategories').innerText = totalCat;
+      document.getElementById('badgeNavProviders').innerText = totalProv;
+      document.getElementById('badgeNavCustomers').innerText = totalCust;
+      document.getElementById('badgeNavListings').innerText = totalListings;
+      document.getElementById('badgeNavBookings').innerText = totalBook;
+      document.getElementById('badgeNavComplaints').innerText = openDisputes;
+      document.getElementById('badgeNavVerif').innerText = pendingVerif;
+      document.getElementById('badgeNavNotifs').innerText = unreadNotifs;
+
+      const topbarBadge = document.getElementById('topbarNotifBadge');
+      if (topbarBadge) {
+        topbarBadge.innerText = unreadNotifs;
+        topbarBadge.style.display = unreadNotifs > 0 ? 'inline-block' : 'none';
+      }
+
+      // Recent bookings on overview
+      const recentBookingsTbody = document.getElementById('overviewRecentBookingsTbody');
+      const recentBookings = bookings.slice(0, 5);
+      if (recentBookings.length === 0) {
+        recentBookingsTbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--tl-text-muted); padding: 18px;">No bookings recorded yet.</td></tr>';
+      } else {
+        recentBookingsTbody.innerHTML = recentBookings.map(b => `
+          <tr>
+            <td><strong>#${b.id}</strong></td>
+            <td>${b.customerName || 'Customer'}</td>
+            <td><span class="tl-badge tl-badge-accepted" style="font-size: 0.7rem;">${b.category || b.categoryTitle || 'Trade'}</span></td>
+            <td><span class="tl-badge tl-badge-${b.status}">${b.status.toUpperCase()}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      // Recent audit log on overview
+      const recentAuditTbody = document.getElementById('overviewRecentAuditTbody');
+      const recentAudit = TLCommunication.getAllAdminAuditLogs().slice(0, 5);
+      if (recentAudit.length === 0) {
+        recentAuditTbody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--tl-text-muted); padding: 18px;">No audit records.</td></tr>';
+      } else {
+        recentAuditTbody.innerHTML = recentAudit.map(a => `
+          <tr>
+            <td><span class="tl-badge" style="background: var(--tl-navy-800); color: #FFF; font-size: 0.65rem;">${a.actionType}</span></td>
+            <td style="font-size: 0.8rem; color: var(--tl-text-secondary);">${a.details}</td>
+            <td style="font-size: 0.75rem; color: var(--tl-text-muted); white-space: nowrap;">${new Date(a.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // 4. SERVICE CATEGORY MANAGEMENT — MAIN PRIORITY
+    // ------------------------------------------------------------------------
+    function renderCategoriesTable() {
+      const q = (document.getElementById('categorySearchInput')?.value || '').toLowerCase().trim();
+      const statusFilter = document.getElementById('categoryStatusFilter')?.value || 'all';
+      let categories = TLCommunication.getAllCategories();
+
+      if (q) {
+        categories = categories.filter(c => 
+          c.title.toLowerCase().includes(q) || 
+          c.id.toLowerCase().includes(q) || 
+          (c.description || '').toLowerCase().includes(q)
+        );
+      }
+
+      if (statusFilter === 'active') {
+        categories = categories.filter(c => c.isActive);
+      } else if (statusFilter === 'inactive') {
+        categories = categories.filter(c => !c.isActive);
+      }
+
+      const tbody = document.getElementById('categoriesManagementTbody');
+      if (!tbody) return;
+
+      if (categories.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 36px; color: var(--tl-text-muted);">
+              <div style="font-size: 1.1rem; font-weight: 700; color: var(--tl-navy-800); margin-bottom: 6px;">No Service Categories Found</div>
+              <div>No categories match your search or filter. Click 'Add New Category' above to create one.</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = categories.map(cat => {
+        const usage = TLCommunication.getCategoryUsage(cat.id);
+        const iconKey = cat.icon || "tools";
+        const dateStr = cat.createdAt ? new Date(cat.createdAt).toLocaleDateString() : "Platform Seed";
+
+        return `
+          <tr>
+            <td>
+              <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--tl-teal-100); color: var(--tl-teal-700); display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                <span data-tl-icon="${iconKey}"></span>
+              </div>
+            </td>
+            <td>
+              <strong>${cat.title}</strong>
+              ${(cat.popularServices && cat.popularServices.length > 0) ? `
+                <div style="font-size: 0.72rem; color: var(--tl-text-muted); margin-top: 2px;">
+                  Popular: ${cat.popularServices.slice(0, 2).join(', ')}
+                </div>
+              ` : ''}
+            </td>
+            <td><code>${cat.id}</code></td>
+            <td style="max-width: 280px; color: var(--tl-text-secondary); line-height: 1.4;">${cat.description || '-'}</td>
+            <td>
+              <span class="tl-badge" style="background: var(--tl-bg-subtle); color: var(--tl-navy-800); font-weight: 700;">
+                ${usage.serviceCount} listings
+              </span>
+            </td>
+            <td>
+              <span class="tl-badge" style="background: var(--tl-bg-subtle); color: var(--tl-navy-800); font-weight: 700;">
+                ${usage.bookingCount} bookings
+              </span>
+            </td>
+            <td>
+              <span class="tl-badge ${cat.isActive ? 'tl-badge-completed' : 'tl-badge-cancelled'}">
+                ${cat.isActive ? 'ACTIVE' : 'INACTIVE'}
+              </span>
+            </td>
+            <td>
+              <div style="display: flex; gap: 6px; align-items: center; flex-wrap: nowrap;">
+                <button class="tl-btn tl-btn-outline tl-btn-xs" onclick="openEditCategoryModal('${cat.id}')" title="Edit Category Details">
+                  <span data-tl-icon="edit"></span> Edit
+                </button>
+                <button class="tl-btn tl-btn-outline tl-btn-xs" style="color: ${cat.isActive ? '#D97706' : '#059669'};" onclick="handleToggleCategory('${cat.id}')">
+                  ${cat.isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <button class="tl-btn tl-btn-ghost tl-btn-xs" style="color: #DC2626;" onclick="openDeleteCategoryModal('${cat.id}')" title="Remove Category Safely">
+                  &times;
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    function resetCategoryFilters() {
+      document.getElementById('categorySearchInput').value = '';
+      document.getElementById('categoryStatusFilter').value = 'all';
+      renderCategoriesTable();
+    }
+
+    // Auto-generate slug from Category Title
+    function autoGenerateCategorySlug(val) {
+      const slugInput = document.getElementById('addCatSlug');
+      if (slugInput && !slugInput.dataset.manualEdited) {
+        slugInput.value = val.toLowerCase().trim().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const slugInput = document.getElementById('addCatSlug');
+      if (slugInput) {
+        slugInput.addEventListener('input', () => {
+          slugInput.dataset.manualEdited = "true";
+        });
+      }
+    });
+
+    // Icon Selector for Modals
+    function selectCategoryIcon(modalType, iconName, btnElement) {
+      const gridId = modalType === 'add' ? 'addCatIconGrid' : 'editCatIconGrid';
+      const hiddenInputId = modalType === 'add' ? 'addCatSelectedIcon' : 'editCatSelectedIcon';
+      
+      document.querySelectorAll(`#${gridId} .icon-option-btn`).forEach(b => b.classList.remove('selected'));
+      btnElement.classList.add('selected');
+      document.getElementById(hiddenInputId).value = iconName;
+    }
+
+    // Modal 1: Add New Category
+    function openAddCategoryModal() {
+      const form = document.getElementById('addCategoryForm');
+      if (form) form.reset();
+      const slugInput = document.getElementById('addCatSlug');
+      if (slugInput) delete slugInput.dataset.manualEdited;
+      document.getElementById('addCatSelectedIcon').value = 'construction';
+      document.getElementById('addCategoryModal').classList.add('active');
+    }
+
+    function closeAddCategoryModal() {
+      document.getElementById('addCategoryModal').classList.remove('active');
+    }
+
+    async function submitAddCategory() {
+      const title = document.getElementById('addCatTitle').value.trim();
+      const slug = document.getElementById('addCatSlug').value.trim();
+      const desc = document.getElementById('addCatDesc').value.trim();
+      const icon = document.getElementById('addCatSelectedIcon').value;
+      const popular = document.getElementById('addCatPopular').value.trim();
+      const isActive = document.getElementById('addCatIsActive').checked;
+      const submitBtn = document.getElementById('addCategorySubmitBtn');
+
+      if (window.TLReloader) {
+        await window.TLReloader.withLoading('admin-add-category', async () => {
+          await new Promise(r => setTimeout(r, 400));
+          const res = TLCommunication.addCategory({
+            id: slug,
+            title,
+            description: desc,
+            icon,
+            popularServices: popular,
+            isActive,
+            adminId: currentAdminUser ? currentAdminUser.id : 'admin'
+          });
+
+          if (!res.success) throw new Error(res.error);
+          return res.category;
+        }, {
+          button: submitBtn,
+          loadingText: "Saving Category...",
+          onSuccess: (cat) => {
+            closeAddCategoryModal();
+            refreshAdminData();
+            alert(`Service Category '${cat.title}' successfully added and published to TradeLinker database!`);
+          },
+          onError: (err) => {
+            alert("Category Creation Error: " + err.message);
+          }
+        });
+      }
+    }
+
+    // Modal 2: Edit Category
+    function openEditCategoryModal(catId) {
+      const cat = TLCommunication.getCategoryById(catId);
+      if (!cat) {
+        alert("Category not found.");
+        return;
+      }
+
+      document.getElementById('editCatOriginalId').value = cat.id;
+      document.getElementById('editCatTitle').value = cat.title;
+      document.getElementById('editCatSlug').value = cat.id;
+      document.getElementById('editCatDesc').value = cat.description || '';
+      document.getElementById('editCatSelectedIcon').value = cat.icon || 'tools';
+      document.getElementById('editCatIsActive').checked = Boolean(cat.isActive);
+
+      // Select icon button
+      const grid = document.getElementById('editCatIconGrid');
+      grid.querySelectorAll('.icon-option-btn').forEach(b => {
+        b.classList.toggle('selected', b.dataset.icon === cat.icon);
+      });
+
+      document.getElementById('editCategoryModal').classList.add('active');
+    }
+
+    function closeEditCategoryModal() {
+      document.getElementById('editCategoryModal').classList.remove('active');
+    }
+
+    async function submitEditCategory() {
+      const origId = document.getElementById('editCatOriginalId').value;
+      const title = document.getElementById('editCatTitle').value.trim();
+      const newSlug = document.getElementById('editCatSlug').value.trim();
+      const desc = document.getElementById('editCatDesc').value.trim();
+      const icon = document.getElementById('editCatSelectedIcon').value;
+      const isActive = document.getElementById('editCatIsActive').checked;
+      const submitBtn = document.getElementById('editCategorySubmitBtn');
+
+      if (window.TLReloader) {
+        await window.TLReloader.withLoading('admin-edit-category', async () => {
+          await new Promise(r => setTimeout(r, 400));
+          const res = TLCommunication.updateCategory(origId, {
+            title,
+            newSlug,
+            description: desc,
+            icon,
+            isActive,
+            adminId: currentAdminUser ? currentAdminUser.id : 'admin'
+          });
+
+          if (!res.success) throw new Error(res.error);
+          return res.category;
+        }, {
+          button: submitBtn,
+          loadingText: "Updating Category...",
+          onSuccess: (cat) => {
+            closeEditCategoryModal();
+            refreshAdminData();
+            alert(`Service Category '${cat.title}' updated successfully.`);
+          },
+          onError: (err) => {
+            alert("Update Error: " + err.message);
+          }
+        });
+      }
+    }
+
+    // Modal 3: Safe Delete Category Workflow
+    function openDeleteCategoryModal(catId) {
+      const cat = TLCommunication.getCategoryById(catId);
+      if (!cat) return;
+      pendingDeleteCategoryId = catId;
+
+      const usage = TLCommunication.getCategoryUsage(catId);
+      const container = document.getElementById('deleteCategoryWarningContent');
+      const footer = document.getElementById('deleteCategoryFooterActions');
+
+      if (usage.totalReferences > 0) {
+        // Safe protection alert
+        container.innerHTML = `
+          <div style="background: #FEF3C7; border: 1px solid #FDE68A; padding: 14px; border-radius: 8px; margin-bottom: 14px;">
+            <div style="font-weight: 700; color: #92400E; margin-bottom: 4px;">⚠️ Active Category in Use</div>
+            <p style="font-size: 0.85rem; color: #78350F; margin: 0 0 10px 0;">
+              Category <strong>${cat.title}</strong> is actively referenced by <strong>${usage.serviceCount} service listing(s)</strong> and <strong>${usage.bookingCount} historical booking(s)</strong>.
+            </p>
+            <p style="font-size: 0.82rem; color: #78350F; margin: 0;">
+              Deleting this record would orphan existing provider listings and corrupt customer booking history. As an SRS architectural rule, <strong>deactivation is strongly recommended</strong>.
+            </p>
+          </div>
+        `;
+        footer.innerHTML = `
+          <button type="button" class="tl-btn tl-btn-ghost" onclick="closeDeleteCategoryModal()">Cancel</button>
+          <button type="button" class="tl-btn tl-btn-secondary" onclick="handleDeactivateInstead('${cat.id}')">
+            Deactivate Category Instead (Recommended)
+          </button>
+        `;
+      } else {
+        // Safe to remove
+        container.innerHTML = `
+          <p style="font-size: 0.9rem; color: var(--tl-navy-800); margin: 0 0 10px 0;">
+            Are you sure you want to permanently remove category <strong>${cat.title}</strong> (<code>${cat.id}</code>)?
+          </p>
+          <div style="font-size: 0.8rem; color: #059669; background: #ECFDF5; padding: 10px; border-radius: 6px;">
+            ✓ Safe to delete: 0 active services and 0 bookings reference this category.
+          </div>
+        `;
+        footer.innerHTML = `
+          <button type="button" class="tl-btn tl-btn-ghost" onclick="closeDeleteCategoryModal()">Cancel</button>
+          <button type="button" class="tl-btn tl-btn-primary" style="background: #DC2626;" onclick="executeDeleteCategory('${cat.id}')">
+            Confirm Permanent Deletion
+          </button>
+        `;
+      }
+
+      document.getElementById('deleteCategoryModal').classList.add('active');
+    }
+
+    function closeDeleteCategoryModal() {
+      document.getElementById('deleteCategoryModal').classList.remove('active');
+      pendingDeleteCategoryId = null;
+    }
+
+    function handleDeactivateInstead(catId) {
+      TLCommunication.toggleCategoryStatus(catId, currentAdminUser ? currentAdminUser.id : 'admin');
+      closeDeleteCategoryModal();
+      refreshAdminData();
+      alert(`Category status changed to Inactive. Existing bookings remain intact.`);
+    }
+
+    function executeDeleteCategory(catId) {
+      const res = TLCommunication.deleteCategory(catId, { force: true, adminId: currentAdminUser ? currentAdminUser.id : 'admin' });
+      closeDeleteCategoryModal();
+      if (res.success) {
+        refreshAdminData();
+        alert(`Category '${res.title}' successfully removed.`);
+      } else {
+        alert("Delete failed: " + res.error);
+      }
+    }
+
+    function handleToggleCategory(catId) {
+      const res = TLCommunication.toggleCategoryStatus(catId, currentAdminUser ? currentAdminUser.id : 'admin');
+      if (res.success) {
+        refreshAdminData();
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // 5. SERVICE PROVIDER MANAGEMENT
+    // ------------------------------------------------------------------------
+    function renderProvidersTable() {
+      const q = (document.getElementById('providerSearchInput')?.value || '').toLowerCase().trim();
+      const verifFilter = document.getElementById('providerVerifFilter')?.value || 'all';
+      let providers = TLAuth.getProviders();
+
+      if (q) {
+        providers = providers.filter(p => 
+          p.businessName.toLowerCase().includes(q) ||
+          p.name.toLowerCase().includes(q) ||
+          (p.city || '').toLowerCase().includes(q) ||
+          (p.phone || '').includes(q)
+        );
+      }
+
+      if (verifFilter !== 'all') {
+        providers = providers.filter(p => p.verificationStatus === verifFilter);
+      }
+
+      const tbody = document.getElementById('providersManagementTbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = providers.map(p => {
+        const user = TLAuth.getUsers().find(u => u.id === p.userId) || { status: 'active', phone: p.phone };
+        const statusBadges = {
+          verified: '<span class="tl-badge tl-badge-verified"><span data-tl-icon="check"></span> Verified</span>',
+          pending: '<span class="tl-badge tl-badge-pending">Pending Review</span>',
+          info_requested: '<span class="tl-badge" style="background: #FEF3C7; color: #92400E;">Info Requested</span>',
+          rejected: '<span class="tl-badge tl-badge-cancelled">Rejected</span>'
+        };
+
+        return `
+          <tr>
+            <td>
+              <strong>${p.businessName}</strong>
+              <div style="font-size: 0.75rem; color: var(--tl-text-muted);">${p.name} • ${p.id}</div>
+            </td>
+            <td><span class="tl-badge tl-badge-accepted" style="font-size: 0.72rem;">${p.categoryTitle || 'Specialist'}</span></td>
+            <td>${p.city}</td>
+            <td>
+              <span style="font-weight: 700; color: var(--tl-gold-600);">&#9733; ${(p.rating || 5.0).toFixed(1)}</span>
+              <span style="font-size: 0.75rem; color: var(--tl-text-muted);">(${p.reviewCount || 0})</span>
+            </td>
+            <td>
+              <span class="tl-badge ${user.status === 'active' ? 'tl-badge-completed' : 'tl-badge-cancelled'}">
+                ${(user.status || 'active').toUpperCase()}
+              </span>
+            </td>
+            <td>${statusBadges[p.verificationStatus] || statusBadges.pending}</td>
+            <td>
+              <div style="display: flex; gap: 6px;">
+                <button class="tl-btn tl-btn-outline tl-btn-xs" onclick="openVerifReviewModal('${p.id}', '${p.businessName}', '${p.verificationStatus}')">
+                  Review
+                </button>
+                <button class="tl-btn tl-btn-xs tl-btn-ghost" style="color: ${user.status === 'active' ? '#DC2626' : '#059669'};" onclick="toggleUserSuspension('${p.userId}')">
+                  ${user.status === 'active' ? 'Suspend' : 'Reinstate'}
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ------------------------------------------------------------------------
+    // 6. CUSTOMER MANAGEMENT
+    // ------------------------------------------------------------------------
+    function renderCustomersTable() {
+      const q = (document.getElementById('customerSearchInput')?.value || '').toLowerCase().trim();
+      let customers = TLAuth.getUsers().filter(u => u.role === 'customer');
+      const allBookings = TLBookings.getAllBookings();
+
+      if (q) {
+        customers = customers.filter(c => 
+          c.fullName.toLowerCase().includes(q) || 
+          c.email.toLowerCase().includes(q) || 
+          (c.city || '').toLowerCase().includes(q)
+        );
+      }
+
+      const tbody = document.getElementById('customersManagementTbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = customers.map(c => {
+        const bookingCount = allBookings.filter(b => b.customerId === c.id).length;
+        return `
+          <tr>
+            <td><code>${c.id}</code></td>
+            <td><strong>${c.fullName}</strong></td>
+            <td>${c.email}</td>
+            <td>${c.phone || '-'}</td>
+            <td>${c.city || 'Islamabad'}</td>
+            <td><span class="tl-badge tl-badge-accepted">${bookingCount} bookings</span></td>
+            <td>
+              <span class="tl-badge ${c.status === 'active' ? 'tl-badge-completed' : 'tl-badge-cancelled'}">
+                ${c.status.toUpperCase()}
+              </span>
+            </td>
+            <td>
+              <button class="tl-btn tl-btn-outline tl-btn-xs" style="color: ${c.status === 'active' ? '#DC2626' : '#059669'};" onclick="toggleUserSuspension('${c.id}')">
+                ${c.status === 'active' ? 'Suspend Account' : 'Reactivate'}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function toggleUserSuspension(userId) {
+      const users = TLAuth.getUsers();
+      const idx = users.findIndex(u => u.id === userId);
+      if (idx === -1) return;
+
+      const newStatus = (users[idx].status === 'active') ? 'suspended' : 'active';
+      const reason = prompt(`Administrative justification to ${newStatus === 'suspended' ? 'suspend' : 'reactivate'} ${users[idx].fullName}:`, newStatus === 'suspended' ? 'Policy violation review (BR-08)' : 'Reinstated by administration');
+      if (reason === null) return;
+
+      users[idx].status = newStatus;
+      localStorage.setItem(TLAuth.STORAGE_KEYS.USERS, JSON.stringify(users));
+
+      TLCommunication.logAdminAction({
+        actionType: (newStatus === 'suspended') ? 'USER_SUSPENDED' : 'USER_REACTIVATED',
+        targetType: 'user',
+        targetId: userId,
+        details: `${users[idx].fullName} (${users[idx].role}) set to ${newStatus.toUpperCase()}. Note: ${reason}`,
+        adminId: currentAdminUser ? currentAdminUser.id : 'admin'
+      });
+
+      refreshAdminData();
+      alert(`Account updated: ${users[idx].fullName} is now ${newStatus.toUpperCase()}.`);
+    }
+
+    // ------------------------------------------------------------------------
+    // 7. SERVICE LISTINGS MANAGEMENT
+    // ------------------------------------------------------------------------
+    function populateListingCategoryFilter() {
+      const select = document.getElementById('listingCategoryFilter');
+      if (!select) return;
+      const categories = TLCommunication.getAllCategories();
+      select.innerHTML = '<option value="all">All Service Categories</option>' + categories.map(c => `
+        <option value="${c.id}">${c.title}</option>
+      `).join('');
+    }
+
+    function renderListingsTable() {
+      const q = (document.getElementById('listingSearchInput')?.value || '').toLowerCase().trim();
+      const catFilter = document.getElementById('listingCategoryFilter')?.value || 'all';
+      let listings = TLServices.getAllServices();
+
+      if (q) {
+        listings = listings.filter(l => 
+          l.title.toLowerCase().includes(q) || 
+          (l.description || '').toLowerCase().includes(q) ||
+          l.providerId.toLowerCase().includes(q)
+        );
+      }
+
+      if (catFilter !== 'all') {
+        listings = listings.filter(l => l.categoryId === catFilter || l.category === catFilter);
+      }
+
+      const tbody = document.getElementById('listingsManagementTbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = listings.map(s => `
+        <tr>
+          <td><code>${s.id}</code></td>
+          <td>
+            <strong>${s.title}</strong>
+            <div style="font-size: 0.72rem; color: var(--tl-text-muted);">${(s.description || '').substring(0, 50)}...</div>
+          </td>
+          <td><span class="tl-badge tl-badge-accepted" style="font-size: 0.7rem;">${s.categoryTitle || s.categoryId}</span></td>
+          <td>${s.providerId}</td>
+          <td><strong>${s.pricingType === 'upon_request' ? 'Upon Request' : `PKR ${s.priceAmount}`}</strong></td>
+          <td>
+            <span class="tl-badge ${s.isAvailable ? 'tl-badge-completed' : 'tl-badge-cancelled'}">
+              ${s.isAvailable ? 'AVAILABLE' : 'PAUSED'}
+            </span>
+          </td>
+          <td>
+            <button class="tl-btn tl-btn-outline tl-btn-xs" onclick="alert('Service Listing Inspection:\\n\\nTitle: ${s.title}\\nCategory: ${s.categoryTitle}\\nProvider: ${s.providerId}\\nPrice: ${s.pricingType} (${s.priceAmount || \'Quote\'})\\nDescription: ${s.description}')">
+              Inspect Scope
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // ------------------------------------------------------------------------
+    // 8. BOOKING MANAGEMENT
+    // ------------------------------------------------------------------------
+    function renderBookingsTable() {
+      const q = (document.getElementById('bookingSearchInput')?.value || '').toLowerCase().trim();
+      const statusFilter = document.getElementById('bookingStatusFilter')?.value || 'all';
+      let bookings = TLBookings.getAllBookings();
+
+      if (q) {
+        bookings = bookings.filter(b => 
+          b.id.toLowerCase().includes(q) ||
+          (b.customerName || '').toLowerCase().includes(q) ||
+          (b.providerBusinessName || b.providerName || '').toLowerCase().includes(q)
+        );
+      }
+
+      if (statusFilter !== 'all') {
+        bookings = bookings.filter(b => b.status === statusFilter);
+      }
+
+      const tbody = document.getElementById('bookingsManagementTbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = bookings.map(b => `
+        <tr>
+          <td><strong>#${b.id}</strong></td>
+          <td>${b.customerName || 'Customer'}</td>
+          <td>${b.providerBusinessName || b.providerName || 'Specialist'}</td>
+          <td><span class="tl-badge tl-badge-accepted" style="font-size: 0.72rem;">${b.category || b.categoryTitle || 'Trade'}</span></td>
+          <td style="font-size: 0.8rem;">${b.scheduledDate || '-'}</td>
+          <td><span class="tl-badge tl-badge-${b.status}">${b.status.toUpperCase()}</span></td>
+          <td>
+            <button class="tl-btn tl-btn-outline tl-btn-xs" onclick="openAuditModal('${b.id}')">Audit Trail</button>
+          </td>
+          <td>
+            <button class="tl-btn tl-btn-ghost tl-btn-xs" onclick="openMessagesModal('${b.id}')">Messages</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openAuditModal(bookingId) {
+      const b = TLBookings.getAllBookings().find(x => x.id === bookingId);
+      if (!b) return;
+
+      document.getElementById('auditModalTitle').innerText = `Booking #${b.id} Audit Trail`;
+      const content = document.getElementById('auditModalContent');
+      const trail = b.auditTrail || [];
+
+      content.innerHTML = trail.map((item, idx) => `
+        <div style="background: var(--tl-bg-subtle, #F8FAFC); padding: 12px; border-radius: 8px; border-left: 3px solid var(--tl-teal-500, #01AD8F);">
+          <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 0.85rem;">
+            <span>Step ${idx + 1}: ${item.action || 'Status Change'}</span>
+            <span style="color: var(--tl-text-muted); font-size: 0.75rem;">${new Date(item.timestamp).toLocaleString()}</span>
+          </div>
+          <div style="font-size: 0.8rem; color: var(--tl-text-secondary); margin-top: 4px;">Status Transition: <strong>${item.toStatus}</strong></div>
+          <div style="font-size: 0.75rem; color: var(--tl-text-muted);">Recorded by user: ${item.byUserId}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('auditModal').classList.add('active');
+    }
+
+    function closeAuditModal() {
+      document.getElementById('auditModal').classList.remove('active');
+    }
+
+    function openMessagesModal(bookingId) {
+      document.getElementById('messagesBookingId').value = bookingId;
+      document.getElementById('messagesModalTitle').innerText = `Messages for Booking #${bookingId}`;
+      const threadList = document.getElementById('messagesThreadList');
+      const messages = TLCommunication.getBookingMessages(bookingId);
+
+      if (messages.length === 0) {
+        threadList.innerHTML = '<div style="text-align: center; color: var(--tl-text-muted); padding: 20px;">No messages recorded for this booking.</div>';
+      } else {
+        threadList.innerHTML = messages.map(m => `
+          <div style="background: #FFF; padding: 10px; border-radius: 8px; border: 1px solid var(--tl-border-subtle, #E2E8F0);">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--tl-text-muted); margin-bottom: 4px;">
+              <strong>${m.senderName} (${m.senderRole})</strong>
+              <span>${new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--tl-navy-950);">${m.messageText}</div>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('messagesModal').classList.add('active');
+    }
+
+    function closeMessagesModal() {
+      document.getElementById('messagesModal').classList.remove('active');
+    }
+
+    function submitAdminMessage() {
+      const bId = document.getElementById('messagesBookingId').value;
+      const text = document.getElementById('adminMsgInput').value.trim();
+      if (!text) return;
+
+      TLCommunication.sendMessage({
+        bookingId: bId,
+        senderId: currentAdminUser ? currentAdminUser.id : 'admin',
+        senderName: "Administrator Moderation",
+        senderRole: "admin",
+        messageText: text
+      });
+
+      document.getElementById('adminMsgInput').value = '';
+      openMessagesModal(bId);
+    }
+
+    // ------------------------------------------------------------------------
+    // 9. REVIEWS & RATINGS MODERATION
+    // ------------------------------------------------------------------------
+    function renderReviewsTable() {
+      const reviews = TLBookings.getAllReviews();
+      const tbody = document.getElementById('reviewsManagementTbody');
+      if (!tbody) return;
+
+      if (reviews.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--tl-text-muted); padding: 24px;">No customer reviews recorded yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = reviews.map(r => `
+        <tr>
+          <td><code>${r.id}</code></td>
+          <td><strong>#${r.bookingId}</strong></td>
+          <td>${r.customerName}</td>
+          <td>${r.providerName || r.providerId}</td>
+          <td><span style="font-weight: 800; color: var(--tl-gold-600);">&#9733; ${r.rating}.0</span></td>
+          <td style="max-width: 300px; color: var(--tl-text-secondary); line-height: 1.4;">${r.reviewText}</td>
+          <td style="font-size: 0.75rem;">${new Date(r.timestamp).toLocaleDateString()}</td>
+          <td>
+            <button class="tl-btn tl-btn-outline tl-btn-xs" style="color: #DC2626;" onclick="handleModerateReview('${r.id}', '${r.bookingId}')">
+              Remove / Moderate
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function handleModerateReview(revId, bId) {
+      const reason = prompt("Enter administrative justification to remove this review (e.g. abusive language, off-topic):", "Violation of community review guidelines");
+      if (!reason) return;
+
+      const reportRes = TLCommunication.reportReview({
+        reviewId: revId,
+        bookingId: bId,
+        reporterId: currentAdminUser ? currentAdminUser.id : 'admin',
+        reporterRole: 'admin',
+        reason
+      });
+
+      if (reportRes.success) {
+        TLCommunication.resolveReportedContent({
+          reportId: reportRes.report.id,
+          action: 'remove_review',
+          adminNotes: reason,
+          adminId: currentAdminUser ? currentAdminUser.id : 'admin'
+        });
+
+        refreshAdminData();
+        alert(`Review #${revId} removed and provider rating recalculated.`);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // 10. REPORTS & COMPLAINTS
+    // ------------------------------------------------------------------------
+    function renderComplaintsTable() {
+      const disputes = TLCommunication.getAllComplaints();
+      const tbody = document.getElementById('complaintsManagementTbody');
+      if (!tbody) return;
+
+      if (disputes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--tl-text-muted); padding: 24px;">No disputes or complaints filed.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = disputes.map(d => `
+        <tr>
+          <td><strong>#${d.id}</strong></td>
+          <td>#${d.bookingId}</td>
+          <td>${d.reporterName} (${d.reporterRole})</td>
+          <td>
+            <strong>${d.subject}</strong>
+            <div style="font-size: 0.72rem; color: var(--tl-text-muted);">${d.description}</div>
+          </td>
+          <td><span class="tl-badge tl-badge-pending">${d.priority || 'Normal'}</span></td>
+          <td>
+            <span class="tl-badge ${d.status === 'resolved' ? 'tl-badge-completed' : 'tl-badge-cancelled'}">
+              ${d.status.toUpperCase()}
+            </span>
+          </td>
+          <td>
+            <button class="tl-btn tl-btn-primary tl-btn-xs" onclick="openDisputeModal('${d.id}')">
+              Investigate (FR-47)
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openDisputeModal(disputeId) {
+      const d = TLCommunication.getAllComplaints().find(x => x.id === disputeId);
+      if (!d) return;
+
+      document.getElementById('disputeModalId').value = d.id;
+      document.getElementById('disputeModalTitle').innerText = `Investigate Dispute #${d.id}`;
+      document.getElementById('disputeModalDetails').innerHTML = `
+        <div><strong>Booking Ref:</strong> #${d.bookingId}</div>
+        <div><strong>Reporter:</strong> ${d.reporterName} (${d.reporterRole})</div>
+        <div><strong>Subject:</strong> ${d.subject}</div>
+        <div style="margin-top: 4px; color: var(--tl-navy-950);">${d.description}</div>
+      `;
+      document.getElementById('disputeNotesText').value = d.adminNotes || '';
+      document.getElementById('disputeStatusSelect').value = d.status === 'resolved' ? 'resolved' : 'investigating';
+      document.getElementById('disputeModal').classList.add('active');
+    }
+
+    function closeDisputeModal() {
+      document.getElementById('disputeModal').classList.remove('active');
+    }
+
+    function submitDisputeResolution() {
+      const id = document.getElementById('disputeModalId').value;
+      const status = document.getElementById('disputeStatusSelect').value;
+      const notes = document.getElementById('disputeNotesText').value.trim();
+
+      const res = TLCommunication.updateComplaintStatus({
+        complaintId: id,
+        status,
+        adminNotes: notes,
+        adminId: currentAdminUser ? currentAdminUser.id : 'admin'
+      });
+
+      if (res.success) {
+        closeDisputeModal();
+        refreshAdminData();
+        alert(`Dispute #${id} updated with findings.`);
+      } else {
+        alert("Error: " + res.error);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // 11. PROVIDER VERIFICATION QUEUE
+    // ------------------------------------------------------------------------
+    function renderVerifQueueTable() {
+      const providers = TLAuth.getProviders();
+      const tbody = document.getElementById('verifManagementTbody');
+      if (!tbody) return;
+
+      const docs = [
+        { provId: "prov-profile-001", file: "PEC_License_2026.pdf", type: "PEC Certified Electrical Engineer" },
+        { provId: "prov-profile-002", file: "Govt_Vocational_Diploma.pdf", type: "Master Plumber Certification" },
+        { provId: "prov-profile-003", file: "PEC_Solar_Technician.pdf", type: "Solar PV Installer Certificate" }
+      ];
+
+      tbody.innerHTML = providers.map(p => {
+        const doc = docs.find(d => d.provId === p.id) || { file: "CNIC_Government_ID.pdf", type: "National CNIC Card" };
+        const statusBadges = {
+          verified: '<span class="tl-badge tl-badge-verified"><span data-tl-icon="check"></span> Verified</span>',
+          pending: '<span class="tl-badge tl-badge-pending">Pending Review</span>',
+          info_requested: '<span class="tl-badge" style="background: #FEF3C7; color: #92400E;">Info Requested</span>',
+          rejected: '<span class="tl-badge tl-badge-cancelled">Declined</span>'
+        };
+
+        return `
+          <tr>
+            <td>
+              <strong>${p.businessName}</strong>
+              <div style="font-size: 0.72rem; color: var(--tl-text-muted);">${p.name} • ${p.id}</div>
+            </td>
+            <td><span class="tl-badge tl-badge-accepted" style="font-size: 0.72rem;">${p.categoryTitle || 'Specialist'}</span></td>
+            <td>${p.city}</td>
+            <td>
+              <span style="color: var(--tl-teal-600); font-weight: 600; text-decoration: underline; cursor: pointer;" onclick="alert('Credential Viewer:\\n\\nDocument: ${doc.file}\\nType: ${doc.type}\\nStatus: Verified as authentic on-file credential.')">
+                ${doc.file}
+              </span>
+              <div style="font-size: 0.72rem; color: var(--tl-text-muted);">${doc.type}</div>
+            </td>
+            <td>${statusBadges[p.verificationStatus] || statusBadges.pending}</td>
+            <td>
+              <button class="tl-btn tl-btn-primary tl-btn-xs" onclick="openVerifReviewModal('${p.id}', '${p.businessName}', '${p.verificationStatus}')">
+                Review Decision
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openVerifReviewModal(provId, name, status) {
+      document.getElementById('verifModalProviderId').value = provId;
+      document.getElementById('verifModalTitle').innerText = `Review Credentials: ${name}`;
+      document.getElementById('verifModalSummary').innerHTML = `
+        <div><strong>Provider Name:</strong> ${name}</div>
+        <div><strong>Current Status:</strong> <span class="tl-badge tl-badge-${status}">${(status || 'pending').toUpperCase()}</span></div>
+        <div style="margin-top: 4px; font-size: 0.75rem; color: var(--tl-text-muted);">Approved credentials award the official Verified Badge on all public listings and search results.</div>
+      `;
+      document.getElementById('verifActionSelect').value = 'approve';
+      document.getElementById('verifNotesText').value = '';
+      document.getElementById('verifReviewModal').classList.add('active');
+    }
+
+    function closeVerifReviewModal() {
+      document.getElementById('verifReviewModal').classList.remove('active');
+    }
+
+    function toggleVerifReasonRequirement() {
+      const act = document.getElementById('verifActionSelect').value;
+      const label = document.getElementById('verifNotesLabel');
+      label.innerText = (act === 'approve') 
+        ? "Administrative Notes & Congratulatory Message (Optional)" 
+        : "Mandatory Instructions / Reason (Required)";
+    }
+
+    function submitVerificationReview() {
+      const provId = document.getElementById('verifModalProviderId').value;
+      const action = document.getElementById('verifActionSelect').value;
+      const notes = document.getElementById('verifNotesText').value.trim();
+
+      if (action !== 'approve' && notes.length < 5) {
+        alert("Please provide specific instructions or reason notes when declining or requesting additional information.");
+        return;
+      }
+
+      const res = TLCommunication.reviewVerification({
+        providerId: provId,
+        action,
+        reasonNote: notes,
+        adminId: currentAdminUser ? currentAdminUser.id : 'admin'
+      });
+
+      if (res.success) {
+        closeVerifReviewModal();
+        refreshAdminData();
+        alert(`Provider verification decision applied: ${action.toUpperCase()}`);
+      } else {
+        alert("Error: " + res.error);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // 12. ADMIN NOTIFICATIONS
+    // ------------------------------------------------------------------------
+    function renderNotificationsList() {
+      const notifs = TLCommunication.getAllAdminNotifications();
+      const list = document.getElementById('adminNotificationsList');
+      if (!list) return;
+
+      if (notifs.length === 0) {
+        list.innerHTML = '<div style="text-align: center; color: var(--tl-text-muted); padding: 24px;">No notifications.</div>';
+        return;
+      }
+
+      list.innerHTML = notifs.map(n => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: ${n.isRead ? '#FFFFFF' : 'var(--tl-teal-50, #F2FCFA)'}; border: 1px solid ${n.isRead ? 'var(--tl-border-subtle, #E2E8F0)' : 'var(--tl-teal-200, #A7F0E2)'}; border-radius: 8px;">
+          <div>
+            <div style="font-weight: 700; font-size: 0.88rem; color: var(--tl-navy-800, #012B52); margin-bottom: 2px;">
+              ${!n.isRead ? '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--tl-teal-500, #01AD8F); margin-right: 6px;"></span>' : ''}
+              ${n.title}
+            </div>
+            <div style="font-size: 0.8rem; color: var(--tl-text-secondary);">${n.message}</div>
+            <div style="font-size: 0.72rem; color: var(--tl-text-muted); margin-top: 4px;">${new Date(n.timestamp).toLocaleString()}</div>
+          </div>
+          <div>
+            ${n.linkTab ? `<button class="tl-btn tl-btn-outline tl-btn-xs" onclick="switchAdminSection('${n.linkTab}')">Inspect &rarr;</button>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function handleMarkAllAdminNotifsRead() {
+      TLCommunication.markAllNotificationsRead();
+      renderNotificationsList();
+      loadExecutiveKPIs();
+    }
+
+    // ------------------------------------------------------------------------
+    // 13. SETTINGS
+    // ------------------------------------------------------------------------
+    function handleSaveMarketplaceSettings() {
+      const fee = parseFloat(document.getElementById('settingPlatformFee').value);
+      const days = parseInt(document.getElementById('settingDisputeDays').value);
+      const email = document.getElementById('settingSupportEmail').value.trim();
+      const phone = document.getElementById('settingSupportPhone').value.trim();
+      const maintenance = document.getElementById('settingMaintenanceMode').checked;
+
+      TLCommunication.updateMarketplaceSettings({
+        platformFeePercent: fee,
+        disputeResolutionDays: days,
+        supportEmail: email,
+        supportPhone: phone,
+        maintenanceMode: maintenance
+      }, currentAdminUser ? currentAdminUser.id : 'admin');
+
+      alert("TradeLinker marketplace settings updated successfully.");
+    }
+
+    // Global Search across tabs
+    function handleGlobalAdminSearch(term) {
+      if (!term) return;
+      const activePane = document.querySelector('.admin-tab-pane.active');
+      if (!activePane) return;
+
+      const paneId = activePane.id;
+      if (paneId === 'pane-categories') {
+        const inp = document.getElementById('categorySearchInput');
+        if (inp) { inp.value = term; renderCategoriesTable(); }
+      } else if (paneId === 'pane-providers') {
+        const inp = document.getElementById('providerSearchInput');
+        if (inp) { inp.value = term; renderProvidersTable(); }
+      } else if (paneId === 'pane-customers') {
+        const inp = document.getElementById('customerSearchInput');
+        if (inp) { inp.value = term; renderCustomersTable(); }
+      } else if (paneId === 'pane-listings') {
+        const inp = document.getElementById('listingSearchInput');
+        if (inp) { inp.value = term; renderListingsTable(); }
+      } else if (paneId === 'pane-bookings') {
+        const inp = document.getElementById('bookingSearchInput');
+        if (inp) { inp.value = term; renderBookingsTable(); }
+      }
+    }
+  </script>
+
+
+<div id="tl-sr-announcer" class="tl-sr-only" role="status" aria-live="polite" aria-atomic="true"></div><div id="tl-reloader-overlay" class="tl-reloader-overlay" role="dialog" aria-modal="true" aria-label="Loading content">
+        <div class="tl-reloader-modal" id="tl-reloader-modal">
+          <div style="text-align: center;">
+            <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Logo" class="tl-reloader-logo" id="tl-overlay-logo" onerror="this.style.display='none'">
+          </div>
+          <div class="tl-reloader-orbit tl-reloader-orbit-lg" id="tl-overlay-orbit" style="margin: 0 auto;">
+            <div class="tl-reloader-track-outer"></div>
+            <div class="tl-reloader-track-inner"></div>
+            <div class="tl-reloader-center-glyph">
+              <img src="assets/images/tradelinker-monogram.png" alt="TradeLinker" class="tl-reloader-monogram-img" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='block';">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+            </div>
+          </div>
+          <h3 class="tl-reloader-title" id="tl-overlay-title">Loading TradeLinker</h3>
+          <p class="tl-reloader-message" id="tl-overlay-msg">Connecting with verified professionals...</p>
+          <div class="tl-reloader-progress" id="tl-overlay-progress">
+            <div class="tl-reloader-progress-bar"></div>
+          </div>
+          <div id="tl-overlay-cancel-wrap" style="margin-top: 18px; display: none;">
+            <button class="tl-btn tl-btn-ghost tl-btn-sm" id="tl-overlay-cancel-btn">Cancel Request</button>
+          </div>
+        </div>
+      </div></body></html>

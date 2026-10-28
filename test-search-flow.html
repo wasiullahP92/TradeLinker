@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TradeLinker Search & Discovery Automated Test Suite</title>
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    body { padding: 40px; background: #F8FAFC; }
+    .test-card { background: #FFF; border: 1px solid var(--tl-border-subtle); border-radius: 12px; padding: 18px; margin-bottom: 14px; }
+    .test-pass { color: #059669; font-weight: 700; }
+    .test-fail { color: #DC2626; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="tl-container">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+      <div>
+        <h1 style="font-size: 2rem; color: var(--tl-navy-800);">Search & Discovery Automated Test Suite</h1>
+        <p style="color: var(--tl-text-secondary);">Validates SRS Section 3.5 (FR-23 to FR-27), all 6 categories, multi-filters, and empty states.</p>
+      </div>
+      <button class="tl-btn tl-btn-primary" onclick="runSearchTests()">Run All Search Tests</button>
+    </div>
+
+    <div id="testResults">
+      <div style="padding: 20px; background: #FFF; border-radius: 12px; border: 1px solid var(--tl-border-subtle);">
+        Running discovery test suite...
+      </div>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/search-engine.js"></script>
+  <script>
+    async function runSearchTests() {
+      const container = document.getElementById('testResults');
+      container.innerHTML = '<div style="padding: 20px;"><span class="tl-spinner tl-spinner-sm"></span> Running 10 automated discovery tests across all 6 service categories...</div>';
+
+      const results = [];
+
+      // Test 1: Search by Professional Name (FR-23)
+      try {
+        const res = await TLSearchEngine.search({ query: "Rashid" });
+        const found = res.some(p => p.name.includes("Rashid"));
+        results.push({
+          name: "1. Search by Professional Name (FR-23)",
+          passed: found && res.length > 0,
+          details: `Found ${res.length} record(s) matching 'Rashid'. Name: '${res[0]?.name}'.`
+        });
+      } catch (e) {
+        results.push({ name: "1. Search by Professional Name", passed: false, details: e.message });
+      }
+
+      // Test 2: Search by Service Title Keyword (FR-23)
+      try {
+        const res = await TLSearchEngine.search({ query: "Inspection" });
+        const found = res.some(p => p.services.some(s => s.title.toLowerCase().includes("inspection")));
+        results.push({
+          name: "2. Search by Service Title (FR-23)",
+          passed: found,
+          details: `Found specialist matching service title keyword 'Inspection'.`
+        });
+      } catch (e) {
+        results.push({ name: "2. Search by Service Title", passed: false, details: e.message });
+      }
+
+      // Test 3: Verification of All 6 Launch Categories (FR-24, BR-09)
+      const categories = ['construction', 'plumbing', 'electrical', 'hvac', 'solar', 'carpentry'];
+      let allCatsPassed = true;
+      let catDetails = [];
+      for (const cat of categories) {
+        const catRes = await TLSearchEngine.search({ category: cat });
+        if (catRes.length === 0) {
+          allCatsPassed = false;
+        }
+        catDetails.push(`${cat}: ${catRes.length}`);
+      }
+      results.push({
+        name: "3. Category Filtering across All 6 Launch Trades (FR-24, BR-09)",
+        passed: allCatsPassed,
+        details: `Verified results in every category: [${catDetails.join(', ')}]`
+      });
+
+      // Test 4: City & Location Filter (FR-24)
+      try {
+        const isbRes = await TLSearchEngine.search({ city: "Islamabad" });
+        const allInIsb = isbRes.every(p => p.city.toLowerCase() === "islamabad" || p.serviceAreas.some(a => a.toLowerCase().includes("islamabad")));
+        results.push({
+          name: "4. City & Location-Based Filtering (FR-24)",
+          passed: isbRes.length > 0 && allInIsb,
+          details: `Found ${isbRes.length} specialist(s) located in or serving Islamabad.`
+        });
+      } catch (e) {
+        results.push({ name: "4. City Location Filter", passed: false, details: e.message });
+      }
+
+      // Test 5: Multi-Filter Combination (Category + City + Verified Only)
+      try {
+        const multiRes = await TLSearchEngine.search({
+          category: "electrical",
+          city: "Islamabad",
+          verifiedOnly: true
+        });
+        const valid = multiRes.every(p => 
+          p.categoryId === "electrical" && 
+          p.city.toLowerCase() === "islamabad" && 
+          (p.verificationStatus === "verified" || p.isVerified)
+        );
+        results.push({
+          name: "5. Compound Multi-Facet Filter (Category + City + Verified)",
+          passed: multiRes.length > 0 && valid,
+          details: `Successfully combined category='electrical' + city='Islamabad' + verifiedOnly=true.`
+        });
+      } catch (e) {
+        results.push({ name: "5. Compound Multi-Facet Filter", passed: false, details: e.message });
+      }
+
+      // Test 6: Rating Filter (FR-25)
+      try {
+        const highRated = await TLSearchEngine.search({ minRating: 4.8 });
+        const allHigh = highRated.every(p => p.rating >= 4.8);
+        results.push({
+          name: "6. Minimum Customer Rating Threshold (FR-25)",
+          passed: highRated.length > 0 && allHigh,
+          details: `All ${highRated.length} returned specialists possess rating >= 4.8 ★.`
+        });
+      } catch (e) {
+        results.push({ name: "6. Rating Filter", passed: false, details: e.message });
+      }
+
+      // Test 7: Experience Years Filter (FR-25)
+      try {
+        const expRes = await TLSearchEngine.search({ minExperience: 5 });
+        const allExp = expRes.every(p => p.experienceYears >= 5);
+        results.push({
+          name: "7. Practical Experience Threshold (FR-25)",
+          passed: expRes.length > 0 && allExp,
+          details: `All ${expRes.length} returned specialists possess >= 5 years trade experience.`
+        });
+      } catch (e) {
+        results.push({ name: "7. Experience Filter", passed: false, details: e.message });
+      }
+
+      // Test 8: Pricing Structure Filter (Fixed vs Upon Request, FR-15)
+      try {
+        const quoteRes = await TLSearchEngine.search({ pricingType: "upon_request" });
+        results.push({
+          name: "8. Pricing Structure Filter (FR-15)",
+          passed: quoteRes.length > 0,
+          details: `Found ${quoteRes.length} specialist(s) offering free custom quotes / upon-request pricing.`
+        });
+      } catch (e) {
+        results.push({ name: "8. Pricing Structure Filter", passed: false, details: e.message });
+      }
+
+      // Test 9: Helpful Empty State on Zero Matches (FR-27)
+      try {
+        const emptyRes = await TLSearchEngine.search({ query: "NonExistentKeywordXYZ9999" });
+        results.push({
+          name: "9. Zero Results Handling & Empty State (FR-27)",
+          passed: emptyRes.length === 0,
+          details: `Query for impossible term cleanly yielded 0 results, triggering user-friendly empty state guidance.`
+        });
+      } catch (e) {
+        results.push({ name: "9. Empty State Handling", passed: false, details: e.message });
+      }
+
+      // Test 10: Clear Filters Restores Complete Catalog (FR-26)
+      try {
+        const initial = await TLSearchEngine.search({});
+        const filtered = await TLSearchEngine.search({ query: "Rashid", city: "Islamabad" });
+        const restored = await TLSearchEngine.search({});
+        results.push({
+          name: "10. Filter Clearing & Catalog Restoration (FR-26)",
+          passed: initial.length > 0 && filtered.length < initial.length && restored.length === initial.length,
+          details: `Restoring filters returned full catalog of ${restored.length} specialists.`
+        });
+      } catch (e) {
+        results.push({ name: "10. Filter Restoration", passed: false, details: e.message });
+      }
+
+      // Render
+      container.innerHTML = `
+        <div style="margin-bottom: 16px; padding: 14px; background: #D1FAE5; border: 1px solid #A7F3D0; border-radius: 10px; font-weight: 700; color: #065F46;">
+          ✓ Discovery Test Suite Execution Complete: ${results.filter(r => r.passed).length} / ${results.length} Tests Passed
+        </div>
+        ${results.map(r => `
+          <div class="test-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <h3 style="font-size: 1.05rem; color: var(--tl-navy-800);">${r.name}</h3>
+              <span class="${r.passed ? 'test-pass' : 'test-fail'}">${r.passed ? 'PASSED ✓' : 'FAILED ✗'}</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin: 0;">${r.details}</p>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      runSearchTests();
+    });
+  </script>
+</body>
+</html>

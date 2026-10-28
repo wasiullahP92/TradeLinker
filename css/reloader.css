@@ -1,0 +1,852 @@
+/**
+ * TradeLinker Professional Reloader & Feedback System CSS
+ * Visual design faithful to TradeLinker official branding (Navy #012B52, Teal #01AD8F, Gold #F59E0B)
+ * Supports screen readers, reduced-motion accessibility, responsive breakpoints
+ */
+
+/* ==========================================================================
+   1. Brand Orbital Spinner & Interlocking Loader
+   ========================================================================== */
+.tl-reloader-orbit {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+}
+
+.tl-reloader-orbit-sm {
+  width: 24px;
+  height: 24px;
+}
+
+.tl-reloader-orbit-lg {
+  width: 72px;
+  height: 72px;
+}
+
+.tl-reloader-orbit-xl {
+  width: 96px;
+  height: 96px;
+}
+
+/* Outer Teal Orbital Track */
+.tl-reloader-track-outer {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid rgba(1, 173, 143, 0.15);
+  border-top-color: var(--tl-teal-500, #01AD8F);
+  border-right-color: var(--tl-teal-500, #01AD8F);
+  animation: tl-spin-cw 0.9s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+}
+
+.tl-reloader-orbit-sm .tl-reloader-track-outer {
+  border-width: 2px;
+}
+
+.tl-reloader-orbit-lg .tl-reloader-track-outer,
+.tl-reloader-orbit-xl .tl-reloader-track-outer {
+  border-width: 4px;
+}
+
+/* Inner Navy Counter-Orbital Track */
+.tl-reloader-track-inner {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(1, 43, 82, 0.12);
+  border-bottom-color: var(--tl-navy-800, #012B52);
+  border-left-color: var(--tl-navy-800, #012B52);
+  animation: tl-spin-ccw 1.2s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+}
+
+.tl-reloader-orbit-sm .tl-reloader-track-inner {
+  inset: 3px;
+  border-width: 1.5px;
+}
+
+.tl-reloader-orbit-lg .tl-reloader-track-inner {
+  inset: 8px;
+  border-width: 3px;
+}
+
+.tl-reloader-orbit-xl .tl-reloader-track-inner {
+  inset: 12px;
+  border-width: 4px;
+}
+
+/* Center TradeLinker Monogram / Emblem Glyph */
+.tl-reloader-center-glyph {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tl-navy-800, #012B52);
+}
+
+.tl-reloader-monogram-img {
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(1, 173, 143, 0.3));
+  animation: tl-monogram-pulse 1.8s ease-in-out infinite;
+  user-select: none;
+  pointer-events: none;
+}
+
+.tl-reloader-orbit-sm .tl-reloader-monogram-img {
+  width: 14px;
+  height: 14px;
+}
+
+.tl-reloader-orbit .tl-reloader-monogram-img {
+  width: 28px;
+  height: 28px;
+}
+
+.tl-reloader-orbit-lg .tl-reloader-monogram-img {
+  width: 44px;
+  height: 44px;
+}
+
+.tl-reloader-orbit-xl .tl-reloader-monogram-img {
+  width: 62px;
+  height: 62px;
+}
+
+.tl-reloader-orbit-sm .tl-reloader-center-glyph svg {
+  width: 12px;
+  height: 12px;
+}
+
+.tl-reloader-orbit .tl-reloader-center-glyph svg {
+  width: 22px;
+  height: 22px;
+}
+
+.tl-reloader-orbit-lg .tl-reloader-center-glyph svg {
+  width: 32px;
+  height: 32px;
+}
+
+.tl-reloader-orbit-xl .tl-reloader-center-glyph svg {
+  width: 42px;
+  height: 42px;
+}
+
+/* ==========================================================================
+   1.1 Standalone Brand Emblem Preloader ("Just This" Emblem)
+   ========================================================================== */
+.tl-page-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s ease;
+  opacity: 1;
+  visibility: visible;
+}
+
+.tl-page-preloader.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.tl-standalone-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.tl-standalone-loader-img {
+  width: 96px;
+  height: auto;
+  max-width: 80vw;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  animation: tl-monogram-standalone-pulse 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 8px 24px rgba(1, 173, 143, 0.35));
+}
+
+@keyframes tl-monogram-standalone-pulse {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.85;
+    filter: drop-shadow(0 4px 12px rgba(1, 173, 143, 0.25));
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+    filter: drop-shadow(0 10px 32px rgba(1, 173, 143, 0.65));
+  }
+  100% {
+    transform: scale(0.92);
+    opacity: 0.85;
+    filter: drop-shadow(0 4px 12px rgba(1, 173, 143, 0.25));
+  }
+}
+
+/* Optional structured content container if enabled */
+.tl-preloader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  max-width: 440px;
+  width: 100%;
+}
+
+.tl-preloader-logo {
+  height: 48px;
+  width: auto;
+  max-width: 240px;
+  object-fit: contain;
+  margin-bottom: 28px;
+  filter: drop-shadow(0 2px 8px rgba(1, 43, 82, 0.08));
+}
+
+.tl-preloader-text {
+  font-family: var(--tl-font-sans, system-ui, -apple-system, sans-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--tl-navy-800, #012B52);
+  margin-top: 20px;
+  margin-bottom: 4px;
+}
+
+.tl-preloader-subtext {
+  font-size: 0.85rem;
+  color: var(--tl-text-secondary, #64748B);
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.tl-preloader-bar-wrap {
+  width: 200px;
+  height: 4px;
+  background: #E2E8F0;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.tl-preloader-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, var(--tl-navy-800, #012B52), var(--tl-teal-500, #01AD8F), var(--tl-gold-500, #F59E0B));
+  border-radius: 999px;
+  animation: tl-progress-indeterminate 1.5s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   2. Fullscreen & Modal Loading Overlays
+   ========================================================================== */
+.tl-reloader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(1, 43, 82, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  padding: 1.5rem;
+}
+
+.tl-reloader-overlay.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.tl-reloader-modal {
+  background: #FFFFFF;
+  border-radius: var(--tl-radius-lg, 16px);
+  box-shadow: 0 25px 50px -12px rgba(1, 43, 82, 0.35), 0 0 0 1px rgba(1, 173, 143, 0.15);
+  padding: 32px;
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: tl-scale-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Top Accent Bar */
+.tl-reloader-modal::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--tl-navy-800, #012B52), var(--tl-teal-500, #01AD8F), var(--tl-gold-500, #F59E0B));
+}
+
+.tl-reloader-logo {
+  height: 44px;
+  margin-bottom: 20px;
+  display: inline-block;
+  object-fit: contain;
+}
+
+.tl-reloader-title {
+  font-family: var(--tl-font-sans, system-ui);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--tl-navy-800, #012B52);
+  margin: 16px 0 6px 0;
+}
+
+.tl-reloader-message {
+  font-size: 0.875rem;
+  color: var(--tl-text-secondary, #475569);
+  line-height: 1.5;
+  margin: 0 0 18px 0;
+}
+
+/* Linear Indeterminate Progress Bar */
+.tl-reloader-progress {
+  width: 100%;
+  height: 5px;
+  background: #E2E8F0;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  margin-top: 14px;
+}
+
+.tl-reloader-progress-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--tl-navy-800, #012B52), var(--tl-teal-500, #01AD8F), var(--tl-gold-500, #F59E0B));
+  animation: tl-progress-indeterminate 1.5s cubic-bezier(0.65, 0.05, 0.36, 1) infinite;
+}
+
+/* ==========================================================================
+   3. Inline Container Loader & Skeletons
+   ========================================================================== */
+.tl-inline-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--tl-text-secondary, #475569);
+  width: 100%;
+}
+
+.tl-inline-loader-text {
+  margin-top: 14px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--tl-navy-800, #012B52);
+}
+
+.tl-inline-loader-subtext {
+  font-size: 0.775rem;
+  color: var(--tl-text-muted, #94A3B8);
+  margin-top: 4px;
+}
+
+/* Skeleton Loading Elements */
+.tl-skeleton-box {
+  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
+  background-size: 200% 100%;
+  animation: tl-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--tl-radius-xs, 6px);
+}
+
+.tl-skeleton-card {
+  background: #FFFFFF;
+  border: 1px solid var(--tl-border-subtle, #E2E8F0);
+  border-radius: var(--tl-radius-md, 12px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tl-skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tl-skeleton-title {
+  height: 20px;
+  width: 65%;
+}
+
+.tl-skeleton-line {
+  height: 14px;
+  width: 100%;
+}
+
+.tl-skeleton-line-short {
+  height: 14px;
+  width: 40%;
+}
+
+.tl-skeleton-btn {
+  height: 38px;
+  width: 110px;
+  border-radius: var(--tl-radius-sm, 8px);
+}
+
+/* ==========================================================================
+   4. Button Loading States
+   ========================================================================== */
+.tl-btn-is-loading {
+  position: relative;
+  pointer-events: none;
+  color: transparent !important;
+  cursor: not-allowed !important;
+}
+
+.tl-btn-is-loading .tl-btn-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: tl-spin-cw 0.7s linear infinite;
+}
+
+.tl-btn-secondary.tl-btn-is-loading .tl-btn-spinner,
+.tl-btn-ghost.tl-btn-is-loading .tl-btn-spinner,
+.tl-btn-outline.tl-btn-is-loading .tl-btn-spinner {
+  border-color: rgba(1, 43, 82, 0.2);
+  border-top-color: var(--tl-navy-800, #012B52);
+}
+
+/* ==========================================================================
+   5. Interactive Refresh & Retry Control Bar
+   ========================================================================== */
+.tl-refresh-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  background: var(--tl-bg-subtle, #F8FAFC);
+  border: 1px solid var(--tl-border-subtle, #E2E8F0);
+  border-radius: var(--tl-radius-sm, 8px);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.tl-refresh-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--tl-text-secondary, #475569);
+}
+
+.tl-refresh-time-badge {
+  background: #FFFFFF;
+  border: 1px solid var(--tl-border-subtle, #E2E8F0);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--tl-navy-800, #012B52);
+}
+
+.tl-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFFFFF;
+  border: 1px solid var(--tl-border-subtle, #E2E8F0);
+  padding: 6px 14px;
+  border-radius: var(--tl-radius-sm, 8px);
+  color: var(--tl-navy-800, #012B52);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.tl-refresh-btn:hover:not(:disabled) {
+  border-color: var(--tl-teal-500, #01AD8F);
+  color: var(--tl-teal-600, #008C74);
+  background: var(--tl-teal-50, #E6F8F5);
+}
+
+.tl-refresh-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.tl-refresh-btn.is-refreshing svg {
+  animation: tl-spin-cw 0.8s linear infinite;
+}
+
+/* ==========================================================================
+   6. Fallback & Error State Interfaces
+   ========================================================================== */
+.tl-fallback-card {
+  background: #FFFFFF;
+  border: 1px solid var(--tl-border-subtle, #E2E8F0);
+  border-radius: var(--tl-radius-md, 12px);
+  padding: 40px 24px;
+  text-align: center;
+  max-width: 540px;
+  margin: 20px auto;
+  box-shadow: 0 4px 6px -1px rgba(1, 43, 82, 0.05);
+}
+
+.tl-fallback-icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.tl-fallback-icon-wrap.error {
+  background: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid #FECACA;
+}
+
+.tl-fallback-icon-wrap.offline {
+  background: #FFFBEB;
+  color: #D97706;
+  border: 1px solid #FDE68A;
+}
+
+.tl-fallback-icon-wrap.empty {
+  background: var(--tl-teal-50, #E6F8F5);
+  color: var(--tl-teal-600, #008C74);
+  border: 1px solid #CCFBF1;
+}
+
+.tl-fallback-icon-wrap.unauthorized {
+  background: #EFF6FF;
+  color: #2563EB;
+  border: 1px solid #BFDBFE;
+}
+
+.tl-fallback-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--tl-navy-800, #012B52);
+  margin: 0 0 8px 0;
+}
+
+.tl-fallback-desc {
+  font-size: 0.875rem;
+  color: var(--tl-text-secondary, #475569);
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+}
+
+.tl-fallback-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tl-fallback-details-toggle {
+  display: block;
+  margin-top: 16px;
+  font-size: 0.75rem;
+  color: var(--tl-text-muted, #94A3B8);
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.tl-fallback-details-content {
+  margin-top: 12px;
+  padding: 10px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #475569;
+  text-align: left;
+  max-height: 120px;
+  overflow-y: auto;
+  word-break: break-all;
+  display: none;
+}
+
+/* Form Input Preservation Alert */
+.tl-preserved-input-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+}
+
+/* ==========================================================================
+   7. Screen Reader Only Utility
+   ========================================================================== */
+.tl-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* ==========================================================================
+   8. Keyframes Animations
+   ========================================================================== */
+@keyframes tl-monogram-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 2px 8px rgba(1, 173, 143, 0.3));
+  }
+  50% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 4px 16px rgba(1, 173, 143, 0.55));
+  }
+}
+
+@keyframes tl-spin-cw {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes tl-spin-ccw {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+@keyframes tl-pulse-subtle {
+  0%, 100% { transform: scale(1); opacity: 0.95; }
+  50% { transform: scale(1.08); opacity: 0.75; }
+}
+
+@keyframes tl-scale-up {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes tl-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes tl-progress-indeterminate {
+  0% { left: -40%; width: 30%; }
+  50% { left: 30%; width: 60%; }
+  100% { left: 100%; width: 40%; }
+}
+
+/* ==========================================================================
+   9. Accessibility: Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .tl-reloader-track-outer,
+  .tl-reloader-track-inner,
+  .tl-reloader-center-glyph,
+  .tl-reloader-monogram-img,
+  .tl-standalone-loader-img,
+  .tl-btn-is-loading .tl-btn-spinner,
+  .tl-refresh-btn.is-refreshing svg,
+  .tl-reloader-progress-bar,
+  .tl-skeleton-box {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .tl-reloader-track-outer {
+    border-top-color: var(--tl-teal-500, #01AD8F);
+    border-right-color: var(--tl-teal-500, #01AD8F);
+  }
+  
+  .tl-reloader-track-inner {
+    border-bottom-color: var(--tl-navy-800, #012B52);
+  }
+
+  .tl-reloader-progress-bar {
+    width: 100% !important;
+    left: 0 !important;
+  }
+}
+
+/* ==========================================================================
+   10. Mobile & Desktop Responsive Adaptations
+   ========================================================================== */
+/* Mobile Devices (< 600px) */
+@media (max-width: 599.98px) {
+  .tl-standalone-loader {
+    padding: 16px;
+  }
+
+  .tl-standalone-loader-img {
+    width: 72px;
+  }
+
+  .tl-preloader-logo {
+    height: 38px;
+    margin-bottom: 20px;
+  }
+
+  .tl-preloader-text {
+    font-size: 1rem;
+    margin-top: 16px;
+  }
+
+  .tl-preloader-subtext {
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+  }
+
+  .tl-preloader-bar-wrap {
+    width: 160px;
+  }
+
+  .tl-reloader-overlay {
+    padding: 12px;
+  }
+
+  .tl-reloader-modal {
+    padding: 24px 16px;
+    max-width: calc(100vw - 24px);
+    border-radius: 14px;
+  }
+
+  .tl-reloader-orbit-lg {
+    width: 64px;
+    height: 64px;
+  }
+
+  .tl-reloader-orbit-lg .tl-reloader-monogram-img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .tl-reloader-orbit-lg .tl-reloader-track-inner {
+    inset: 6px;
+    border-width: 2.5px;
+  }
+
+  .tl-reloader-logo {
+    height: 36px;
+    margin-bottom: 14px;
+  }
+
+  .tl-reloader-title {
+    font-size: 1.05rem;
+    margin: 12px 0 4px 0;
+  }
+
+  .tl-reloader-message {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .tl-refresh-dock {
+    bottom: 14px;
+    right: 14px;
+  }
+
+  .tl-refresh-btn {
+    height: 38px;
+    padding: 0 12px;
+    font-size: 0.82rem;
+  }
+
+  .tl-inline-loader {
+    padding: 24px 12px;
+  }
+
+  .tl-skeleton-card {
+    padding: 16px;
+  }
+}
+
+/* Tablet Devices (600px - 991px) */
+@media (min-width: 600px) and (max-width: 991.98px) {
+  .tl-standalone-loader-img {
+    width: 88px;
+  }
+
+  .tl-reloader-modal {
+    max-width: 400px;
+    padding: 28px 22px;
+  }
+
+  .tl-reloader-orbit-lg {
+    width: 68px;
+    height: 68px;
+  }
+
+  .tl-reloader-orbit-lg .tl-reloader-monogram-img {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Desktop & Large Screens (>= 992px) */
+@media (min-width: 992px) {
+  .tl-standalone-loader-img {
+    width: 104px;
+  }
+
+  .tl-reloader-modal {
+    max-width: 440px;
+    padding: 32px;
+  }
+
+  .tl-reloader-orbit-lg {
+    width: 72px;
+    height: 72px;
+  }
+
+  .tl-reloader-orbit-lg .tl-reloader-monogram-img {
+    width: 44px;
+    height: 44px;
+  }
+}
+

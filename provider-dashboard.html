@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Provider Portal & Operations Dashboard — TradeLinker</title>
+  <meta name="description" content="Manage your professional trade profile, service listings, and customer booking workflow on TradeLinker.">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reloader.css">
+  <style>
+    .provider-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding: 2.5rem 0 5rem;
+    }
+    @media (min-width: 992px) {
+      .provider-layout {
+        grid-template-columns: 340px 1fr;
+      }
+    }
+    .profile-sidebar {
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+      height: fit-content;
+      box-shadow: var(--tl-shadow-xs);
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      box-shadow: var(--tl-shadow-xs);
+    }
+    .kpi-num {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: var(--tl-navy-800);
+      line-height: 1.1;
+    }
+    .kpi-label {
+      font-size: 0.75rem;
+      color: var(--tl-text-muted);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .nav-tabs-row {
+      display: flex;
+      gap: 8px;
+      border-bottom: 2px solid var(--tl-border-subtle);
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+    .nav-tab-btn {
+      padding: 10px 18px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      border: none;
+      background: transparent;
+      color: var(--tl-text-secondary);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      white-space: nowrap;
+      transition: all var(--tl-transition-fast);
+    }
+    .nav-tab-btn.active {
+      color: var(--tl-teal-600);
+      border-bottom-color: var(--tl-teal-500);
+    }
+    .service-item-card {
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 14px;
+      box-shadow: var(--tl-shadow-xs);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all var(--tl-transition-normal);
+    }
+    .service-item-card:hover {
+      border-color: var(--tl-teal-300);
+      box-shadow: var(--tl-shadow-md);
+    }
+    .booking-item-card {
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--tl-shadow-xs);
+    }
+    .empty-state-box {
+      text-align: center;
+      padding: 50px 20px;
+      background: #FFFFFF;
+      border: 1.5px dashed var(--tl-border-subtle);
+      border-radius: 16px;
+    }
+    .empty-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--tl-teal-100);
+      color: var(--tl-teal-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    .empty-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="tl-navbar">
+    <div class="tl-container">
+      <div class="tl-navbar-inner">
+        <a href="index.html" class="tl-logo" title="TradeLinker Home">
+          <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Logo" class="tl-logo-img">
+        </a>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <!-- Provider In-App Notification Bell (FR-36) -->
+          <button class="notif-bell-btn" id="notifBell" onclick="openNotificationsModal()" title="View Notifications (FR-36)" style="position: relative; background: #FFF; border: 1px solid var(--tl-border-subtle); border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--tl-navy-800);">
+            <span data-tl-icon="calendar" style="width: 18px; height: 18px;"></span>
+            <span id="notifBadgePill" style="position: absolute; top: -4px; right: -4px; background: #DC2626; color: #FFF; border-radius: 10px; font-size: 0.65rem; font-weight: 800; padding: 2px 6px; display: none;">0</span>
+          </button>
+          <a href="index.html" class="tl-btn tl-btn-ghost tl-btn-sm">&larr; Return to Marketplace</a>
+          <button class="tl-btn tl-btn-outline tl-btn-sm" onclick="TLAuth.logout()">Log Out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="tl-container">
+    <div class="provider-layout">
+
+      <!-- =====================================================================
+           Left Column: Comprehensive Professional Profile (FR-11 to FR-13)
+           ===================================================================== -->
+      <aside class="profile-sidebar">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <!-- Avatar with Upload Indicator -->
+          <div style="position: relative; width: 90px; height: 90px; margin: 0 auto 12px;">
+            <img src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=200&auto=format&fit=crop" alt="Profile Picture" id="provAvatarImg" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #FFF; box-shadow: var(--tl-shadow-sm);">
+            <button class="tl-verified-check" style="cursor: pointer; width: 26px; height: 26px;" onclick="document.getElementById('avatarFileInput').click()" title="Change Profile Image">
+              <span data-tl-icon="check"></span>
+            </button>
+            <input type="file" id="avatarFileInput" accept="image/png, image/jpeg" style="display: none;" onchange="handleAvatarUpload(this)">
+          </div>
+
+          <h2 style="font-size: 1.3rem; color: var(--tl-navy-800); margin-bottom: 2px;" id="dispBusinessName">Loading...</h2>
+          <div style="font-size: 0.85rem; color: var(--tl-teal-600); font-weight: 700;" id="dispCategory">Electrical Services</div>
+          
+          <div style="margin-top: 10px;" id="verificationStatusContainer">
+            <!-- Dynamic Verification Badge -->
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--tl-border-subtle); padding-top: 16px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 10px;">
+          <div>
+            <strong style="color: var(--tl-navy-800); display: block;">Owner / Specialist:</strong>
+            <span id="dispOwnerName" style="color: var(--tl-text-secondary);">-</span>
+          </div>
+
+          <div>
+            <strong style="color: var(--tl-navy-800); display: block;">Contact Info:</strong>
+            <span id="dispContact" style="color: var(--tl-text-secondary);">-</span>
+          </div>
+
+          <div>
+            <strong style="color: var(--tl-navy-800); display: block;">Service Areas:</strong>
+            <span id="dispAreas" style="color: var(--tl-text-secondary);">-</span>
+          </div>
+
+          <div>
+            <strong style="color: var(--tl-navy-800); display: block;">Experience:</strong>
+            <span id="dispExperience" style="color: var(--tl-text-secondary);">-</span>
+          </div>
+
+          <div>
+            <strong style="color: var(--tl-navy-800); display: block;">Key Skills:</strong>
+            <div id="dispSkillsTags" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;"></div>
+          </div>
+
+          <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <button class="tl-btn tl-btn-outline" style="width: 100%;" onclick="openEditProfileModal()">
+              Edit Professional Profile
+            </button>
+            <button class="tl-btn tl-btn-outline-teal" style="width: 100%;" onclick="openUploadDocModal()">
+              Submit Credentials (FR-13)
+            </button>
+            <a href="#" id="viewPublicProfileBtn" class="tl-btn tl-btn-secondary" style="width: 100%; text-align: center;">
+              View Public Profile
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <!-- =====================================================================
+           Right Column: Operations Hub (KPIs, Services, Bookings, Alerts)
+           ===================================================================== -->
+      <section>
+        <!-- Verification Banner (FR-18) -->
+        <div id="verificationAlertBanner" style="padding: 16px 20px; border-radius: 12px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+          <!-- Dynamically Injected -->
+        </div>
+
+        <!-- KPI Metrics Ribbon -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-num" id="kpiServices">0</div>
+            <div class="kpi-label">Active Services</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-num" id="kpiPending" style="color: var(--tl-gold-600);">0</div>
+            <div class="kpi-label">Pending Requests</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-num" id="kpiAccepted" style="color: #2563EB;">0</div>
+            <div class="kpi-label">Accepted</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-num" id="kpiInProgress" style="color: #7C3AED;">0</div>
+            <div class="kpi-label">In Progress</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-num" id="kpiCompleted" style="color: #059669;">0</div>
+            <div class="kpi-label">Completed</div>
+          </div>
+        </div>
+
+        <!-- Section Navigation Tabs -->
+        <div class="nav-tabs-row">
+          <button class="nav-tab-btn active" id="tabBtnServices" onclick="switchMainTab('services')">
+            Published Services (<span id="tabCountServices">0</span>)
+          </button>
+          <button class="nav-tab-btn" id="tabBtnBookings" onclick="switchMainTab('bookings')">
+            Incoming Bookings (<span id="tabCountBookings">0</span>)
+          </button>
+          <button class="nav-tab-btn" id="tabBtnDocs" onclick="switchMainTab('docs')">
+            Verification Documents
+          </button>
+        </div>
+
+        <!-- ===================================================================
+             Tab 1: Published Services Management (FR-14, FR-15)
+             =================================================================== -->
+        <div id="tabContentServices">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h3 style="font-size: 1.25rem; color: var(--tl-navy-800);">Trade Service Catalog</h3>
+              <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin: 0;">Create and publish trade packages for customers to browse and book.</p>
+            </div>
+            <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openCreateServiceModal()">
+              + Create Service Listing
+            </button>
+          </div>
+
+          <div id="servicesListContainer">
+            <!-- Services injected via JS -->
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             Tab 2: Booking Requests Pipeline (FR-16, FR-17, FR-31, FR-33)
+             =================================================================== -->
+        <div id="tabContentBookings" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h3 style="font-size: 1.25rem; color: var(--tl-navy-800);">Customer Booking Pipeline</h3>
+              <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin: 0;">Review, accept, execute, and complete incoming trade jobs.</p>
+            </div>
+
+            <!-- Booking Filter Pills -->
+            <div style="display: flex; gap: 6px;">
+              <select id="bookingStatusFilter" class="tl-select" style="padding: 6px 12px; font-size: 0.8rem;" onchange="renderBookingsList()">
+                <option value="all">All Bookings</option>
+                <option value="pending">Pending Requests</option>
+                <option value="accepted">Accepted</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="rejected">Rejected / Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="providerRefreshBarSlot"></div>
+          <div id="bookingsListContainer">
+            <!-- Bookings injected via JS -->
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             Tab 3: Verification Documents & Credentials (FR-13, FR-18)
+             =================================================================== -->
+        <div id="tabContentDocs" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h3 style="font-size: 1.25rem; color: var(--tl-navy-800);">Trade Verification Documents (FR-13)</h3>
+              <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin: 0;">Submitted government ID, trade diplomas, and PEC registrations for administrator approval.</p>
+            </div>
+            <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openUploadDocModal()">
+              + Upload New Document
+            </button>
+          </div>
+
+          <div id="docsListContainer">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       Modal 1: Create / Edit Service Listing (FR-14, FR-15)
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="serviceModal">
+    <div class="tl-modal" style="max-width: 580px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title" id="serviceModalTitle">Create Service Listing</h3>
+        <button class="tl-modal-close" onclick="closeServiceModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <form id="serviceForm" onsubmit="event.preventDefault(); handleSaveService();">
+          <input type="hidden" id="serviceEditId">
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="srvTitle">Service Title</label>
+            <input type="text" id="srvTitle" class="tl-input" placeholder="e.g. Full Distribution Board (DB) Panel Upgrade" required>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="srvCategory">Trade Category (6 Core Categories)</label>
+            <select id="srvCategory" class="tl-select" required>
+              <option value="construction">Construction Services</option>
+              <option value="plumbing">Plumbing Services</option>
+              <option value="electrical">Electrical Services</option>
+              <option value="hvac">AC & HVAC Services</option>
+              <option value="solar">Solar Energy Services</option>
+              <option value="carpentry">Wooden Door Making & Carpentry</option>
+            </select>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="srvDesc">Service Description & Scope</label>
+            <textarea id="srvDesc" class="tl-textarea" placeholder="Detail the work process, materials, safety protocols, and what is included..." required></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="srvPricingType">Pricing Structure (FR-15)</label>
+              <select id="srvPricingType" class="tl-select" onchange="togglePriceAmountInput()">
+                <option value="fixed">Fixed Rate</option>
+                <option value="hourly">Hourly Rate</option>
+                <option value="upon_request">Price Upon Request</option>
+              </select>
+            </div>
+
+            <div class="tl-form-group" id="srvPriceAmountGroup">
+              <label class="tl-label tl-label-required" for="srvPriceAmount">Price in PKR</label>
+              <input type="number" id="srvPriceAmount" class="tl-input" placeholder="1500" min="0">
+            </div>
+          </div>
+
+          <div class="tl-form-group">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem;">
+              <input type="checkbox" id="srvIsAvailable" checked>
+              <strong>Publish Listing Immediately (Available for Customer Bookings)</strong>
+            </label>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeServiceModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary" id="saveServiceBtn">Save & Publish Listing</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Modal 2: Edit Professional Profile (FR-11, FR-12)
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="editProfileModal">
+    <div class="tl-modal" style="max-width: 600px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Edit Professional Profile</h3>
+        <button class="tl-modal-close" onclick="closeEditProfileModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <form onsubmit="event.preventDefault(); handleSaveProviderProfile();">
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="editBusinessName">Business / Professional Trade Name</label>
+            <input type="text" id="editBusinessName" class="tl-input" required>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="editCity">Operational City</label>
+            <select id="editCity" class="tl-select" required>
+              <option value="Islamabad">Islamabad</option>
+              <option value="Rawalpindi">Rawalpindi</option>
+              <option value="Lahore">Lahore</option>
+              <option value="Karachi">Karachi</option>
+              <option value="Peshawar">Peshawar</option>
+            </select>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="editServiceAreas">Service Areas & Neighborhoods (Comma separated)</label>
+            <input type="text" id="editServiceAreas" class="tl-input" placeholder="e.g. F-6, F-7, G-10, DHA Phase 2" required>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="editExpYears">Years of Experience</label>
+            <input type="number" id="editExpYears" class="tl-input" min="1" max="50" required>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label" for="editSkills">Skills & Specializations (Comma separated)</label>
+            <input type="text" id="editSkills" class="tl-input" placeholder="Wiring, DB Panels, Solar Inverters, Diagnostics">
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label" for="editBio">Professional Bio & Credentials Description</label>
+            <textarea id="editBio" class="tl-textarea" placeholder="Describe your background, warranty coverage, and customer satisfaction commitments..."></textarea>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeEditProfileModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary">Save Profile</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Modal 3: Upload Supporting Documents (FR-13, FR-18)
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="uploadDocModal">
+    <div class="tl-modal" style="max-width: 520px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Submit Verification Credentials (FR-13)</h3>
+        <button class="tl-modal-close" onclick="closeUploadDocModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <form onsubmit="event.preventDefault(); handleUploadDocSubmit();">
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin-bottom: 16px;">
+            Supporting documents are screened strictly by authorized administrators before awarding the <strong>Verified Professional</strong> badge (BR-07).
+          </p>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="docTypeSelect">Document Type</label>
+            <select id="docTypeSelect" class="tl-select" required>
+              <option value="PEC Trade Certificate">PEC / Government Trade Certificate</option>
+              <option value="CNIC / Government National ID">CNIC / Government National ID</option>
+              <option value="Business Registration Certificate">Business / Enterprise License</option>
+              <option value="Vocational Diploma">Vocational / Apprenticeship Diploma</option>
+            </select>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="docFile">Choose File (PDF, PNG, JPG &lt; 5MB)</label>
+            <input type="file" id="docFile" class="tl-input" accept=".pdf, image/png, image/jpeg" required>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label" for="docNotes">Notes or Registration Number</label>
+            <input type="text" id="docNotes" class="tl-input" placeholder="e.g. License # PEC-ELECT-2024-91">
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeUploadDocModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary">Submit for Administrator Review</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+  <script src="js/reloader.js"></script>
+  <script>
+    let currentProvider = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Enforce Role Protection Guard (FR-49, NFR-06)
+      const isAllowed = TLAuth.protectRoute(['provider']);
+      if (!isAllowed) return;
+
+      const user = TLAuth.getCurrentUser();
+      currentProvider = TLServices.getProviderProfile(user.id);
+      
+      // Update public profile link
+      document.getElementById('viewPublicProfileBtn').href = `provider-profile.html?id=${currentProvider.id}`;
+
+      renderProfileSidebar();
+      renderKPIs();
+      renderServicesList();
+      renderBookingsList();
+      renderDocsList();
+      checkProviderNotifications();
+
+      // Attach In-Place Data Refresh Control for Bookings
+      TLReloader.attachRefreshControl('providerRefreshBarSlot', async () => {
+        renderKPIs();
+        renderBookingsList();
+        checkProviderNotifications();
+      }, { label: "Refresh Bookings Pipeline" });
+    });
+
+    // ------------------------------------------------------------------------
+    // Render Profile Sidebar
+    // ------------------------------------------------------------------------
+    function renderProfileSidebar() {
+      if (!currentProvider) return;
+      const user = TLAuth.getCurrentUser();
+
+      document.getElementById('dispBusinessName').innerText = currentProvider.businessName;
+      document.getElementById('dispCategory').innerText = currentProvider.categoryTitle || 'Trade Specialist';
+      document.getElementById('dispOwnerName').innerText = user.fullName;
+      document.getElementById('dispContact').innerText = `${user.phone} • ${user.email}`;
+      document.getElementById('dispAreas').innerText = (currentProvider.serviceAreas || [currentProvider.city]).join(', ');
+      document.getElementById('dispExperience').innerText = `${currentProvider.experienceYears || 1} Years in Field`;
+
+      // Skills tags
+      const skillsBox = document.getElementById('dispSkillsTags');
+      skillsBox.innerHTML = (currentProvider.skills || []).map(s => `
+        <span class="tl-skill-tag">${s}</span>
+      `).join('') || '<span style="color: var(--tl-text-muted); font-size: 0.75rem;">None listed</span>';
+
+      // Verification Badge (BR-07 Rule: Never show unverified as verified!)
+      const badgeContainer = document.getElementById('verificationStatusContainer');
+      const banner = document.getElementById('verificationAlertBanner');
+
+      if (currentProvider.verificationStatus === 'verified') {
+        badgeContainer.innerHTML = '<span class="tl-badge tl-badge-verified"><span data-tl-icon="verified"></span> Verified Professional</span>';
+        banner.style.background = 'var(--tl-teal-100)';
+        banner.style.border = '1px solid var(--tl-teal-300)';
+        banner.style.color = 'var(--tl-teal-700)';
+        banner.innerHTML = `
+          <div>
+            <strong>✓ Verified Trade Professional</strong>
+            <p style="font-size: 0.85rem; margin: 2px 0 0 0;">Your business identity and credentials have been verified by TradeLinker Administrators.</p>
+          </div>
+          <span class="tl-badge tl-badge-verified">Active Verified Badge</span>
+        `;
+      } else {
+        badgeContainer.innerHTML = '<span class="tl-badge tl-badge-pending"><span class="tl-badge-dot"></span> Verification Pending</span>';
+        banner.style.background = '#FEF3C7';
+        banner.style.border = '1px solid #FDE68A';
+        banner.style.color = '#92400E';
+        banner.innerHTML = `
+          <div>
+            <strong>Identity Verification Required (FR-18)</strong>
+            <p style="font-size: 0.85rem; margin: 2px 0 0 0;">Upload your trade diplomas or CNIC to receive the verified badge and increase customer booking requests.</p>
+          </div>
+          <button class="tl-btn tl-btn-primary tl-btn-xs" onclick="openUploadDocModal()">Submit Documents</button>
+        `;
+      }
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    // ------------------------------------------------------------------------
+    // Render KPIs
+    // ------------------------------------------------------------------------
+    function renderKPIs() {
+      if (!currentProvider) return;
+      const services = TLServices.getProviderServices(currentProvider.id);
+      const bookings = TLBookings.getProviderBookings(currentProvider.id);
+
+      const pending = bookings.filter(b => b.status === 'pending').length;
+      const accepted = bookings.filter(b => b.status === 'accepted').length;
+      const inProgress = bookings.filter(b => b.status === 'in_progress').length;
+      const completed = bookings.filter(b => b.status === 'completed').length;
+
+      document.getElementById('kpiServices').innerText = services.length;
+      document.getElementById('kpiPending').innerText = pending;
+      document.getElementById('kpiAccepted').innerText = accepted;
+      document.getElementById('kpiInProgress').innerText = inProgress;
+      document.getElementById('kpiCompleted').innerText = completed;
+
+      document.getElementById('tabCountServices').innerText = services.length;
+      document.getElementById('tabCountBookings').innerText = bookings.length;
+    }
+
+    // ------------------------------------------------------------------------
+    // Tab 1: Render Services List (with Empty State)
+    // ------------------------------------------------------------------------
+    function renderServicesList() {
+      if (!currentProvider) return;
+      const container = document.getElementById('servicesListContainer');
+      const services = TLServices.getProviderServices(currentProvider.id);
+
+      if (services.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-box">
+            <div class="empty-icon"><span data-tl-icon="construction"></span></div>
+            <h4 style="color: var(--tl-navy-800); margin-bottom: 6px;">No Services Published Yet</h4>
+            <p style="color: var(--tl-text-secondary); max-width: 440px; margin: 0 auto 16px; font-size: 0.9rem;">
+              You have not published any service listings. Create your first service offering with pricing to start receiving customer bookings.
+            </p>
+            <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openCreateServiceModal()">
+              + Create First Service Listing
+            </button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = services.map(s => `
+          <div class="service-item-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                  <span class="tl-badge tl-badge-accepted" style="font-size: 0.7rem;">${s.categoryTitle}</span>
+                  <span class="tl-badge ${s.isAvailable ? 'tl-badge-completed' : 'tl-badge-cancelled'}" style="font-size: 0.7rem;">
+                    ${s.isAvailable ? 'Active' : 'Paused'}
+                  </span>
+                </div>
+                <h4 style="font-size: 1.15rem; color: var(--tl-navy-800); margin: 0;">${s.title}</h4>
+              </div>
+
+              <div style="text-align: right;">
+                <div style="font-size: 1.15rem; font-weight: 800; color: var(--tl-navy-800);">
+                  ${s.pricingType === 'upon_request' ? 'Upon Request' : `PKR ${s.priceAmount.toLocaleString()}`}
+                </div>
+                <div style="font-size: 0.75rem; color: var(--tl-text-muted); text-transform: capitalize;">${s.pricingType.replace('_', ' ')}</div>
+              </div>
+            </div>
+
+            <p style="font-size: 0.9rem; color: var(--tl-text-secondary); margin: 0; line-height: 1.5;">
+              ${s.description}
+            </p>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--tl-border-subtle); padding-top: 12px; margin-top: 4px;">
+              <button class="tl-btn tl-btn-ghost tl-btn-xs" onclick="toggleServiceAvailability('${s.id}')">
+                ${s.isAvailable ? 'Pause Listing' : 'Activate Listing'}
+              </button>
+
+              <div style="display: flex; gap: 8px;">
+                <button class="tl-btn tl-btn-outline tl-btn-xs" onclick="openEditServiceModal('${s.id}')">Edit</button>
+                <button class="tl-btn tl-btn-outline tl-btn-xs" style="color: #DC2626; border-color: #FECACA;" onclick="deleteService('${s.id}')">Delete</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    // ------------------------------------------------------------------------
+    // Tab 2: Render Bookings Pipeline (with Empty State & Status Workflow)
+    // ------------------------------------------------------------------------
+    function renderBookingsList() {
+      if (!currentProvider) return;
+      const container = document.getElementById('bookingsListContainer');
+      const filter = document.getElementById('bookingStatusFilter').value;
+      let bookings = TLBookings.getProviderBookings(currentProvider.id);
+
+      if (filter !== 'all') {
+        if (filter === 'rejected') {
+          bookings = bookings.filter(b => b.status === 'rejected' || b.status === 'cancelled');
+        } else {
+          bookings = bookings.filter(b => b.status === filter);
+        }
+      }
+
+      if (bookings.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-box">
+            <div class="empty-icon"><span data-tl-icon="calendar"></span></div>
+            <h4 style="color: var(--tl-navy-800); margin-bottom: 6px;">No Bookings Found in this Category</h4>
+            <p style="color: var(--tl-text-secondary); max-width: 440px; margin: 0 auto; font-size: 0.9rem;">
+              When customers submit booking requests for your services, they will appear here for your review and status updates.
+            </p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = bookings.map(b => `
+          <div class="booking-item-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+              <div>
+                <span class="tl-badge tl-badge-accepted" style="font-size: 0.75rem; margin-bottom: 4px;">#${b.id}</span>
+                <h4 style="font-size: 1.15rem; color: var(--tl-navy-800); margin: 2px 0;">${b.serviceTitle}</h4>
+                <div style="font-size: 0.85rem; color: var(--tl-text-muted);">
+                  Customer: <strong>${b.customerName}</strong> (${b.customerPhone})
+                </div>
+              </div>
+              <span class="tl-badge tl-badge-${b.status}">${b.status.replace('_', ' ')}</span>
+            </div>
+
+            <div style="background: var(--tl-bg-subtle); padding: 12px; border-radius: 10px; margin-bottom: 12px; font-size: 0.9rem;">
+              <strong style="color: var(--tl-navy-800); display: block; margin-bottom: 2px;">Customer Problem Description:</strong>
+              ${b.problemDescription}
+              <div style="margin-top: 8px; font-size: 0.8rem; color: var(--tl-text-muted);">
+                📍 <strong>Service Location:</strong> ${b.serviceAddress}, ${b.city || 'Islamabad'}
+              </div>
+              ${b.cancellationReason ? `
+                <div style="margin-top: 6px; font-size: 0.8rem; color: #DC2626; font-weight: 600;">
+                  Reason / Notes: ${b.cancellationReason}
+                </div>
+              ` : ''}
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-top: 1px solid var(--tl-border-subtle); padding-top: 12px; gap: 8px;">
+              <div style="font-size: 0.85rem; color: var(--tl-text-muted);">
+                Scheduled: <strong>${b.scheduledDate}</strong> (${b.scheduledTimeSlot})
+              </div>
+
+              <!-- Action Workflow Buttons (FR-17, FR-31) -->
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button class="tl-btn tl-btn-ghost tl-btn-xs" onclick="toggleTimeline('${b.id}')">
+                  Audit History (${(b.statusHistory || []).length})
+                </button>
+
+                <button class="tl-btn tl-btn-outline-teal tl-btn-xs" onclick="openProviderChat('${b.id}', '${b.customerName.replace(/'/g, "\\'")}')">
+                  Message Customer
+                </button>
+
+                <button class="tl-btn tl-btn-ghost tl-btn-xs" style="color: #DC2626;" onclick="openProviderComplaintModal('${b.id}', '${b.customerName.replace(/'/g, "\\'")}')">
+                  Report Issue
+                </button>
+
+                ${b.status === 'pending' ? `
+                  <button class="tl-btn tl-btn-outline tl-btn-xs" style="color: #DC2626; border-color: #FECACA;" onclick="handleDeclineBooking('${b.id}')">Decline</button>
+                  <button class="tl-btn tl-btn-primary tl-btn-xs" onclick="handleAcceptBooking('${b.id}')">Accept Request (FR-31)</button>
+                ` : ''}
+
+                ${b.status === 'accepted' ? `
+                  <button class="tl-btn tl-btn-primary tl-btn-xs" onclick="handleStartJob('${b.id}')">Start Job (In Progress)</button>
+                ` : ''}
+
+                ${b.status === 'in_progress' ? `
+                  <button class="tl-btn tl-btn-primary tl-btn-xs" style="background: #059669;" onclick="handleCompleteJob('${b.id}')">Mark Completed (FR-17)</button>
+                ` : ''}
+
+                ${b.status === 'completed' ? `
+                  <span style="font-size: 0.8rem; color: #059669; font-weight: 700;">✓ Completed & Ready for Review</span>
+                ` : ''}
+
+                ${b.status === 'rejected' ? `
+                  <span style="font-size: 0.8rem; color: #DC2626; font-weight: 600;">Declined</span>
+                ` : ''}
+
+                ${b.status === 'cancelled' ? `
+                  <span style="font-size: 0.8rem; color: #DC2626; font-weight: 600;">Cancelled by Customer</span>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Immutable Status History Timeline (FR-34) -->
+            <div id="timeline-${b.id}" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--tl-border-subtle); font-size: 0.85rem;">
+              <strong style="color: var(--tl-navy-800); display: block; margin-bottom: 6px;">Status Audit Trail (FR-34):</strong>
+              ${(b.statusHistory || []).map(h => `
+                <div style="display: flex; gap: 8px; margin-bottom: 6px; align-items: flex-start;">
+                  <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--tl-teal-500); margin-top: 5px; flex-shrink: 0;"></span>
+                  <div>
+                    <span style="font-weight: 700; color: var(--tl-navy-800);">${h.toStatus.toUpperCase()}</span>
+                    <span style="color: var(--tl-text-muted); font-size: 0.75rem;">by ${h.changedByRole} • ${new Date(h.timestamp).toLocaleString()}</span>
+                    <div style="color: var(--tl-text-secondary); font-size: 0.8rem;">${h.note || ''}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('');
+      }
+      }
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    // ------------------------------------------------------------------------
+    // Tab 3: Render Verification Documents
+    // ------------------------------------------------------------------------
+    function renderDocsList() {
+      if (!currentProvider) return;
+      const container = document.getElementById('docsListContainer');
+      const docs = TLServices.getProviderDocuments(currentProvider.id);
+
+      if (docs.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state-box">
+            <div class="empty-icon"><span data-tl-icon="secure"></span></div>
+            <h4 style="color: var(--tl-navy-800); margin-bottom: 6px;">No Documents Submitted Yet</h4>
+            <p style="color: var(--tl-text-secondary); max-width: 440px; margin: 0 auto 16px; font-size: 0.9rem;">
+              Upload copies of your CNIC, trade certificates, or business registration to qualify for official verification.
+            </p>
+            <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openUploadDocModal()">+ Submit First Document</button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = docs.map(d => `
+          <div style="background: #FFF; border: 1px solid var(--tl-border-subtle); border-radius: 12px; padding: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: var(--tl-navy-800); display: block;">${d.docType} (${d.docName})</strong>
+              <span style="font-size: 0.75rem; color: var(--tl-text-muted);">Submitted: ${new Date(d.submittedAt).toLocaleDateString()} • Note: ${d.notes || 'None'}</span>
+            </div>
+            <span class="tl-badge tl-badge-pending">Pending Admin Review</span>
+          </div>
+        `).join('');
+      }
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    // Tab switcher
+    function switchMainTab(tab) {
+      document.getElementById('tabBtnServices').classList.toggle('active', tab === 'services');
+      document.getElementById('tabBtnBookings').classList.toggle('active', tab === 'bookings');
+      document.getElementById('tabBtnDocs').classList.toggle('active', tab === 'docs');
+
+      document.getElementById('tabContentServices').style.display = (tab === 'services') ? 'block' : 'none';
+      document.getElementById('tabContentBookings').style.display = (tab === 'bookings') ? 'block' : 'none';
+      document.getElementById('tabContentDocs').style.display = (tab === 'docs') ? 'block' : 'none';
+    }
+
+    // ------------------------------------------------------------------------
+    // Service Modal Handlers (Create / Edit / Delete)
+    // ------------------------------------------------------------------------
+    function openCreateServiceModal() {
+      document.getElementById('serviceForm').reset();
+      document.getElementById('serviceEditId').value = '';
+      document.getElementById('serviceModalTitle').innerText = 'Create Service Listing';
+      document.getElementById('saveServiceBtn').innerText = 'Save & Publish Listing';
+      togglePriceAmountInput();
+      document.getElementById('serviceModal').classList.add('active');
+    }
+
+    function openEditServiceModal(serviceId) {
+      const services = TLServices.getAllServices();
+      const s = services.find(x => x.id === serviceId);
+      if (!s) return;
+
+      document.getElementById('serviceEditId').value = s.id;
+      document.getElementById('srvTitle').value = s.title;
+      document.getElementById('srvCategory').value = s.categoryId;
+      document.getElementById('srvDesc').value = s.description;
+      document.getElementById('srvPricingType').value = s.pricingType;
+      document.getElementById('srvPriceAmount').value = s.priceAmount || '';
+      document.getElementById('srvIsAvailable').checked = s.isAvailable;
+
+      document.getElementById('serviceModalTitle').innerText = 'Edit Service Listing';
+      document.getElementById('saveServiceBtn').innerText = 'Update Service Listing';
+      togglePriceAmountInput();
+      document.getElementById('serviceModal').classList.add('active');
+    }
+
+    function closeServiceModal() {
+      document.getElementById('serviceModal').classList.remove('active');
+    }
+
+    function togglePriceAmountInput() {
+      const type = document.getElementById('srvPricingType').value;
+      const group = document.getElementById('srvPriceAmountGroup');
+      group.style.display = (type === 'upon_request') ? 'none' : 'block';
+    }
+
+    function handleSaveService() {
+      const editId = document.getElementById('serviceEditId').value;
+      const title = document.getElementById('srvTitle').value;
+      const categoryId = document.getElementById('srvCategory').value;
+      const description = document.getElementById('srvDesc').value;
+      const pricingType = document.getElementById('srvPricingType').value;
+      const priceAmount = document.getElementById('srvPriceAmount').value;
+      const isAvailable = document.getElementById('srvIsAvailable').checked;
+
+      let res;
+      if (editId) {
+        res = TLServices.updateService(editId, currentProvider.id, {
+          title, categoryId, description, pricingType, priceAmount: parseFloat(priceAmount) || null, isAvailable
+        });
+      } else {
+        res = TLServices.createService({
+          providerId: currentProvider.id,
+          categoryId,
+          title,
+          description,
+          pricingType,
+          priceAmount,
+          isAvailable
+        });
+      }
+
+      if (res.success) {
+        alert(editId ? 'Service listing updated successfully!' : 'Service listing created and published!');
+        closeServiceModal();
+        renderServicesList();
+        renderKPIs();
+      } else {
+        alert('Error: ' + res.error);
+      }
+    }
+
+    function deleteService(serviceId) {
+      if (!confirm('Are you sure you want to remove this service listing?')) return;
+      const res = TLServices.deleteService(serviceId, currentProvider.id);
+      if (res.success) {
+        renderServicesList();
+        renderKPIs();
+      } else {
+        alert(res.error);
+      }
+    }
+
+    function toggleServiceAvailability(serviceId) {
+      const res = TLServices.toggleServiceAvailability(serviceId, currentProvider.id);
+      if (res.success) {
+        renderServicesList();
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Booking Action Workflow Handlers (FR-17, FR-31, BR-05)
+    // ------------------------------------------------------------------------
+    function toggleTimeline(bookingId) {
+      const el = document.getElementById(`timeline-${bookingId}`);
+      if (el) el.style.display = (el.style.display === 'none' || !el.style.display) ? 'block' : 'none';
+    }
+
+    function handleAcceptBooking(bookingId) {
+      const user = TLAuth.getCurrentUser();
+      const res = TLBookings.transitionStatus({
+        bookingId,
+        targetStatus: 'accepted',
+        actorRole: 'provider',
+        actorUserId: user.id,
+        reasonNote: 'Specialist confirmed booking availability and accepted request.'
+      });
+      if (res.success) {
+        alert('Booking Accepted (FR-31)! The customer has been notified and you can now coordinate on-site visit.');
+        renderBookingsList();
+        renderKPIs();
+        checkProviderNotifications();
+      } else {
+        alert(res.error);
+      }
+    }
+
+    function handleDeclineBooking(bookingId) {
+      const reason = prompt('Please enter a brief reason for declining (e.g. Schedule fully booked for requested slot):');
+      if (reason === null) return;
+      const user = TLAuth.getCurrentUser();
+      const res = TLBookings.transitionStatus({
+        bookingId,
+        targetStatus: 'rejected',
+        actorRole: 'provider',
+        actorUserId: user.id,
+        reasonNote: reason.trim() || 'Schedule conflict'
+      });
+      if (res.success) {
+        alert('Booking request declined.');
+        renderBookingsList();
+        renderKPIs();
+        checkProviderNotifications();
+      } else {
+        alert(res.error);
+      }
+    }
+
+    function handleStartJob(bookingId) {
+      const user = TLAuth.getCurrentUser();
+      const res = TLBookings.transitionStatus({
+        bookingId,
+        targetStatus: 'in_progress',
+        actorRole: 'provider',
+        actorUserId: user.id,
+        reasonNote: 'Specialist commenced service work on site.'
+      });
+      if (res.success) {
+        alert('Job marked "In Progress". Work has commenced on site.');
+        renderBookingsList();
+        renderKPIs();
+        checkProviderNotifications();
+      } else {
+        alert(res.error);
+      }
+    }
+
+    function handleCompleteJob(bookingId) {
+      if (!confirm('Confirm that this service job is 100% completed?')) return;
+      const user = TLAuth.getCurrentUser();
+      const res = TLBookings.transitionStatus({
+        bookingId,
+        targetStatus: 'completed',
+        actorRole: 'provider',
+        actorUserId: user.id,
+        reasonNote: 'Specialist completed all service tasks and verified quality.'
+      });
+      if (res.success) {
+        alert('Job marked Completed (FR-17)! The customer has been notified and invited to submit a verified rating (FR-39).');
+        renderBookingsList();
+        renderKPIs();
+        checkProviderNotifications();
+      } else {
+        alert(res.error);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Profile Modal Handlers
+    // ------------------------------------------------------------------------
+    function openEditProfileModal() {
+      if (!currentProvider) return;
+      document.getElementById('editBusinessName').value = currentProvider.businessName;
+      document.getElementById('editCity').value = currentProvider.city || 'Islamabad';
+      document.getElementById('editServiceAreas').value = (currentProvider.serviceAreas || []).join(', ');
+      document.getElementById('editExpYears').value = currentProvider.experienceYears || 1;
+      document.getElementById('editSkills').value = (currentProvider.skills || []).join(', ');
+      document.getElementById('editBio').value = currentProvider.bioDescription || '';
+      document.getElementById('editProfileModal').classList.add('active');
+    }
+
+    function closeEditProfileModal() {
+      document.getElementById('editProfileModal').classList.remove('active');
+    }
+
+    function handleSaveProviderProfile() {
+      const businessName = document.getElementById('editBusinessName').value;
+      const city = document.getElementById('editCity').value;
+      const serviceAreas = document.getElementById('editServiceAreas').value.split(',').map(s => s.trim());
+      const experienceYears = parseInt(document.getElementById('editExpYears').value) || 1;
+      const skills = document.getElementById('editSkills').value.split(',').map(s => s.trim());
+      const bioDescription = document.getElementById('editBio').value;
+
+      const user = TLAuth.getCurrentUser();
+      const res = TLServices.updateProviderProfile(user.id, {
+        businessName, city, serviceAreas, experienceYears, skills, bioDescription
+      });
+
+      if (res.success) {
+        currentProvider = res.profile;
+        alert('Provider profile updated successfully!');
+        closeEditProfileModal();
+        renderProfileSidebar();
+      } else {
+        alert(res.error);
+      }
+    }
+
+    // Avatar upload validation
+    function handleAvatarUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      if (!['image/png', 'image/jpeg'].includes(file.type)) {
+        alert('Invalid file format. Please upload a PNG or JPG image.');
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        alert('Image file size must be less than 2MB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('provAvatarImg').src = e.target.result;
+        const user = TLAuth.getCurrentUser();
+        TLServices.updateProviderProfile(user.id, { avatarUrl: e.target.result });
+        alert('Profile picture updated!');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Document Modal Handlers
+    function openUploadDocModal() {
+      document.getElementById('uploadDocModal').classList.add('active');
+    }
+    function closeUploadDocModal() {
+      document.getElementById('uploadDocModal').classList.remove('active');
+    }
+
+    function handleUploadDocSubmit() {
+      const docType = document.getElementById('docTypeSelect').value;
+      const fileInput = document.getElementById('docFile');
+      const notes = document.getElementById('docNotes').value;
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Please select a credential document file.');
+        return;
+      }
+      const file = fileInput.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size exceeds 5MB limit.');
+        return;
+      }
+
+      const res = TLServices.submitVerificationDoc(currentProvider.id, {
+        docType,
+        docName: file.name,
+        notes
+      });
+
+      if (res.success) {
+        alert('Document Submitted Successfully! Awaiting Administrator screening (UC-04).');
+        closeUploadDocModal();
+        currentProvider = TLServices.getProviderProfile(TLAuth.getCurrentUser().id);
+        renderProfileSidebar();
+        renderDocsList();
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Provider In-App Notifications (FR-36, FR-37)
+    // ------------------------------------------------------------------------
+    function checkProviderNotifications() {
+      const user = TLAuth.getCurrentUser();
+      if (!user) return;
+      const notifs = TLBookings.getUserNotifications(user.id);
+      const unread = notifs.filter(n => !n.isRead);
+
+      const pill = document.getElementById('notifBadgePill');
+      if (unread.length > 0) {
+        pill.innerText = unread.length;
+        pill.style.display = 'block';
+      } else {
+        pill.style.display = 'none';
+      }
+    }
+
+    function openNotificationsModal() {
+      const user = TLAuth.getCurrentUser();
+      const notifs = TLBookings.getUserNotifications(user.id);
+      const container = document.getElementById('notificationsContainer');
+
+      if (notifs.length === 0) {
+        container.innerHTML = '<p style="color: var(--tl-text-muted); text-align: center; margin: 20px 0;">No new notifications.</p>';
+      } else {
+        container.innerHTML = notifs.map(n => `
+          <div style="background: ${n.isRead ? 'var(--tl-bg-subtle)' : 'var(--tl-teal-50)'}; border: 1px solid var(--tl-border-subtle); border-radius: 10px; padding: 12px; font-size: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="color: var(--tl-navy-800);">${n.title}</strong>
+              <span style="font-size: 0.7rem; color: var(--tl-text-muted);">${new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <p style="margin: 0; color: var(--tl-text-secondary);">${n.message}</p>
+          </div>
+        `).join('');
+
+        notifs.forEach(n => TLBookings.markNotificationAsRead(n.id));
+        document.getElementById('notifBadgePill').style.display = 'none';
+      }
+
+      document.getElementById('notificationsModal').classList.add('active');
+    }
+
+    function closeNotificationsModal() {
+      document.getElementById('notificationsModal').classList.remove('active');
+    }
+
+    // ------------------------------------------------------------------------
+    // Provider Booking Messaging
+    // ------------------------------------------------------------------------
+    function openProviderChat(bookingId, customerName) {
+      document.getElementById('providerChatBookingId').value = bookingId;
+      document.getElementById('providerChatModalTitle').innerText = `Chat with ${customerName} (#${bookingId})`;
+      renderProviderChatMessages(bookingId);
+      document.getElementById('providerChatModal').classList.add('active');
+    }
+
+    function closeProviderChatModal() {
+      document.getElementById('providerChatModal').classList.remove('active');
+    }
+
+    function renderProviderChatMessages(bookingId) {
+      const messages = TLCommunication.getBookingMessages(bookingId);
+      const container = document.getElementById('providerChatMessagesList');
+
+      if (messages.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--tl-text-muted); font-size: 0.85rem; margin: 20px 0;">No messages yet. Send a message to coordinate with the customer.</p>';
+        return;
+      }
+
+      const user = TLAuth.getCurrentUser();
+      container.innerHTML = messages.map(m => {
+        const isMine = m.senderId === user.id || m.senderRole === 'provider';
+        return `
+          <div style="align-self: ${isMine ? 'flex-end' : 'flex-start'}; max-width: 80%; background: ${isMine ? 'var(--tl-navy-800)' : '#FFF'}; color: ${isMine ? '#FFF' : 'var(--tl-text-primary)'}; border: 1px solid var(--tl-border-subtle); border-radius: 12px; padding: 10px 14px; font-size: 0.85rem; box-shadow: var(--tl-shadow-xs);">
+            <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 0.7rem; color: ${isMine ? 'var(--tl-teal-200)' : 'var(--tl-text-muted)'}; margin-bottom: 2px;">
+              <strong>${m.senderName}</strong>
+              <span>${new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <div style="line-height: 1.4;">${m.messageText}</div>
+          </div>
+        `;
+      }).join('');
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function submitProviderChatMessage() {
+      const bookingId = document.getElementById('providerChatBookingId').value;
+      const text = document.getElementById('providerChatMsgInput').value.trim();
+      const user = TLAuth.getCurrentUser();
+
+      const res = TLCommunication.sendMessage({
+        bookingId,
+        senderId: user.id,
+        senderName: currentProvider ? currentProvider.businessName : user.fullName,
+        senderRole: 'provider',
+        messageText: text
+      });
+
+      if (res.success) {
+        document.getElementById('providerChatMsgInput').value = '';
+        renderProviderChatMessages(bookingId);
+      } else {
+        alert('Error: ' + res.error);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Provider Dispute / Complaint Filing (FR-47, UC-05)
+    // ------------------------------------------------------------------------
+    function openProviderComplaintModal(bookingId, customerName) {
+      document.getElementById('providerComplaintBookingId').value = bookingId;
+      document.getElementById('providerComplaintSubject').value = '';
+      document.getElementById('providerComplaintDesc').value = '';
+      document.getElementById('providerComplaintModal').classList.add('active');
+    }
+
+    function closeProviderComplaintModal() {
+      document.getElementById('providerComplaintModal').classList.remove('active');
+    }
+
+    function submitProviderComplaint() {
+      const bookingId = document.getElementById('providerComplaintBookingId').value;
+      const subject = document.getElementById('providerComplaintSubject').value.trim();
+      const priority = document.getElementById('providerComplaintPriority').value;
+      const desc = document.getElementById('providerComplaintDesc').value.trim();
+      const user = TLAuth.getCurrentUser();
+
+      const res = TLCommunication.fileComplaint({
+        bookingId,
+        reporterId: user.id,
+        reporterRole: 'provider',
+        reporterName: currentProvider ? currentProvider.businessName : user.fullName,
+        subject,
+        description: desc,
+        priority
+      });
+
+      if (res.success) {
+        alert(`Issue report submitted to administration (ID: ${res.dispute.id}). An administrator will investigate.`);
+        closeProviderComplaintModal();
+      } else {
+        alert('Error: ' + res.error);
+      }
+    }
+  </script>
+
+  <!-- Notification Modal -->
+  <div class="tl-modal-backdrop" id="notificationsModal">
+    <div class="tl-modal" style="max-width: 500px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Provider Notifications (FR-36)</h3>
+        <button class="tl-modal-close" onclick="closeNotificationsModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <div id="notificationsContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
+          <!-- Loaded via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Provider Chat Modal -->
+  <div class="tl-modal-backdrop" id="providerChatModal">
+    <div class="tl-modal" style="max-width: 540px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title" id="providerChatModalTitle">Chat with Customer</h3>
+        <button class="tl-modal-close" onclick="closeProviderChatModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <div id="providerChatMessagesList" style="display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; padding: 12px; background: var(--tl-bg-subtle); border-radius: 10px; margin-bottom: 12px;">
+          <!-- Loaded via JS -->
+        </div>
+        <form onsubmit="event.preventDefault(); submitProviderChatMessage();">
+          <input type="hidden" id="providerChatBookingId">
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="providerChatMsgInput" class="tl-input" placeholder="Type message to customer..." required>
+            <button type="submit" class="tl-btn tl-btn-primary" style="white-space: nowrap;">Send</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Provider Dispute Modal -->
+  <div class="tl-modal-backdrop" id="providerComplaintModal">
+    <div class="tl-modal" style="max-width: 520px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Report Issue to Administrator</h3>
+        <button class="tl-modal-close" onclick="closeProviderComplaintModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <form onsubmit="event.preventDefault(); submitProviderComplaint();">
+          <input type="hidden" id="providerComplaintBookingId">
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin-bottom: 14px;">
+            Submit a formal report to TradeLinker administrators regarding payment issues, access hurdles, or customer misconduct.
+          </p>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Issue Subject</label>
+            <input type="text" id="providerComplaintSubject" class="tl-input" placeholder="e.g. Property inaccessible at agreed time" required minlength="5">
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Priority</label>
+            <select id="providerComplaintPriority" class="tl-select" required>
+              <option value="Normal">Normal Priority</option>
+              <option value="High">High Priority</option>
+              <option value="Urgent">Urgent Issue</option>
+            </select>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Detailed Description</label>
+            <textarea id="providerComplaintDesc" class="tl-textarea" placeholder="Detail the situation clearly for administrative mediation..." required minlength="10"></textarea>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeProviderComplaintModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary">Submit to Administrator</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

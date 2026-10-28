@@ -1,0 +1,257 @@
+/* ==========================================================================
+   TradeLinker Design System — Core Design Tokens & Global Styles
+   Brand Reference: Techminds (Wasi Ullah & Hamad Ullah)
+   Platform Tagline: "Connecting People with Trusted Professionals"
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap');
+
+:root {
+  /* -------------------------------------------------------------------------
+     1. Color Palette (Extracted directly from TradeLinker Official Branding)
+     ------------------------------------------------------------------------- */
+  
+  /* Primary Deep Navy: Logo 'Trade', Headings, Hero accents, Dark Footer */
+  --tl-navy-950: #011425;
+  --tl-navy-900: #011E38;
+  --tl-navy-800: #012B52; /* Primary Brand Navy (Sampled: #012B52 / #00294E) */
+  --tl-navy-700: #043868;
+  --tl-navy-600: #094B85;
+  --tl-navy-100: #E6EFF7;
+  --tl-navy-50:  #F0F6FB;
+
+  /* Primary Vibrant Teal: Logo 'Linker', Interlocking Chain, Primary CTAs */
+  --tl-teal-700: #007A65;
+  --tl-teal-600: #008F76;
+  --tl-teal-500: #01AD8F; /* Primary Brand Teal (Sampled: #01AD8F / #02B693) */
+  --tl-teal-400: #00C4A2;
+  --tl-teal-300: #34D8B9;
+  --tl-teal-200: #A7F0E2;
+  --tl-teal-100: #E6F8F5; /* Light Mint Tint (Card highlight / category backgrounds) */
+  --tl-teal-50:  #F2FCFA;
+
+  /* Accent Gold: "Premium Plan" Ribbon, Crown, 5-Star Ratings */
+  --tl-gold-700: #B45309;
+  --tl-gold-600: #D97706;
+  --tl-gold-500: #F59E0B; /* Gold Accent (Sampled: #F9D02F / #EFAF20) */
+  --tl-gold-400: #FBBF24;
+  --tl-gold-100: #FEF3C7;
+  --tl-gold-50:  #FFFDF5;
+
+  /* Booking Lifecycle & Semantic Status Colors */
+  --tl-status-pending-text:   #92400E;
+  --tl-status-pending-bg:     #FEF3C7;
+  --tl-status-pending-border: #FDE68A;
+
+  --tl-status-accepted-text:   #1D4ED8;
+  --tl-status-accepted-bg:     #DBEAFE;
+  --tl-status-accepted-border: #BFDBFE;
+
+  --tl-status-inprogress-text:   #6D28D9;
+  --tl-status-inprogress-bg:     #EDE9FE;
+  --tl-status-inprogress-border: #DDD6FE;
+
+  --tl-status-completed-text:   #065F46;
+  --tl-status-completed-bg:     #D1FAE5;
+  --tl-status-completed-border: #A7F3D0;
+
+  --tl-status-cancelled-text:   #991B1B;
+  --tl-status-cancelled-bg:     #FEE2E2;
+  --tl-status-cancelled-border: #FECACA;
+
+  --tl-status-rejected-text:   #9F1239;
+  --tl-status-rejected-bg:     #FFE4E6;
+  --tl-status-rejected-border: #FECDD3;
+
+  /* Surfaces, Borders & Layout */
+  --tl-bg-page:        #F8FAFC;
+  --tl-bg-surface:     #FFFFFF;
+  --tl-bg-card:        #FFFFFF;
+  --tl-bg-subtle:      #F1F5F9;
+  --tl-border-subtle:  #E2E8F0;
+  --tl-border-strong:  #CBD5E1;
+  --tl-border-focus:   var(--tl-teal-500);
+
+  /* Typography Text Colors */
+  --tl-text-primary:   #0F172A;
+  --tl-text-secondary: #475569;
+  --tl-text-muted:     #94A3B8;
+  --tl-text-inverse:   #FFFFFF;
+  --tl-text-teal:      var(--tl-teal-600);
+
+  /* -------------------------------------------------------------------------
+     2. Typography System
+     ------------------------------------------------------------------------- */
+  --tl-font-sans:     'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --tl-font-display:  'Outfit', 'Plus Jakarta Sans', sans-serif;
+  --tl-font-script:   'Caveat', cursive; /* For "Your Service, Our Priority" */
+
+  --tl-font-size-xs:   0.75rem;   /* 12px */
+  --tl-font-size-sm:   0.875rem;  /* 14px */
+  --tl-font-size-base: 1rem;      /* 16px */
+  --tl-font-size-md:   1.125rem;  /* 18px */
+  --tl-font-size-lg:   1.25rem;   /* 20px */
+  --tl-font-size-xl:   1.5rem;    /* 24px */
+  --tl-font-size-2xl:  1.875rem;  /* 30px */
+  --tl-font-size-3xl:  2.25rem;   /* 36px */
+  --tl-font-size-4xl:  3rem;      /* 48px */
+  --tl-font-size-5xl:  3.75rem;   /* 60px */
+
+  --tl-font-weight-regular:  400;
+  --tl-font-weight-medium:   500;
+  --tl-font-weight-semibold: 600;
+  --tl-font-weight-bold:     700;
+  --tl-font-weight-extrabold:800;
+
+  --tl-line-height-tight:  1.2;
+  --tl-line-height-snug:   1.35;
+  --tl-line-height-normal: 1.5;
+  --tl-line-height-loose:  1.75;
+
+  /* -------------------------------------------------------------------------
+     3. Elevation & Box Shadows
+     ------------------------------------------------------------------------- */
+  --tl-shadow-xs: 0 1px 2px rgba(1, 43, 82, 0.05);
+  --tl-shadow-sm: 0 2px 8px rgba(1, 43, 82, 0.06);
+  --tl-shadow-md: 0 6px 18px rgba(1, 43, 82, 0.08);
+  --tl-shadow-lg: 0 12px 30px -4px rgba(1, 43, 82, 0.12);
+  --tl-shadow-xl: 0 20px 40px -8px rgba(1, 43, 82, 0.16);
+  --tl-shadow-teal: 0 8px 24px -4px rgba(1, 173, 143, 0.35);
+  --tl-shadow-gold: 0 8px 24px -4px rgba(245, 158, 11, 0.35);
+
+  /* -------------------------------------------------------------------------
+     4. Border Radii
+     ------------------------------------------------------------------------- */
+  --tl-radius-xs:   4px;
+  --tl-radius-sm:   8px;
+  --tl-radius-md:   12px;
+  --tl-radius-lg:   16px;
+  --tl-radius-xl:   22px;
+  --tl-radius-2xl:  30px;
+  --tl-radius-full: 9999px;
+
+  /* -------------------------------------------------------------------------
+     5. Spacing System
+     ------------------------------------------------------------------------- */
+  --tl-space-1:  0.25rem;  /* 4px */
+  --tl-space-2:  0.5rem;   /* 8px */
+  --tl-space-3:  0.75rem;  /* 12px */
+  --tl-space-4:  1rem;     /* 16px */
+  --tl-space-5:  1.25rem;  /* 20px */
+  --tl-space-6:  1.5rem;   /* 24px */
+  --tl-space-8:  2rem;     /* 32px */
+  --tl-space-10: 2.5rem;   /* 40px */
+  --tl-space-12: 3rem;     /* 48px */
+  --tl-space-16: 4rem;     /* 64px */
+  --tl-space-20: 5rem;     /* 80px */
+
+  /* -------------------------------------------------------------------------
+     6. Layout & Container Breakpoints
+     ------------------------------------------------------------------------- */
+  --tl-container-max: 1240px;
+  --tl-container-wide: 1360px;
+  --tl-container-pad: var(--tl-space-4);
+
+  /* Transitions */
+  --tl-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --tl-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --tl-transition-smooth: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Z-Index Layers */
+  --tl-z-dropdown: 1000;
+  --tl-z-sticky:   1020;
+  --tl-z-fixed:    1030;
+  --tl-z-modal-backdrop: 1040;
+  --tl-z-modal:    1050;
+  --tl-z-toast:    1060;
+  --tl-z-tooltip:  1070;
+}
+
+/* -------------------------------------------------------------------------
+   Global Reset & Base Rules
+   ------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--tl-font-sans);
+  font-size: var(--tl-font-size-base);
+  line-height: var(--tl-line-height-normal);
+  color: var(--tl-text-primary);
+  background-color: var(--tl-bg-page);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* Typography Defaults */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--tl-font-display);
+  color: var(--tl-navy-800);
+  font-weight: var(--tl-font-weight-bold);
+  line-height: var(--tl-line-height-tight);
+}
+
+h1 { font-size: var(--tl-font-size-4xl); font-weight: var(--tl-font-weight-extrabold); letter-spacing: -0.025em; }
+h2 { font-size: var(--tl-font-size-3xl); letter-spacing: -0.02em; }
+h3 { font-size: var(--tl-font-size-xl); }
+h4 { font-size: var(--tl-font-size-lg); }
+h5 { font-size: var(--tl-font-size-md); }
+h6 { font-size: var(--tl-font-size-base); }
+
+p {
+  color: var(--tl-text-secondary);
+  margin-bottom: var(--tl-space-3);
+}
+
+a {
+  color: var(--tl-teal-600);
+  text-decoration: none;
+  transition: color var(--tl-transition-fast);
+}
+
+a:hover {
+  color: var(--tl-teal-700);
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Container Utility */
+.tl-container {
+  width: 100%;
+  max-width: var(--tl-container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--tl-container-pad);
+  padding-right: var(--tl-container-pad);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --tl-container-pad: var(--tl-space-6);
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --tl-container-pad: var(--tl-space-8);
+  }
+}

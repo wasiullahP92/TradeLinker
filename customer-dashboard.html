@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Dashboard — TradeLinker</title>
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reloader.css">
+  <style>
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding: 3rem 0;
+    }
+    @media (min-width: 992px) {
+      .dashboard-grid {
+        grid-template-columns: 320px 1fr;
+      }
+    }
+    .profile-card {
+      background: #FFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--tl-shadow-xs);
+      height: fit-content;
+    }
+    .booking-card {
+      background: #FFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--tl-shadow-xs);
+      transition: all var(--tl-transition-fast);
+      position: relative;
+    }
+    .booking-card:hover {
+      box-shadow: var(--tl-shadow-md);
+      border-color: var(--tl-border-strong);
+    }
+    .filter-btn-group {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 20px;
+    }
+    .filter-btn {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid var(--tl-border-subtle);
+      background: #FFF;
+      color: var(--tl-text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--tl-transition-fast);
+    }
+    .filter-btn:hover {
+      border-color: var(--tl-teal-500);
+      color: var(--tl-teal-600);
+    }
+    .filter-btn.active {
+      background: var(--tl-navy-800);
+      color: #FFF;
+      border-color: var(--tl-navy-800);
+    }
+    .timeline-wrap {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--tl-border-subtle);
+      font-size: 0.85rem;
+      display: none;
+    }
+    .timeline-wrap.open {
+      display: block;
+    }
+    .timeline-step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .timeline-step:last-child {
+      margin-bottom: 0;
+    }
+    .timeline-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--tl-teal-500);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .notif-bell-btn {
+      position: relative;
+      background: #FFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--tl-navy-800);
+    }
+    .notif-badge-pill {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #DC2626;
+      color: #FFF;
+      border-radius: 10px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="tl-navbar">
+    <div class="tl-container">
+      <div class="tl-navbar-inner">
+        <a href="index.html" class="tl-logo" title="TradeLinker Home">
+          <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Logo" class="tl-logo-img">
+        </a>
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <!-- Notification Bell -->
+          <button class="notif-bell-btn" id="notifBell" onclick="openNotificationsModal()" title="View Notifications (FR-36)">
+            <span data-tl-icon="calendar" style="width: 18px; height: 18px;"></span>
+            <span class="notif-badge-pill" id="notifBadgePill">0</span>
+          </button>
+          <span class="tl-badge tl-badge-verified">
+            <span class="tl-badge-dot"></span> Customer Portal
+          </span>
+          <button class="tl-btn tl-btn-outline tl-btn-sm" onclick="TLAuth.logout()">Log Out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="tl-container">
+    <div class="dashboard-grid">
+      <!-- Left Sidebar: Profile Summary & Actions -->
+      <aside class="profile-card">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--tl-teal-100); color: var(--tl-teal-700); font-size: 1.75rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;" id="userInitials">
+            U
+          </div>
+          <h2 style="font-size: 1.25rem; color: var(--tl-navy-800);" id="profileName">Loading...</h2>
+          <span class="tl-badge tl-badge-accepted" id="profileRoleBadge" style="margin-top: 4px;">Customer</span>
+        </div>
+
+        <div style="border-top: 1px solid var(--tl-border-subtle); padding-top: 16px; font-size: 0.9rem;">
+          <div style="margin-bottom: 10px;">
+            <strong style="color: var(--tl-navy-800); display: block;">Email:</strong>
+            <span id="profileEmail" style="color: var(--tl-text-secondary); word-break: break-all;">-</span>
+          </div>
+          <div style="margin-bottom: 10px;">
+            <strong style="color: var(--tl-navy-800); display: block;">Phone:</strong>
+            <span id="profilePhone" style="color: var(--tl-text-secondary);">-</span>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <strong style="color: var(--tl-navy-800); display: block;">Location:</strong>
+            <span id="profileCity" style="color: var(--tl-text-secondary);">-</span>
+          </div>
+
+          <button class="tl-btn tl-btn-primary" style="width: 100%;" onclick="openEditProfileModal()">Edit Profile Details</button>
+          <a href="search.html" class="tl-btn tl-btn-outline-teal" style="width: 100%; margin-top: 10px; text-align: center; display: block;">Book New Service</a>
+        </div>
+      </aside>
+
+      <!-- Right Area: Bookings Management (FR-10, FR-30, FR-34, BR-05) -->
+      <section>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h2 style="font-size: 1.5rem; color: var(--tl-navy-800); margin: 0 0 4px 0;">Your Service Requests & Bookings</h2>
+            <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin: 0;">Track service progress, verify provider updates, and manage bookings.</p>
+          </div>
+          <span class="tl-badge tl-badge-accepted" id="totalBookingsCount">0 Bookings</span>
+        </div>
+
+        <!-- Status Filter Tabs -->
+        <div class="filter-btn-group">
+          <button class="filter-btn active" onclick="setBookingFilter('all', this)">All Bookings</button>
+          <button class="filter-btn" onclick="setBookingFilter('pending', this)">Pending</button>
+          <button class="filter-btn" onclick="setBookingFilter('accepted', this)">Accepted</button>
+          <button class="filter-btn" onclick="setBookingFilter('in_progress', this)">In Progress</button>
+          <button class="filter-btn" onclick="setBookingFilter('completed', this)">Completed</button>
+          <button class="filter-btn" onclick="setBookingFilter('cancelled', this)">Cancelled / Declined</button>
+        </div>
+
+        <div id="refreshBarSlot"></div>
+        <div id="customerBookingsList" style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Loaded dynamically via TLBookings -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       Modal 1: Edit Profile (FR-06)
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="editProfileModal">
+    <div class="tl-modal">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Edit Account Information (FR-06)</h3>
+        <button class="tl-modal-close" onclick="closeEditProfileModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <form onsubmit="event.preventDefault(); saveProfileUpdates();">
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Full Name</label>
+            <input type="text" id="editName" class="tl-input" required>
+          </div>
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Phone Number</label>
+            <input type="tel" id="editPhone" class="tl-input" required>
+          </div>
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">City / Primary Location</label>
+            <input type="text" id="editCity" class="tl-input" required>
+          </div>
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeEditProfileModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Modal 2: Cancel Booking (FR-10, BR-05)
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="cancelModal">
+    <div class="tl-modal">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Cancel Service Booking (FR-10)</h3>
+        <button class="tl-modal-close" onclick="closeCancelModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <form onsubmit="event.preventDefault(); confirmCancellation();">
+          <input type="hidden" id="cancelBookingId">
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin-bottom: 14px;">
+            According to TradeLinker policy (<strong>FR-10</strong>), you may cancel bookings that are <em>Pending</em> or <em>Accepted</em> prior to commencement. Once work is <em>In Progress</em>, cancellations cannot be self-served.
+          </p>
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Reason for Cancellation</label>
+            <select id="cancelReasonPreset" class="tl-select" onchange="toggleCancelOtherReason()" required>
+              <option value="Schedule conflict / Rescheduling required">Schedule conflict / Rescheduling required</option>
+              <option value="Issue resolved independently">Issue resolved independently</option>
+              <option value="Found alternative arrangement">Found alternative arrangement</option>
+              <option value="Other">Other Reason (Please explain)</option>
+            </select>
+          </div>
+          <div class="tl-form-group" id="cancelOtherGroup" style="display: none;">
+            <label class="tl-label">Please explain:</label>
+            <textarea id="cancelReasonCustom" class="tl-textarea" placeholder="Detail your cancellation reason..."></textarea>
+          </div>
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeCancelModal()">Keep Booking</button>
+            <button type="submit" class="tl-btn tl-btn-outline" style="color: #DC2626; border-color: #FECACA;">Confirm Cancellation</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Modal 3: Leave Verified Rating & Review (BR-06, FR-39, FR-40)
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="reviewModal">
+    <div class="tl-modal">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Rate Completed Service (BR-06)</h3>
+        <button class="tl-modal-close" onclick="closeReviewModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <form onsubmit="event.preventDefault(); submitVerifiedReview();">
+          <input type="hidden" id="reviewBookingId">
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin-bottom: 14px;">
+            Your feedback directly impacts the trade specialist's verified score across Pakistan. Only customers with completed bookings can leave verified reviews (<strong>BR-06</strong>).
+          </p>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Your Rating (1 to 5 Stars)</label>
+            <select id="reviewRatingSelect" class="tl-select" required>
+              <option value="5">★★★★★ 5 Stars (Exceptional Service)</option>
+              <option value="4">★★★★☆ 4 Stars (Very Good)</option>
+              <option value="3">★★★☆☆ 3 Stars (Satisfactory / Average)</option>
+              <option value="2">★★☆☆☆ 2 Stars (Needs Improvement)</option>
+              <option value="1">★☆☆☆☆ 1 Star (Unsatisfactory)</option>
+            </select>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Written Review & Feedback</label>
+            <textarea id="reviewCommentText" class="tl-textarea" placeholder="Describe punctuality, technical skill, safety compliance, and overall satisfaction..." required minlength="5"></textarea>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeReviewModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary">Submit Verified Review (FR-39)</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Modal 4: In-App Notifications (FR-36, FR-37)
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="notificationsModal">
+    <div class="tl-modal" style="max-width: 500px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">In-App Notifications (FR-36)</h3>
+        <button class="tl-modal-close" onclick="closeNotificationsModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <div id="notificationsContainer" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
+          <!-- Loaded via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Modal 5: Booking Communication / Messages Thread
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="chatModal">
+    <div class="tl-modal" style="max-width: 540px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title" id="chatModalTitle">Chat with Specialist</h3>
+        <button class="tl-modal-close" onclick="closeChatModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <div id="chatMessagesList" style="display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; padding: 12px; background: var(--tl-bg-subtle); border-radius: 10px; margin-bottom: 12px;">
+          <!-- Loaded via JS -->
+        </div>
+        <form onsubmit="event.preventDefault(); submitCustomerChatMessage();">
+          <input type="hidden" id="chatBookingId">
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="chatMsgInput" class="tl-input" placeholder="Type message to specialist..." required>
+            <button type="submit" class="tl-btn tl-btn-primary" style="white-space: nowrap;">Send</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Modal 6: File Issue / Complaint to Administrator (FR-47, UC-05)
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="complaintModal">
+    <div class="tl-modal" style="max-width: 520px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Report Issue / Dispute to Admin</h3>
+        <button class="tl-modal-close" onclick="closeComplaintModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <form onsubmit="event.preventDefault(); submitCustomerComplaint();">
+          <input type="hidden" id="complaintBookingId">
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin-bottom: 14px;">
+            Platform administrators actively investigate service disputes, non-attendance, or unfulfilled workmanship (<strong>FR-47</strong>).
+          </p>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Issue Subject</label>
+            <input type="text" id="complaintSubject" class="tl-input" placeholder="e.g. Specialist did not arrive at scheduled slot" required minlength="5">
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Urgency / Priority</label>
+            <select id="complaintPriority" class="tl-select" required>
+              <option value="Normal">Normal Priority</option>
+              <option value="High">High Priority</option>
+              <option value="Urgent">Urgent / Safety Hazard</option>
+            </select>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Detailed Description</label>
+            <textarea id="complaintDesc" class="tl-textarea" placeholder="Detail the events, attempts to communicate, and desired resolution..." required minlength="10"></textarea>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeComplaintModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary">Submit to Administrator</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+  <script src="js/reloader.js"></script>
+  <script>
+    let activeFilter = 'all';
+
+    // Enforce Route Protection for Customer role (FR-49, NFR-06)
+    document.addEventListener('DOMContentLoaded', () => {
+      const isAllowed = TLAuth.protectRoute(['customer']);
+      if (!isAllowed) return;
+
+      loadCustomerData();
+      checkNotifications();
+
+      // Attach In-Place Data Refresh Control
+      TLReloader.attachRefreshControl('refreshBarSlot', async () => {
+        loadCustomerData();
+        checkNotifications();
+        renderBookings();
+      }, { label: "Refresh Bookings" });
+    });
+
+    function setBookingFilter(filter, btn) {
+      activeFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderBookings();
+    }
+
+    function loadCustomerData() {
+      const user = TLAuth.getCurrentUser();
+      if (!user) return;
+
+      document.getElementById('profileName').innerText = user.fullName;
+      document.getElementById('profileEmail').innerText = user.email;
+      document.getElementById('profilePhone').innerText = user.phone;
+      document.getElementById('profileCity').innerText = user.city || 'Islamabad';
+      document.getElementById('userInitials').innerText = user.fullName.charAt(0).toUpperCase();
+
+      renderBookings();
+    }
+
+    function renderBookings() {
+      const user = TLAuth.getCurrentUser();
+      let bookings = TLBookings.getCustomerBookings(user.id);
+
+      // Filtering logic
+      if (activeFilter !== 'all') {
+        if (activeFilter === 'cancelled') {
+          bookings = bookings.filter(b => b.status === 'cancelled' || b.status === 'rejected');
+        } else {
+          bookings = bookings.filter(b => b.status === activeFilter);
+        }
+      }
+
+      document.getElementById('totalBookingsCount').innerText = `${bookings.length} Bookings`;
+      const container = document.getElementById('customerBookingsList');
+
+      if (bookings.length === 0) {
+        container.innerHTML = `
+          <div style="background: #FFF; border: 1px dashed var(--tl-border-subtle); border-radius: 16px; padding: 48px 24px; text-align: center;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--tl-teal-100); color: var(--tl-teal-700); font-size: 1.5rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+              <span data-tl-icon="calendar"></span>
+            </div>
+            <h3 style="color: var(--tl-navy-800); margin-bottom: 6px;">No Bookings in this Category</h3>
+            <p style="color: var(--tl-text-secondary); max-width: 420px; margin: 0 auto 16px; font-size: 0.9rem;">
+              You haven't submitted any booking requests matching this status filter. Find verified trade professionals anytime.
+            </p>
+            <a href="search.html" class="tl-btn tl-btn-primary tl-btn-sm">Browse Services & Pros</a>
+          </div>
+        `;
+        if (window.TLIcons) window.TLIcons.renderAll();
+        return;
+      }
+
+      container.innerHTML = bookings.map(b => {
+        const isReviewed = TLBookings.isBookingReviewed(b.id);
+        const canCancel = (b.status === 'pending' || b.status === 'accepted');
+        const canReview = (b.status === 'completed' && !isReviewed);
+
+        // Status badge class mapping
+        const badgeClasses = {
+          pending: 'tl-badge-pending',
+          accepted: 'tl-badge-accepted',
+          in_progress: 'tl-badge-in_progress',
+          completed: 'tl-badge-completed',
+          rejected: 'tl-badge-rejected',
+          cancelled: 'tl-badge-cancelled'
+        };
+
+        const statusLabels = {
+          pending: 'Pending Specialist Acceptance',
+          accepted: 'Accepted by Specialist',
+          in_progress: 'In Progress (Active Work)',
+          completed: 'Completed Successfully',
+          rejected: 'Declined by Specialist',
+          cancelled: 'Cancelled'
+        };
+
+        return `
+          <div class="booking-card" id="card-${b.id}">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <span class="tl-badge tl-badge-accepted" style="font-size: 0.75rem;">#${b.id}</span>
+                <h3 style="font-size: 1.15rem; color: var(--tl-navy-800); margin: 6px 0 2px 0;">
+                  ${b.serviceTitle}
+                </h3>
+                <div style="font-size: 0.85rem; color: var(--tl-text-muted);">
+                  Specialist: <strong>${b.providerBusinessName || b.providerName}</strong>
+                </div>
+              </div>
+              <span class="tl-badge ${badgeClasses[b.status] || 'tl-badge-pending'}">
+                ${statusLabels[b.status] || b.status}
+              </span>
+            </div>
+
+            <div style="background: var(--tl-bg-subtle); padding: 12px 14px; border-radius: 10px; margin-bottom: 12px; font-size: 0.85rem;">
+              <strong style="color: var(--tl-navy-800); display: block; margin-bottom: 3px;">Problem Description:</strong>
+              ${b.problemDescription}
+              <div style="margin-top: 8px; color: var(--tl-text-secondary);">
+                📍 <strong>Service Location:</strong> ${b.serviceAddress}, ${b.city || 'Islamabad'}
+              </div>
+              ${b.cancellationReason ? `
+                <div style="margin-top: 6px; color: #DC2626; font-weight: 600;">
+                  Reason: ${b.cancellationReason}
+                </div>
+              ` : ''}
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; border-top: 1px solid var(--tl-border-subtle); padding-top: 12px; font-size: 0.85rem; gap: 10px;">
+              <div style="color: var(--tl-text-muted);">
+                Scheduled: <strong>${b.scheduledDate} (${b.scheduledTimeSlot})</strong>
+              </div>
+
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button class="tl-btn tl-btn-ghost tl-btn-xs" onclick="toggleTimeline('${b.id}')">
+                  Audit History (${(b.statusHistory || []).length})
+                </button>
+
+                <button class="tl-btn tl-btn-outline-teal tl-btn-xs" onclick="openBookingChat('${b.id}', '${(b.providerBusinessName || b.providerName).replace(/'/g, "\\'")}')">
+                  Message Specialist
+                </button>
+
+                <button class="tl-btn tl-btn-ghost tl-btn-xs" style="color: #DC2626;" onclick="openComplaintModal('${b.id}', '${(b.providerBusinessName || b.providerName).replace(/'/g, "\\'")}')">
+                  Report Issue
+                </button>
+
+                ${canCancel ? `
+                  <button class="tl-btn tl-btn-outline tl-btn-xs" style="color: #DC2626; border-color: #FECACA;" onclick="openCancelModal('${b.id}')">
+                    Cancel Booking (FR-10)
+                  </button>
+                ` : ''}
+
+                ${b.status === 'in_progress' ? `
+                  <span style="font-size: 0.8rem; color: var(--tl-navy-700); font-weight: 600;">
+                    ⚙️ Work in Progress
+                  </span>
+                ` : ''}
+
+                ${canReview ? `
+                  <button class="tl-btn tl-btn-primary tl-btn-xs" onclick="openReviewModal('${b.id}')">
+                    Leave Review ★ (BR-06)
+                  </button>
+                ` : ''}
+
+                ${isReviewed ? `
+                  <span class="tl-badge tl-badge-completed" style="font-size: 0.75rem;">
+                    ✓ Review Submitted
+                  </span>
+                ` : ''}
+              </div>
+            </div>
+
+            <!-- Immutable Status History Timeline (FR-34) -->
+            <div class="timeline-wrap" id="timeline-${b.id}">
+              <strong style="color: var(--tl-navy-800); display: block; margin-bottom: 8px;">Status Audit Trail (FR-34):</strong>
+              ${(b.statusHistory || []).map(h => `
+                <div class="timeline-step">
+                  <div class="timeline-dot"></div>
+                  <div>
+                    <div style="font-weight: 700; color: var(--tl-navy-800);">
+                      ${h.toStatus.toUpperCase()} 
+                      <span style="font-weight: 400; color: var(--tl-text-muted); font-size: 0.75rem;">
+                        by ${h.changedByRole} • ${new Date(h.timestamp).toLocaleString()}
+                      </span>
+                    </div>
+                    <div style="color: var(--tl-text-secondary); font-size: 0.8rem;">${h.note || ''}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    function toggleTimeline(bookingId) {
+      const wrap = document.getElementById(`timeline-${bookingId}`);
+      if (wrap) wrap.classList.toggle('open');
+    }
+
+    // ------------------------------------------------------------------------
+    // Cancellation Modal (FR-10)
+    // ------------------------------------------------------------------------
+    function openCancelModal(bookingId) {
+      document.getElementById('cancelBookingId').value = bookingId;
+      document.getElementById('cancelReasonPreset').value = 'Schedule conflict / Rescheduling required';
+      toggleCancelOtherReason();
+      document.getElementById('cancelModal').classList.add('active');
+    }
+
+    function closeCancelModal() {
+      document.getElementById('cancelModal').classList.remove('active');
+    }
+
+    function toggleCancelOtherReason() {
+      const val = document.getElementById('cancelReasonPreset').value;
+      document.getElementById('cancelOtherGroup').style.display = (val === 'Other') ? 'block' : 'none';
+    }
+
+    function confirmCancellation() {
+      const bookingId = document.getElementById('cancelBookingId').value;
+      const preset = document.getElementById('cancelReasonPreset').value;
+      const custom = document.getElementById('cancelReasonCustom').value.trim();
+      const reason = (preset === 'Other' && custom) ? custom : preset;
+      const user = TLAuth.getCurrentUser();
+
+      const res = TLBookings.transitionStatus({
+        bookingId,
+        targetStatus: 'cancelled',
+        actorRole: 'customer',
+        actorUserId: user.id,
+        reasonNote: reason
+      });
+
+      if (res.success) {
+        alert(`Booking #${bookingId} successfully cancelled according to policy (FR-10).`);
+        closeCancelModal();
+        renderBookings();
+        checkNotifications();
+      } else {
+        alert('Cancellation Error: ' + res.error);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Verified Reviews Modal (BR-06, FR-39, FR-40)
+    // ------------------------------------------------------------------------
+    function openReviewModal(bookingId) {
+      document.getElementById('reviewBookingId').value = bookingId;
+      document.getElementById('reviewRatingSelect').value = '5';
+      document.getElementById('reviewCommentText').value = '';
+      document.getElementById('reviewModal').classList.add('active');
+    }
+
+    function closeReviewModal() {
+      document.getElementById('reviewModal').classList.remove('active');
+    }
+
+    function submitVerifiedReview() {
+      const bookingId = document.getElementById('reviewBookingId').value;
+      const rating = document.getElementById('reviewRatingSelect').value;
+      const comment = document.getElementById('reviewCommentText').value;
+      const user = TLAuth.getCurrentUser();
+
+      const res = TLBookings.submitReview({
+        bookingId,
+        customerId: user.id,
+        rating,
+        comment
+      });
+
+      if (res.success) {
+        alert('Thank you! Your verified rating and review have been recorded and added to the specialist profile (BR-06).');
+        closeReviewModal();
+        renderBookings();
+      } else {
+        alert('Review Error: ' + res.error);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Profile Updates (FR-06)
+    // ------------------------------------------------------------------------
+    function openEditProfileModal() {
+      const user = TLAuth.getCurrentUser();
+      document.getElementById('editName').value = user.fullName;
+      document.getElementById('editPhone').value = user.phone;
+      document.getElementById('editCity').value = user.city || 'Islamabad';
+      document.getElementById('editProfileModal').classList.add('active');
+    }
+
+    function closeEditProfileModal() {
+      document.getElementById('editProfileModal').classList.remove('active');
+    }
+
+    function saveProfileUpdates() {
+      const fullName = document.getElementById('editName').value;
+      const phone = document.getElementById('editPhone').value;
+      const city = document.getElementById('editCity').value;
+
+      const res = TLAuth.updateProfile({ fullName, phone, city });
+      if (res.success) {
+        alert('Profile details updated successfully!');
+        closeEditProfileModal();
+        loadCustomerData();
+      } else {
+        alert('Update error: ' + res.error);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // In-App Notifications (FR-36, FR-37)
+    // ------------------------------------------------------------------------
+    function checkNotifications() {
+      const user = TLAuth.getCurrentUser();
+      if (!user) return;
+      const notifs = TLBookings.getUserNotifications(user.id);
+      const unread = notifs.filter(n => !n.isRead);
+
+      const pill = document.getElementById('notifBadgePill');
+      if (unread.length > 0) {
+        pill.innerText = unread.length;
+        pill.style.display = 'block';
+      } else {
+        pill.style.display = 'none';
+      }
+    }
+
+    function openNotificationsModal() {
+      const user = TLAuth.getCurrentUser();
+      const notifs = TLBookings.getUserNotifications(user.id);
+      const container = document.getElementById('notificationsContainer');
+
+      if (notifs.length === 0) {
+        container.innerHTML = '<p style="color: var(--tl-text-muted); text-align: center; margin: 20px 0;">No notifications at this time.</p>';
+      } else {
+        container.innerHTML = notifs.map(n => `
+          <div style="background: ${n.isRead ? 'var(--tl-bg-subtle)' : 'var(--tl-teal-50)'}; border: 1px solid var(--tl-border-subtle); border-radius: 10px; padding: 12px; font-size: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="color: var(--tl-navy-800);">${n.title}</strong>
+              <span style="font-size: 0.7rem; color: var(--tl-text-muted);">${new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <p style="margin: 0; color: var(--tl-text-secondary);">${n.message}</p>
+          </div>
+        `).join('');
+
+        // Mark all as read
+        notifs.forEach(n => TLBookings.markNotificationAsRead(n.id));
+        document.getElementById('notifBadgePill').style.display = 'none';
+      }
+
+      document.getElementById('notificationsModal').classList.add('active');
+    }
+
+    function closeNotificationsModal() {
+      document.getElementById('notificationsModal').classList.remove('active');
+    }
+
+    // ------------------------------------------------------------------------
+    // Booking Communication / Messages Thread
+    // ------------------------------------------------------------------------
+    function openBookingChat(bookingId, providerName) {
+      document.getElementById('chatBookingId').value = bookingId;
+      document.getElementById('chatModalTitle').innerText = `Chat with ${providerName} (#${bookingId})`;
+      renderCustomerChatMessages(bookingId);
+      document.getElementById('chatModal').classList.add('active');
+    }
+
+    function closeChatModal() {
+      document.getElementById('chatModal').classList.remove('active');
+    }
+
+    function renderCustomerChatMessages(bookingId) {
+      const messages = TLCommunication.getBookingMessages(bookingId);
+      const container = document.getElementById('chatMessagesList');
+
+      if (messages.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--tl-text-muted); font-size: 0.85rem; margin: 20px 0;">No messages yet. Send a message to coordinate with the specialist.</p>';
+        return;
+      }
+
+      const user = TLAuth.getCurrentUser();
+      container.innerHTML = messages.map(m => {
+        const isMine = m.senderId === user.id || m.senderRole === 'customer';
+        return `
+          <div style="align-self: ${isMine ? 'flex-end' : 'flex-start'}; max-width: 80%; background: ${isMine ? 'var(--tl-navy-800)' : '#FFF'}; color: ${isMine ? '#FFF' : 'var(--tl-text-primary)'}; border: 1px solid var(--tl-border-subtle); border-radius: 12px; padding: 10px 14px; font-size: 0.85rem; box-shadow: var(--tl-shadow-xs);">
+            <div style="display: flex; justify-content: space-between; gap: 8px; font-size: 0.7rem; color: ${isMine ? 'var(--tl-teal-200)' : 'var(--tl-text-muted)'}; margin-bottom: 2px;">
+              <strong>${m.senderName}</strong>
+              <span>${new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            </div>
+            <div style="line-height: 1.4;">${m.messageText}</div>
+          </div>
+        `;
+      }).join('');
+
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function submitCustomerChatMessage() {
+      const bookingId = document.getElementById('chatBookingId').value;
+      const text = document.getElementById('chatMsgInput').value.trim();
+      const user = TLAuth.getCurrentUser();
+
+      const res = TLCommunication.sendMessage({
+        bookingId,
+        senderId: user.id,
+        senderName: user.fullName,
+        senderRole: 'customer',
+        messageText: text
+      });
+
+      if (res.success) {
+        document.getElementById('chatMsgInput').value = '';
+        renderCustomerChatMessages(bookingId);
+      } else {
+        alert('Error: ' + res.error);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Dispute / Complaint Filing (FR-47, UC-05)
+    // ------------------------------------------------------------------------
+    function openComplaintModal(bookingId, providerName) {
+      document.getElementById('complaintBookingId').value = bookingId;
+      document.getElementById('complaintSubject').value = '';
+      document.getElementById('complaintDesc').value = '';
+      document.getElementById('complaintModal').classList.add('active');
+    }
+
+    function closeComplaintModal() {
+      document.getElementById('complaintModal').classList.remove('active');
+    }
+
+    function submitCustomerComplaint() {
+      const bookingId = document.getElementById('complaintBookingId').value;
+      const subject = document.getElementById('complaintSubject').value.trim();
+      const priority = document.getElementById('complaintPriority').value;
+      const desc = document.getElementById('complaintDesc').value.trim();
+      const user = TLAuth.getCurrentUser();
+
+      const res = TLCommunication.fileComplaint({
+        bookingId,
+        reporterId: user.id,
+        reporterRole: 'customer',
+        reporterName: user.fullName,
+        subject,
+        description: desc,
+        priority
+      });
+
+      if (res.success) {
+        alert(`Dispute report submitted successfully (ID: ${res.dispute.id}). Platform administrators will investigate this issue.`);
+        closeComplaintModal();
+      } else {
+        alert('Error: ' + res.error);
+      }
+    }
+  </script>
+</body>
+</html>

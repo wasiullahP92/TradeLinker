@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Service Request — TradeLinker</title>
+  <meta name="description" content="Submit a transparent service booking request to trusted trade professionals across Pakistan on TradeLinker.">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reloader.css">
+  <style>
+    .booking-wizard-wrap {
+      max-width: 740px;
+      margin: 3rem auto 6rem;
+      padding: 0 1rem;
+    }
+    .wizard-card {
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: var(--tl-shadow-lg);
+    }
+    .wizard-stepper {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .wizard-stepper::before {
+      content: '';
+      position: absolute;
+      top: 18px;
+      left: 30px;
+      right: 30px;
+      height: 2px;
+      background: var(--tl-border-subtle);
+      z-index: 1;
+    }
+    .step-item {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .step-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 2px solid var(--tl-border-strong);
+      color: var(--tl-text-muted);
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      transition: all var(--tl-transition-fast);
+    }
+    .step-item.active .step-circle {
+      background: var(--tl-teal-500);
+      border-color: var(--tl-teal-500);
+      color: #FFFFFF;
+      box-shadow: var(--tl-shadow-teal);
+    }
+    .step-item.completed .step-circle {
+      background: var(--tl-navy-800);
+      border-color: var(--tl-navy-800);
+      color: #FFFFFF;
+    }
+    .step-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--tl-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .step-item.active .step-label {
+      color: var(--tl-teal-700);
+    }
+    .summary-box {
+      background: var(--tl-bg-subtle);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .summary-row:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="tl-navbar">
+    <div class="tl-container">
+      <div class="tl-navbar-inner">
+        <a href="index.html" class="tl-logo" title="TradeLinker Home">
+          <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Logo" class="tl-logo-img">
+        </a>
+        <a href="search.html" class="tl-btn tl-btn-ghost tl-btn-sm">&larr; Return to Search</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="tl-container">
+    <div class="booking-wizard-wrap">
+      <div class="wizard-card">
+
+        <!-- Stepper (Steps 1 to 4) -->
+        <div class="wizard-stepper">
+          <div class="step-item active" id="stepIndicator1">
+            <div class="step-circle">1</div>
+            <span class="step-label">Service</span>
+          </div>
+          <div class="step-item" id="stepIndicator2">
+            <div class="step-circle">2</div>
+            <span class="step-label">Problem</span>
+          </div>
+          <div class="step-item" id="stepIndicator3">
+            <div class="step-circle">3</div>
+            <span class="step-label">Location</span>
+          </div>
+          <div class="step-item" id="stepIndicator4">
+            <div class="step-circle">4</div>
+            <span class="step-label">Review</span>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             Step 1: Service & Specialist Confirmation
+             =================================================================== -->
+        <div id="step1View">
+          <h2 style="font-size: 1.4rem; color: var(--tl-navy-800); margin-bottom: 6px;">Confirm Trade Specialist</h2>
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin-bottom: 20px;">
+            Review the selected trade professional before entering your service requirements.
+          </p>
+
+          <div style="background: var(--tl-teal-50); border: 1.5px solid var(--tl-teal-200); border-radius: 14px; padding: 20px; display: flex; gap: 16px; align-items: center; margin-bottom: 24px;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--tl-navy-800); color: #FFF; font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;" id="wizAvatar">
+              P
+            </div>
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <h3 style="font-size: 1.2rem; color: var(--tl-navy-800); margin: 0;" id="wizProviderName">Specialist Name</h3>
+                <span class="tl-badge tl-badge-verified" style="font-size: 0.65rem;" id="wizVerifiedBadge">Verified</span>
+              </div>
+              <div style="font-size: 0.85rem; color: var(--tl-teal-700); font-weight: 700; margin-top: 2px;" id="wizCategory">Trade Category</div>
+              <div style="font-size: 0.8rem; color: var(--tl-text-muted); margin-top: 2px;" id="wizCity">Coverage Area</div>
+            </div>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="wizServiceSelect">Choose Service Package</label>
+            <select id="wizServiceSelect" class="tl-select" onchange="updateSelectedService()"></select>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+            <button type="button" class="tl-btn tl-btn-primary" onclick="goToStep(2)">
+              Proceed to Problem Details &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             Step 2: Problem Description (FR-29)
+             =================================================================== -->
+        <div id="step2View" style="display: none;">
+          <h2 style="font-size: 1.4rem; color: var(--tl-navy-800); margin-bottom: 6px;">Describe Your Service Issue</h2>
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin-bottom: 20px;">
+            Provide clear details so the specialist can prepare the right tools, parts, and equipment.
+          </p>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="wizProblemDesc">Problem Description</label>
+            <textarea id="wizProblemDesc" class="tl-textarea" style="min-height: 130px;" placeholder="Please describe what needs repair, installation, or inspection (e.g. Inverter tripping periodically, water pipe leakage under main sink)..." required oninput="updateCharCount()"></textarea>
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--tl-text-muted); margin-top: 4px;">
+              <span>Minimum 10 characters</span>
+              <span id="charCount">0 characters</span>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="goToStep(1)">&larr; Back</button>
+            <button type="button" class="tl-btn tl-btn-primary" onclick="validateStep2()">
+              Proceed to Location & Schedule &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             Step 3: Service Location & Schedule (FR-29)
+             =================================================================== -->
+        <div id="step3View" style="display: none;">
+          <h2 style="font-size: 1.4rem; color: var(--tl-navy-800); margin-bottom: 6px;">Service Location & Preferred Time</h2>
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin-bottom: 20px;">
+            Where and when should the trade professional visit your property?
+          </p>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="wizAddress">Complete Street Address / Property Location</label>
+            <input type="text" id="wizAddress" class="tl-input" placeholder="House / Building #, Street #, Sector / Area" required>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="wizCitySelect">City</label>
+            <select id="wizCitySelect" class="tl-select">
+              <option value="Islamabad">Islamabad</option>
+              <option value="Rawalpindi">Rawalpindi</option>
+              <option value="Lahore">Lahore</option>
+              <option value="Karachi">Karachi</option>
+              <option value="Peshawar">Peshawar</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="wizDate">Preferred Appointment Date</label>
+              <input type="date" id="wizDate" class="tl-input" required>
+            </div>
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="wizTimeSlot">Preferred Time Slot</label>
+              <select id="wizTimeSlot" class="tl-select" required>
+                <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+                <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
+                <option value="Evening (3 PM - 6 PM)">Evening (3 PM - 6 PM)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="goToStep(2)">&larr; Back</button>
+            <button type="button" class="tl-btn tl-btn-primary" onclick="validateStep3()">
+              Review Booking Summary &rarr;
+            </button>
+          </div>
+        </div>
+
+        <!-- ===================================================================
+             Step 4: Review Summary & Submit (FR-28, FR-30, FR-33)
+             =================================================================== -->
+        <div id="step4View" style="display: none;">
+          <h2 style="font-size: 1.4rem; color: var(--tl-navy-800); margin-bottom: 6px;">Review Booking Details</h2>
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin-bottom: 20px;">
+            Please confirm your request details before dispatching to the professional.
+          </p>
+
+          <div class="summary-box">
+            <div class="summary-row">
+              <strong style="color: var(--tl-navy-800);">Specialist:</strong>
+              <span id="sumProvider">-</span>
+            </div>
+            <div class="summary-row">
+              <strong style="color: var(--tl-navy-800);">Service Package:</strong>
+              <span id="sumService">-</span>
+            </div>
+            <div class="summary-row">
+              <strong style="color: var(--tl-navy-800);">Appointment:</strong>
+              <span id="sumSchedule">-</span>
+            </div>
+            <div class="summary-row">
+              <strong style="color: var(--tl-navy-800);">Location:</strong>
+              <span id="sumLocation">-</span>
+            </div>
+            <div class="summary-row" style="border-top: 1px solid var(--tl-border-subtle); padding-top: 8px; margin-top: 8px;">
+              <strong style="color: var(--tl-navy-800);">Estimated Fee:</strong>
+              <strong style="color: var(--tl-teal-700);" id="sumFee">PKR 1,500 (Inspection)</strong>
+            </div>
+          </div>
+
+          <div style="background: var(--tl-bg-subtle); padding: 12px; border-radius: 10px; margin-bottom: 20px; font-size: 0.85rem; color: var(--tl-text-secondary);">
+            <strong>Issue Summary:</strong>
+            <p id="sumProblem" style="margin: 4px 0 0 0; line-height: 1.4;"></p>
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-bottom: 20px; font-size: 0.8rem; color: var(--tl-text-muted);">
+            <span data-tl-icon="secure" style="color: var(--tl-teal-600); flex-shrink: 0; width: 18px; height: 18px;"></span>
+            <span>By submitting, you agree to TradeLinker service terms. Booking status will be assigned as <strong>Pending</strong> awaiting specialist confirmation (FR-33).</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="goToStep(3)">&larr; Back</button>
+            <button type="button" class="tl-btn tl-btn-primary tl-btn-lg" id="submitBookingBtn" onclick="handleFinalBookingSubmission()">
+              Confirm & Submit Request (FR-28)
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/reloader.js"></script>
+  <script>
+    let selectedProvider = null;
+    let selectedService = null;
+    let activeStep = 1;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Enforce Authentication (BR-01: Customers must sign in to book)
+      const user = TLAuth.getCurrentUser();
+      if (!user) {
+        alert('Authentication Required (BR-01): Please sign in to submit a service booking request.');
+        window.location.href = `auth.html?mode=login&returnUrl=${encodeURIComponent(window.location.href)}`;
+        return;
+      }
+
+      // 2. Parse URL Params
+      const params = new URLSearchParams(window.location.search);
+      const provId = params.get('providerId') || 'prov-profile-001';
+      const srvId = params.get('serviceId');
+
+      loadProviderContext(provId, srvId);
+
+      // Default date to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById('wizDate').value = tomorrow.toISOString().split('T')[0];
+
+      // Pre-fill user city
+      if (user.city) document.getElementById('wizCitySelect').value = user.city;
+    });
+
+    function loadProviderContext(provId, srvId) {
+      const providers = TLAuth.getProviders();
+      selectedProvider = providers.find(p => p.id === provId) || providers[0];
+
+      if (selectedProvider) {
+        document.getElementById('wizProviderName').innerText = selectedProvider.businessName;
+        document.getElementById('wizCategory').innerText = selectedProvider.categoryTitle || 'Specialist';
+        document.getElementById('wizCity').innerText = `Serving: ${(selectedProvider.serviceAreas || [selectedProvider.city]).join(', ')}`;
+        document.getElementById('wizAvatar').innerText = selectedProvider.businessName.charAt(0).toUpperCase();
+
+        const badge = document.getElementById('wizVerifiedBadge');
+        if (selectedProvider.verificationStatus === 'verified') {
+          badge.className = 'tl-badge tl-badge-verified';
+          badge.innerText = 'Verified';
+        } else {
+          badge.className = 'tl-badge tl-badge-pending';
+          badge.innerText = 'Pending Verification';
+        }
+
+        // Load services
+        const services = TLServices.getProviderServices(selectedProvider.id);
+        const select = document.getElementById('wizServiceSelect');
+        if (services.length === 0) {
+          select.innerHTML = '<option value="general">Standard On-Site Trade Diagnostic & Consultation</option>';
+        } else {
+          select.innerHTML = services.map(s => `
+            <option value="${s.id}" data-title="${s.title}" data-pricing="${s.pricingType}" data-amount="${s.priceAmount || ''}">
+              ${s.title} — ${s.pricingType === 'upon_request' ? 'Upon Request' : 'PKR ' + s.priceAmount}
+            </option>
+          `).join('');
+
+          if (srvId) select.value = srvId;
+        }
+        updateSelectedService();
+      }
+    }
+
+    function updateSelectedService() {
+      const select = document.getElementById('wizServiceSelect');
+      const opt = select.selectedOptions[0];
+      selectedService = {
+        id: select.value,
+        title: opt ? opt.getAttribute('data-title') || opt.text : 'Trade Service',
+        pricing: opt ? opt.getAttribute('data-pricing') : 'fixed',
+        amount: opt ? opt.getAttribute('data-amount') : '1500'
+      };
+    }
+
+    function updateCharCount() {
+      const len = document.getElementById('wizProblemDesc').value.length;
+      document.getElementById('charCount').innerText = `${len} characters`;
+    }
+
+    function goToStep(step) {
+      activeStep = step;
+      [1, 2, 3, 4].forEach(s => {
+        document.getElementById(`step${s}View`).style.display = (s === step) ? 'block' : 'none';
+        const ind = document.getElementById(`stepIndicator${s}`);
+        ind.className = (s === step) ? 'step-item active' : (s < step ? 'step-item completed' : 'step-item');
+      });
+      window.scrollTo({ top: 100, behavior: 'smooth' });
+    }
+
+    function validateStep2() {
+      const desc = document.getElementById('wizProblemDesc').value.trim();
+      if (desc.length < 10) {
+        alert('Please describe your issue with at least 10 characters so the specialist can prepare.');
+        return;
+      }
+      goToStep(3);
+    }
+
+    function validateStep3() {
+      const addr = document.getElementById('wizAddress').value.trim();
+      const date = document.getElementById('wizDate').value;
+      if (addr.length < 5) {
+        alert('Please provide a complete street address.');
+        return;
+      }
+      if (!date) {
+        alert('Please select an appointment date.');
+        return;
+      }
+
+      // Populate Step 4 Summary
+      document.getElementById('sumProvider').innerText = selectedProvider.businessName;
+      document.getElementById('sumService').innerText = selectedService ? selectedService.title : 'Trade Service';
+      document.getElementById('sumSchedule').innerText = `${date} (${document.getElementById('wizTimeSlot').value})`;
+      document.getElementById('sumLocation').innerText = `${addr}, ${document.getElementById('wizCitySelect').value}`;
+      document.getElementById('sumProblem').innerText = document.getElementById('wizProblemDesc').value.trim();
+      
+      const feeText = selectedService && selectedService.pricing === 'upon_request' 
+        ? 'Free Inspection / Upon Request' 
+        : `PKR ${selectedService ? selectedService.amount : '1,500'}`;
+      document.getElementById('sumFee').innerText = feeText;
+
+      goToStep(4);
+    }
+
+    async function handleFinalBookingSubmission() {
+      const user = TLAuth.getCurrentUser();
+      const btn = document.getElementById('submitBookingBtn');
+
+      await TLReloader.withLoading(`book-flow-${selectedProvider.id}`, async () => {
+        const res = TLBookings.createBooking({
+          customerId: user.id,
+          providerId: selectedProvider.id,
+          serviceId: selectedService ? selectedService.id : 'srv-general',
+          serviceTitle: selectedService ? selectedService.title : 'Trade Service',
+          categoryTitle: selectedProvider.categoryTitle,
+          problemDescription: document.getElementById('wizProblemDesc').value.trim(),
+          serviceAddress: document.getElementById('wizAddress').value.trim(),
+          city: document.getElementById('wizCitySelect').value,
+          scheduledDate: document.getElementById('wizDate').value,
+          scheduledTimeSlot: document.getElementById('wizTimeSlot').value
+        });
+
+        if (res.success) {
+          alert(`Booking Request Successfully Created!\n\nBooking ID: ${res.booking.id}\nStatus: PENDING (FR-33)\n\nAn in-app notification has been dispatched to ${selectedProvider.businessName}. You can track the status in your Customer Dashboard.`);
+          window.location.href = 'customer-dashboard.html';
+        } else {
+          alert('Booking Error: ' + res.error);
+        }
+      }, {
+        button: btn,
+        loadingText: "Creating Booking Record..."
+      });
+    }
+  </script>
+</body>
+</html>

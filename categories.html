@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Categories — TradeLinker</title>
+  <meta name="description" content="Browse all 6 initial service categories supported by TradeLinker across Pakistan: Construction, Plumbing, Electrical, AC/HVAC, Solar Energy, and Carpentry.">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="tl-navbar">
+    <div class="tl-container">
+      <div class="tl-navbar-inner">
+        <a href="index.html" class="tl-logo" title="TradeLinker">
+          <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Logo" class="tl-logo-img">
+        </a>
+        <nav aria-label="Main Navigation">
+          <ul class="tl-nav-links">
+            <li><a href="index.html" class="tl-nav-link">Home</a></li>
+            <li><a href="categories.html" class="tl-nav-link active">Services</a></li>
+            <li><a href="search.html" class="tl-nav-link">Find Professionals</a></li>
+            <li><a href="index.html#about" class="tl-nav-link">About</a></li>
+            <li><a href="contact.html" class="tl-nav-link">Contact</a></li>
+          </ul>
+        </nav>
+        <div class="tl-nav-actions">
+          <a href="auth.html?mode=login" class="tl-btn tl-btn-ghost tl-btn-sm">Sign In</a>
+          <a href="auth.html?mode=register" class="tl-btn tl-btn-primary tl-btn-sm">Register</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner -->
+  <section style="background: var(--tl-navy-900); color: #FFF; padding: 4rem 0; border-bottom: 3px solid var(--tl-teal-500);">
+    <div class="tl-container">
+      <span class="tl-badge tl-badge-verified" style="margin-bottom: 12px;">SRS Section 3.4 & BR-09 Core Trades</span>
+      <h1 style="color: #FFF; margin-bottom: 8px;">Explore Trade Categories</h1>
+      <p style="color: #CBD5E1; max-width: 650px; font-size: 1.1rem;">
+        Discover certified professionals in our six foundational service categories. Each specialist undergoes identity and credential screening.
+      </p>
+    </div>
+  </section>
+
+  <!-- Categories Detailed Grid -->
+  <main class="tl-container" style="padding: 4rem var(--tl-container-pad);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 2rem;" id="categoriesGrid">
+      <!-- Injected via JS -->
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="tl-footer">
+    <div class="tl-container">
+      <div class="tl-footer-top">
+        <div class="tl-footer-brand">
+          <a href="index.html" class="tl-logo tl-logo-dark">
+            <img src="assets/images/tradelinker-logo-white.png" alt="TradeLinker Logo" class="tl-logo-img" style="height: 44px;">
+          </a>
+          <p>Connecting people with trusted professionals across Pakistan.</p>
+        </div>
+        <div>
+          <h4 class="tl-footer-heading">Service Categories</h4>
+          <ul class="tl-footer-links">
+            <li><a href="search.html?cat=construction">Construction Services</a></li>
+            <li><a href="search.html?cat=plumbing">Plumbing Services</a></li>
+            <li><a href="search.html?cat=electrical">Electrical Services</a></li>
+            <li><a href="search.html?cat=hvac">AC & HVAC Services</a></li>
+            <li><a href="search.html?cat=solar">Solar Energy Services</a></li>
+            <li><a href="search.html?cat=carpentry">Door Making & Carpentry</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="tl-footer-heading">Platform</h4>
+          <ul class="tl-footer-links">
+            <li><a href="auth.html">Account Sign In</a></li>
+            <li><a href="contact.html">Support Desk</a></li>
+            <li><a href="design-system.html">Design System Tokens</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="tl-footer-heading">Founders & Vision</h4>
+          <p style="font-size: 0.85rem; color: #94A3B8; margin-bottom: 12px;">Developed by <strong>Techminds</strong> (Wasi Ullah & Hamad Ullah).</p>
+          <div class="tl-script-tagline">"Better Services. A Stronger Tomorrow."</div>
+        </div>
+      </div>
+      <div class="tl-footer-bottom">
+        <div>&copy; 2026 TradeLinker. All rights reserved.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Session awareness
+      if (window.TLAuth) {
+        const u = TLAuth.getCurrentUser();
+        if (u) {
+          const authDiv = document.querySelector('.tl-nav-actions');
+          if (authDiv) {
+            authDiv.innerHTML = `
+              <a href="${TLConfig.dashboardRoutes[u.role] || 'customer-dashboard.html'}" class="tl-btn tl-btn-outline-teal tl-btn-sm">
+                <span data-tl-icon="user"></span> ${u.fullName.split(' ')[0]}
+              </a>
+              <button class="tl-btn tl-btn-ghost tl-btn-sm" onclick="TLAuth.logout()">Log Out</button>
+            `;
+          }
+        }
+      }
+      const grid = document.getElementById('categoriesGrid');
+      if (!grid || !window.TLData) return;
+
+      const cats = window.TLData.getCategories();
+      grid.innerHTML = cats.map(c => `
+        <div style="background: #FFF; border: 1px solid var(--tl-border-subtle); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--tl-shadow-xs);">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="tl-category-icon-box" style="margin: 0;">
+              <span data-tl-icon="${c.icon}"></span>
+            </div>
+            <span class="tl-category-count">${c.activeCount} Providers Active</span>
+          </div>
+
+          <h3 style="color: var(--tl-navy-800); font-size: 1.35rem; margin-top: 8px;">${c.title}</h3>
+          <p style="color: var(--tl-text-secondary); font-size: 0.95rem; line-height: 1.5; margin: 0;">${c.tagline}</p>
+
+          <div style="background: var(--tl-bg-subtle); padding: 12px; border-radius: 10px; margin-top: 8px;">
+            <strong style="font-size: 0.8rem; color: var(--tl-navy-800); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px;">Common Services:</strong>
+            <ul style="padding-left: 18px; font-size: 0.85rem; color: var(--tl-text-secondary);">
+              ${c.popularServices.map(s => `<li>${s}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div style="margin-top: auto; padding-top: 14px;">
+            <a href="search.html?cat=${c.id}" class="tl-btn tl-btn-primary" style="width: 100%;">
+              Browse ${c.title} <span data-tl-icon="arrowRight"></span>
+            </a>
+          </div>
+        </div>
+      `).join('');
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    });
+  </script>
+</body>
+</html>

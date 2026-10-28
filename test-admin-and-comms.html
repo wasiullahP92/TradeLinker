@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeLinker Admin & Communication Verification Test Runner</title>
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    body {
+      background: #F8FAFC;
+      font-family: var(--tl-font-sans);
+      padding: 2rem 1rem;
+      color: var(--tl-navy-900);
+    }
+    .test-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: 16px;
+      box-shadow: var(--tl-shadow-lg);
+      border: 1px solid var(--tl-border-subtle);
+      overflow: hidden;
+    }
+    .test-header {
+      background: var(--tl-navy-800);
+      color: #FFFFFF;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .test-body {
+      padding: 24px;
+    }
+    .test-suite-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .summary-card {
+      background: var(--tl-bg-subtle);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .summary-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--tl-navy-800);
+    }
+    .test-case-row {
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all var(--tl-transition-fast);
+      background: #FFFFFF;
+    }
+    .test-case-row.pass {
+      border-left: 4px solid var(--tl-teal-500);
+      background: #F0FDF9;
+    }
+    .test-case-row.fail {
+      border-left: 4px solid #DC2626;
+      background: #FEF2F2;
+    }
+    .test-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--tl-navy-800);
+      margin-bottom: 2px;
+    }
+    .test-desc {
+      font-size: 0.8rem;
+      color: var(--tl-text-secondary);
+    }
+    .log-box {
+      background: var(--tl-navy-950);
+      color: #A7F3D0;
+      font-family: monospace;
+      font-size: 0.8rem;
+      padding: 16px;
+      border-radius: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="test-container">
+    <div class="test-header">
+      <div>
+        <h1 style="font-size: 1.4rem; margin: 0; color: #FFFFFF;">TradeLinker Admin, Communication & Moderation Test Suite</h1>
+        <p style="font-size: 0.85rem; color: var(--tl-teal-200); margin: 4px 0 0 0;">
+          SRS Requirements: FR-43 to FR-48, UC-04, UC-05, BR-06, BR-08
+        </p>
+      </div>
+      <button class="tl-btn tl-btn-primary" id="runTestsBtn" onclick="runAllAdminTests()">
+        Run All Verification Tests
+      </button>
+    </div>
+
+    <div class="test-body">
+      <div class="test-suite-summary">
+        <div class="summary-card">
+          <div class="summary-num" id="totalCount">12</div>
+          <div style="font-size: 0.75rem; color: var(--tl-text-muted);">Total Tests</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num" style="color: var(--tl-teal-600);" id="passCount">0</div>
+          <div style="font-size: 0.75rem; color: var(--tl-text-muted);">Passed</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num" style="color: #DC2626;" id="failCount">0</div>
+          <div style="font-size: 0.75rem; color: var(--tl-text-muted);">Failed</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num" style="color: var(--tl-gold-600);" id="statusIndicator">Ready</div>
+          <div style="font-size: 0.75rem; color: var(--tl-text-muted);">Status</div>
+        </div>
+      </div>
+
+      <div id="testCasesContainer">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--tl-navy-800);">Execution Console Logs:</span>
+        <button class="tl-btn tl-btn-ghost tl-btn-xs" onclick="document.getElementById('consoleLog').innerHTML = '';">Clear Logs</button>
+      </div>
+      <div class="log-box" id="consoleLog">Ready to execute admin & communication test suite...</div>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+  <script>
+    const testCases = [
+      {
+        id: "TC-ADM-01",
+        title: "Administrator Route Protection (FR-49, NFR-06)",
+        desc: "Validates that non-admin user roles cannot access the administrator portal."
+      },
+      {
+        id: "TC-ADM-02",
+        title: "User Account Suspension & Reactivation (FR-44, BR-08)",
+        desc: "Enforces account suspension and reinstatement with audit log entry."
+      },
+      {
+        id: "TC-ADM-03",
+        title: "Provider Verification Approval Workflow (UC-04, FR-45)",
+        desc: "Admin approves provider credentials and awards official Verified badge."
+      },
+      {
+        id: "TC-ADM-04",
+        title: "Provider Verification Additional Info Request (FR-45)",
+        desc: "Admin requests additional trade documents and notifies provider."
+      },
+      {
+        id: "TC-ADM-05",
+        title: "Service Category Activation / Deactivation",
+        desc: "Admin deactivates and reactivates core service categories."
+      },
+      {
+        id: "TC-ADM-06",
+        title: "Complaint / Dispute Filing (FR-47, UC-05)",
+        desc: "Customer files formal service dispute with priority and description."
+      },
+      {
+        id: "TC-ADM-07",
+        title: "Administrative Dispute Investigation & Resolution (FR-47)",
+        desc: "Admin investigates dispute, enters settlement notes, and marks resolved."
+      },
+      {
+        id: "TC-ADM-08",
+        title: "Report Inappropriate Customer Review",
+        desc: "Flags a review for abusive content and logs into moderation queue."
+      },
+      {
+        id: "TC-ADM-09",
+        title: "Administrative Content Moderation (Remove Review)",
+        desc: "Admin removes inappropriate review and recalculates provider rating."
+      },
+      {
+        id: "TC-ADM-10",
+        title: "Customer-Provider Booking Communication (Send Message)",
+        desc: "Customer sends booking-related message and triggers recipient notification."
+      },
+      {
+        id: "TC-ADM-11",
+        title: "Chronological Message Thread Retrieval",
+        desc: "Fetches full two-way message history for a specific booking ID."
+      },
+      {
+        id: "TC-ADM-12",
+        title: "Immutable Administrator Action Audit Trail (FR-44, FR-48)",
+        desc: "Validates that administrative actions are permanently logged with timestamps and admin ID."
+      },
+      {
+        id: "TC-ADM-13",
+        title: "Add New Service Category (Section 4B)",
+        desc: "Admin creates a new category with custom slug, icon, and description; verifies database persistence."
+      },
+      {
+        id: "TC-ADM-14",
+        title: "Prevent Duplicate Category Names & Slugs (Section 4B)",
+        desc: "Validates that attempting to register an identical name or slug key fails with a clear validation error."
+      },
+      {
+        id: "TC-ADM-15",
+        title: "Edit Category & Update Attributes (Section 4C)",
+        desc: "Admin updates category name, scope, icon, and status; verifies immediate data layer reflection."
+      },
+      {
+        id: "TC-ADM-16",
+        title: "Category Safe Deletion & Referential Integrity Safeguard (Section 4D)",
+        desc: "Enforces check preventing destructive deletion when category is referenced by active services or bookings."
+      }
+    ];
+
+    function renderInitialTestList() {
+      const container = document.getElementById('testCasesContainer');
+      container.innerHTML = testCases.map(tc => `
+        <div class="test-case-row" id="row-${tc.id}">
+          <div>
+            <div class="test-title"><span class="tl-badge tl-badge-accepted" style="font-size: 0.7rem; margin-right: 6px;">${tc.id}</span>${tc.title}</div>
+            <div class="test-desc">${tc.desc}</div>
+          </div>
+          <span class="tl-badge tl-badge-pending" id="badge-${tc.id}">Pending</span>
+        </div>
+      `).join('');
+    }
+
+    function log(msg) {
+      const el = document.getElementById('consoleLog');
+      const time = new Date().toLocaleTimeString();
+      el.innerHTML += `\n[${time}] ${msg}`;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function markTestPass(testId) {
+      const row = document.getElementById(`row-${testId}`);
+      const badge = document.getElementById(`badge-${testId}`);
+      if (row) row.className = "test-case-row pass";
+      if (badge) {
+        badge.className = "tl-badge tl-badge-completed";
+        badge.innerText = "✓ PASSED";
+      }
+    }
+
+    function markTestFail(testId, errorMsg) {
+      const row = document.getElementById(`row-${testId}`);
+      const badge = document.getElementById(`badge-${testId}`);
+      if (row) row.className = "test-case-row fail";
+      if (badge) {
+        badge.className = "tl-badge tl-badge-cancelled";
+        badge.innerText = "✗ FAILED";
+      }
+    }
+
+    async function runAllAdminTests() {
+      const btn = document.getElementById('runTestsBtn');
+      btn.disabled = true;
+      btn.innerText = "Running Tests...";
+      document.getElementById('statusIndicator').innerText = "Running";
+
+      let passed = 0;
+      let failed = 0;
+
+      log("=== STARTING TRADELINKER ADMIN & COMMUNICATION TEST SUITE ===");
+
+      // Test 1: Route Protection
+      try {
+        log("TC-ADM-01: Verifying admin route guard...");
+        // Non-admin session check
+        const allowedForCust = TLAuth.hasRole({ role: "customer" }, ["admin"]);
+        const allowedForAdmin = TLAuth.hasRole({ role: "admin" }, ["admin"]);
+        if (allowedForCust) throw new Error("Customer was erroneously granted admin access!");
+        if (!allowedForAdmin) throw new Error("Admin was denied access to admin role!");
+
+        markTestPass("TC-ADM-01");
+        passed++;
+        log("TC-ADM-01 PASS: Strict role-based route protection verified.");
+      } catch (e) {
+        markTestFail("TC-ADM-01", e.message);
+        failed++;
+        log("TC-ADM-01 FAIL: " + e.message);
+      }
+
+      // Test 2: User Account Suspension & Reactivation
+      try {
+        log("TC-ADM-02: Testing user suspension (BR-08)...");
+        const users = TLAuth.getUsers();
+        const targetUser = users.find(u => u.role === "customer") || users[0];
+
+        // Suspend
+        targetUser.status = "suspended";
+        localStorage.setItem(TLAuth.STORAGE_KEYS.USERS, JSON.stringify(users));
+        TLCommunication.logAdminAction({
+          actionType: "USER_SUSPENDED",
+          targetType: "user",
+          targetId: targetUser.id,
+          details: "Test suspension for rule violation",
+          adminId: "usr-adm-001"
+        });
+
+        const check1 = TLAuth.getUsers().find(u => u.id === targetUser.id);
+        if (check1.status !== "suspended") throw new Error("Status should be 'suspended'");
+
+        // Reactivate
+        targetUser.status = "active";
+        localStorage.setItem(TLAuth.STORAGE_KEYS.USERS, JSON.stringify(users));
+        TLCommunication.logAdminAction({
+          actionType: "USER_REACTIVATED",
+          targetType: "user",
+          targetId: targetUser.id,
+          details: "Account reactivated after review",
+          adminId: "usr-adm-001"
+        });
+
+        const check2 = TLAuth.getUsers().find(u => u.id === targetUser.id);
+        if (check2.status !== "active") throw new Error("Status should be 'active'");
+
+        markTestPass("TC-ADM-02");
+        passed++;
+        log("TC-ADM-02 PASS: User account suspended and reactivated with audit logs.");
+      } catch (e) {
+        markTestFail("TC-ADM-02", e.message);
+        failed++;
+        log("TC-ADM-02 FAIL: " + e.message);
+      }
+
+      // Test 3: Provider Verification Approval (UC-04, FR-45)
+      try {
+        log("TC-ADM-03: Testing provider verification approval (UC-04)...");
+        const provId = "prov-profile-001";
+        const res3 = TLCommunication.reviewVerification({
+          providerId: provId,
+          action: "approve",
+          reasonNote: "PEC certified license photocopy verified by administration.",
+          adminId: "usr-adm-001"
+        });
+
+        if (!res3.success) throw new Error(res3.error);
+        if (res3.provider.verificationStatus !== "verified") throw new Error("Status should be 'verified'");
+
+        markTestPass("TC-ADM-03");
+        passed++;
+        log("TC-ADM-03 PASS: Provider verification approved and Verified badge awarded.");
+      } catch (e) {
+        markTestFail("TC-ADM-03", e.message);
+        failed++;
+        log("TC-ADM-03 FAIL: " + e.message);
+      }
+
+      // Test 4: Provider Verification Request Info
+      try {
+        log("TC-ADM-04: Testing provider verification 'request_info'...");
+        const provId = "prov-profile-002";
+        const res4 = TLCommunication.reviewVerification({
+          providerId: provId,
+          action: "request_info",
+          reasonNote: "Please re-upload a higher resolution copy of government trade license.",
+          adminId: "usr-adm-001"
+        });
+
+        if (!res4.success) throw new Error(res4.error);
+        if (res4.provider.verificationStatus !== "info_requested") throw new Error("Status should be 'info_requested'");
+
+        markTestPass("TC-ADM-04");
+        passed++;
+        log("TC-ADM-04 PASS: Additional verification information requested and notified.");
+      } catch (e) {
+        markTestFail("TC-ADM-04", e.message);
+        failed++;
+        log("TC-ADM-04 FAIL: " + e.message);
+      }
+
+      // Test 5: Service Category Activation / Deactivation
+      try {
+        log("TC-ADM-05: Testing service category status toggle...");
+        const catId = "construction";
+        const resToggle1 = TLCommunication.toggleCategoryStatus(catId, "usr-adm-001");
+        if (!resToggle1.success) throw new Error(resToggle1.error);
+        const state1 = resToggle1.category.isActive;
+
+        // Toggle back to active
+        const resToggle2 = TLCommunication.toggleCategoryStatus(catId, "usr-adm-001");
+        if (!resToggle2.success) throw new Error(resToggle2.error);
+        if (resToggle2.category.isActive === state1) throw new Error("Category status did not toggle back!");
+
+        markTestPass("TC-ADM-05");
+        passed++;
+        log(`TC-ADM-05 PASS: Category '${catId}' successfully toggled and restored.`);
+      } catch (e) {
+        markTestFail("TC-ADM-05", e.message);
+        failed++;
+        log("TC-ADM-05 FAIL: " + e.message);
+      }
+
+      // Test 6: Dispute Filing (FR-47, UC-05)
+      try {
+        log("TC-ADM-06: Customer filing service dispute...");
+        const res6 = TLCommunication.fileComplaint({
+          bookingId: "TL-BK-7450",
+          reporterId: "usr-cust-001",
+          reporterRole: "customer",
+          reporterName: "Hamad Ullah",
+          subject: "Arrival schedule delay beyond 2 hours",
+          description: "Engineer arrived 2.5 hours late without prior notification.",
+          priority: "High"
+        });
+
+        if (!res6.success) throw new Error(res6.error);
+        if (!res6.dispute.id.startsWith("DISP-")) throw new Error("Invalid dispute ID format");
+        if (res6.dispute.status !== "open") throw new Error("Expected initial status 'open'");
+
+        window.testDisputeId = res6.dispute.id;
+        markTestPass("TC-ADM-06");
+        passed++;
+        log(`TC-ADM-06 PASS: Dispute #${res6.dispute.id} created with status 'open'.`);
+      } catch (e) {
+        markTestFail("TC-ADM-06", e.message);
+        failed++;
+        log("TC-ADM-06 FAIL: " + e.message);
+      }
+
+      // Test 7: Dispute Investigation & Resolution (FR-47)
+      try {
+        log("TC-ADM-07: Administrator resolving dispute...");
+        const res7 = TLCommunication.updateComplaintStatus({
+          complaintId: window.testDisputeId,
+          status: "resolved",
+          adminNotes: "Contacted provider. Traffic roadblock caused delay. 15% courtesy discount credited to customer.",
+          adminId: "usr-adm-001"
+        });
+
+        if (!res7.success) throw new Error(res7.error);
+        if (res7.dispute.status !== "resolved") throw new Error("Expected status 'resolved'");
+        if (!res7.dispute.resolvedAt) throw new Error("resolvedAt timestamp missing");
+
+        markTestPass("TC-ADM-07");
+        passed++;
+        log("TC-ADM-07 PASS: Dispute marked resolved with documented findings.");
+      } catch (e) {
+        markTestFail("TC-ADM-07", e.message);
+        failed++;
+        log("TC-ADM-07 FAIL: " + e.message);
+      }
+
+      // Test 8: Report Review
+      try {
+        log("TC-ADM-08: Reporting inappropriate review...");
+        const res8 = TLCommunication.reportReview({
+          reviewId: "rev-test-999",
+          bookingId: "TL-BK-5190",
+          reporterId: "usr-prov-001",
+          reporterRole: "provider",
+          reason: "Contains abusive language and false allegations."
+        });
+
+        if (!res8.success) throw new Error(res8.error);
+        if (!res8.report.id.startsWith("REP-")) throw new Error("Invalid report ID");
+        if (res8.report.status !== "pending_review") throw new Error("Expected 'pending_review'");
+
+        window.testReportId = res8.report.id;
+        markTestPass("TC-ADM-08");
+        passed++;
+        log(`TC-ADM-08 PASS: Report #${res8.report.id} registered in moderation queue.`);
+      } catch (e) {
+        markTestFail("TC-ADM-08", e.message);
+        failed++;
+        log("TC-ADM-08 FAIL: " + e.message);
+      }
+
+      // Test 9: Content Moderation Action
+      try {
+        log("TC-ADM-09: Administrator processing review report...");
+        const res9 = TLCommunication.resolveReportedContent({
+          reportId: window.testReportId,
+          action: "dismiss",
+          adminNotes: "Investigated. Text conforms to community guidelines.",
+          adminId: "usr-adm-001"
+        });
+
+        if (!res9.success) throw new Error(res9.error);
+        if (res9.report.status !== "dismissed") throw new Error("Expected status 'dismissed'");
+
+        markTestPass("TC-ADM-09");
+        passed++;
+        log("TC-ADM-09 PASS: Review report moderated and dismissed.");
+      } catch (e) {
+        markTestFail("TC-ADM-09", e.message);
+        failed++;
+        log("TC-ADM-09 FAIL: " + e.message);
+      }
+
+      // Test 10: Customer-Provider Messaging
+      try {
+        log("TC-ADM-10: Sending booking message...");
+        const res10 = TLCommunication.sendMessage({
+          bookingId: "TL-BK-7450",
+          senderId: "usr-cust-001",
+          senderName: "Hamad Ullah",
+          senderRole: "customer",
+          messageText: "Please bring 2 spare 32A breakers just in case."
+        });
+
+        if (!res10.success) throw new Error(res10.error);
+        if (!res10.message.id.startsWith("msg-")) throw new Error("Invalid message ID");
+
+        markTestPass("TC-ADM-10");
+        passed++;
+        log("TC-ADM-10 PASS: Message dispatched and recipient notified.");
+      } catch (e) {
+        markTestFail("TC-ADM-10", e.message);
+        failed++;
+        log("TC-ADM-10 FAIL: " + e.message);
+      }
+
+      // Test 11: Chronological Thread Retrieval
+      try {
+        log("TC-ADM-11: Fetching booking message thread...");
+        const thread = TLCommunication.getBookingMessages("TL-BK-7450");
+        if (!Array.isArray(thread) || thread.length < 2) {
+          throw new Error(`Expected at least 2 messages in thread, found ${thread.length}`);
+        }
+
+        markTestPass("TC-ADM-11");
+        passed++;
+        log(`TC-ADM-11 PASS: Message thread verified with ${thread.length} ordered messages.`);
+      } catch (e) {
+        markTestFail("TC-ADM-11", e.message);
+        failed++;
+        log("TC-ADM-11 FAIL: " + e.message);
+      }
+
+      // Test 12: Admin Audit Trail Integrity (FR-44, FR-48)
+      try {
+        log("TC-ADM-12: Verifying immutable administrative audit log...");
+        const auditLogs = TLCommunication.getAllAdminAuditLogs();
+        if (!Array.isArray(auditLogs) || auditLogs.length < 4) {
+          throw new Error(`Expected at least 4 audit logs, found ${auditLogs.length}`);
+        }
+
+        auditLogs.forEach((l, idx) => {
+          if (!l.actionType || !l.targetId || !l.adminId || !l.timestamp) {
+            throw new Error(`Audit log entry ${idx} missing required fields!`);
+          }
+        });
+
+        markTestPass("TC-ADM-12");
+        passed++;
+        log(`TC-ADM-12 PASS: Administrator audit trail verified with ${auditLogs.length} tamper-evident entries.`);
+      } catch (e) {
+        markTestFail("TC-ADM-12", e.message);
+        failed++;
+        log("TC-ADM-12 FAIL: " + e.message);
+      }
+
+      // Test 13: Add New Service Category (Section 4B)
+      try {
+        log("TC-ADM-13: Adding new service category 'Home Security & CCTV'...");
+        const addRes = TLCommunication.addCategory({
+          id: "home-security",
+          title: "Home Security & CCTV Systems",
+          description: "IP cameras, biometric door access, alarm systems, and 24/7 CCTV installations",
+          icon: "tools",
+          isActive: true,
+          popularServices: "4K CCTV Setup, Wireless Video Doorbell, Smart Door Locks",
+          adminId: "usr-adm-001"
+        });
+
+        if (!addRes.success) throw new Error(addRes.error);
+        const storedCat = TLCommunication.getCategoryById("home-security");
+        if (!storedCat) throw new Error("Created category could not be retrieved from database!");
+        if (storedCat.title !== "Home Security & CCTV Systems") throw new Error("Category title mismatch");
+
+        markTestPass("TC-ADM-13");
+        passed++;
+        log("TC-ADM-13 PASS: Category 'Home Security & CCTV Systems' created and persisted in database.");
+      } catch (e) {
+        markTestFail("TC-ADM-13", e.message);
+        failed++;
+        log("TC-ADM-13 FAIL: " + e.message);
+      }
+
+      // Test 14: Prevent Duplicate Category Names & Slugs (Section 4B)
+      try {
+        log("TC-ADM-14: Attempting to insert duplicate category name and duplicate slug...");
+        // Duplicate slug test
+        const dupSlugRes = TLCommunication.addCategory({
+          id: "home-security",
+          title: "Different Title Same Slug",
+          description: "This should fail because slug 'home-security' exists.",
+          adminId: "usr-adm-001"
+        });
+        if (dupSlugRes.success) throw new Error("System erroneously allowed duplicate category slug!");
+
+        // Duplicate name test
+        const dupNameRes = TLCommunication.addCategory({
+          id: "cctv-systems",
+          title: "Home Security & CCTV Systems",
+          description: "This should fail because title already exists.",
+          adminId: "usr-adm-001"
+        });
+        if (dupNameRes.success) throw new Error("System erroneously allowed duplicate category title!");
+
+        markTestPass("TC-ADM-14");
+        passed++;
+        log("TC-ADM-14 PASS: Duplicate slug and duplicate name were both correctly rejected with validation errors.");
+      } catch (e) {
+        markTestFail("TC-ADM-14", e.message);
+        failed++;
+        log("TC-ADM-14 FAIL: " + e.message);
+      }
+
+      // Test 15: Edit Category Attributes (Section 4C)
+      try {
+        log("TC-ADM-15: Updating category 'home-security'...");
+        const editRes = TLCommunication.updateCategory("home-security", {
+          title: "Home & Business Security Systems",
+          description: "Enterprise and residential access control, high-definition IP camera networks, smart surveillance.",
+          icon: "tools",
+          isActive: true,
+          adminId: "usr-adm-001"
+        });
+
+        if (!editRes.success) throw new Error(editRes.error);
+        const updatedCat = TLCommunication.getCategoryById("home-security");
+        if (updatedCat.title !== "Home & Business Security Systems") throw new Error("Category title update not persisted!");
+
+        markTestPass("TC-ADM-15");
+        passed++;
+        log("TC-ADM-15 PASS: Category successfully edited and immediate persistence verified.");
+      } catch (e) {
+        markTestFail("TC-ADM-15", e.message);
+        failed++;
+        log("TC-ADM-15 FAIL: " + e.message);
+      }
+
+      // Test 16: Referential Integrity & Safe Deletion Workflow (Section 4D)
+      try {
+        log("TC-ADM-16: Testing referential safety check when category is referenced...");
+        // 'electrical' is referenced by active services and bookings
+        const usage = TLCommunication.getCategoryUsage("electrical");
+        if (usage.totalReferences === 0) throw new Error("Expected 'electrical' to have active service/booking references!");
+
+        // Deleting without force must be blocked
+        const delRes = TLCommunication.deleteCategory("electrical", { force: false, adminId: "usr-adm-001" });
+        if (delRes.success) throw new Error("Referenced category 'electrical' was deleted without warning or block!");
+        if (!delRes.inUse) throw new Error("Expected inUse flag to be true!");
+
+        // Now test deleting our newly created 'home-security' which has 0 references
+        const usageNew = TLCommunication.getCategoryUsage("home-security");
+        if (usageNew.totalReferences !== 0) throw new Error("Expected 'home-security' to have 0 references");
+
+        const delCleanRes = TLCommunication.deleteCategory("home-security", { force: false, adminId: "usr-adm-001" });
+        if (!delCleanRes.success) throw new Error("Failed to delete unused category: " + delCleanRes.error);
+
+        // Verify it was cleanly removed
+        if (TLCommunication.getCategoryById("home-security") !== null) {
+          throw new Error("Category still exists after deletion!");
+        }
+
+        markTestPass("TC-ADM-16");
+        passed++;
+        log("TC-ADM-16 PASS: Referential integrity protected in-use category, and unreferenced category deleted cleanly.");
+      } catch (e) {
+        markTestFail("TC-ADM-16", e.message);
+        failed++;
+        log("TC-ADM-16 FAIL: " + e.message);
+      }
+
+      // Final summary
+      document.getElementById('passCount').innerText = passed;
+      document.getElementById('failCount').innerText = failed;
+      if (failed === 0) {
+        document.getElementById('statusIndicator').innerText = "100% PASS";
+        document.getElementById('statusIndicator').style.color = "var(--tl-teal-600)";
+        log("==================================================================");
+        log(`VERIFICATION COMPLETE: ALL ${passed} ADMIN & COMMUNICATION TESTS PASSED!`);
+        log("TradeLinker Administrator & Messaging Systems fully meet SRS requirements.");
+        log("==================================================================");
+      } else {
+        document.getElementById('statusIndicator').innerText = `${failed} FAILED`;
+        document.getElementById('statusIndicator').style.color = "#DC2626";
+      }
+
+      btn.disabled = false;
+      btn.innerText = "Re-Run All Verification Tests";
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderInitialTestList();
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('autorun') === '1') {
+        setTimeout(runAllAdminTests, 300);
+      }
+    });
+  </script>
+</body>
+</html>

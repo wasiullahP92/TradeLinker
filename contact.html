@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact & Customer Support — TradeLinker</title>
+  <meta name="description" content="Get help with TradeLinker bookings, provider verification inquiries, or safety concerns across Pakistan.">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="tl-navbar">
+    <div class="tl-container">
+      <div class="tl-navbar-inner">
+        <a href="index.html" class="tl-logo" title="TradeLinker Home">
+          <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Logo" class="tl-logo-img">
+        </a>
+        <nav aria-label="Main Navigation">
+          <ul class="tl-nav-links">
+            <li><a href="index.html" class="tl-nav-link">Home</a></li>
+            <li><a href="categories.html" class="tl-nav-link">Services</a></li>
+            <li><a href="search.html" class="tl-nav-link">Find Professionals</a></li>
+            <li><a href="index.html#about" class="tl-nav-link">About</a></li>
+            <li><a href="contact.html" class="tl-nav-link active">Contact</a></li>
+          </ul>
+        </nav>
+        <div class="tl-nav-actions">
+          <a href="auth.html?mode=login" class="tl-btn tl-btn-ghost tl-btn-sm">Sign In</a>
+          <a href="auth.html?mode=register" class="tl-btn tl-btn-primary tl-btn-sm">Register</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner -->
+  <section style="background: var(--tl-navy-900); color: #FFF; padding: 3.5rem 0; border-bottom: 3px solid var(--tl-teal-500);">
+    <div class="tl-container">
+      <span class="tl-badge tl-badge-verified" style="margin-bottom: 12px;">Help Desk & FAQs</span>
+      <h1 style="color: #FFF; margin-bottom: 8px;">How Can We Help You?</h1>
+      <p style="color: #CBD5E1; max-width: 600px; font-size: 1.1rem;">
+        Have questions regarding a booking request, trade verification, or safety standards? Reach out to our operational team.
+      </p>
+    </div>
+  </section>
+
+  <!-- Contact & FAQs Grid -->
+  <main class="tl-container" style="padding: 4rem var(--tl-container-pad);">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 3rem;">
+      <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;">
+        <!-- Contact Form Card -->
+        <div style="background: #FFF; border: 1px solid var(--tl-border-subtle); border-radius: 16px; padding: 32px; box-shadow: var(--tl-shadow-xs); max-width: 680px; margin: 0 auto; width: 100%;">
+          <h2 style="font-size: 1.5rem; color: var(--tl-navy-800); margin-bottom: 1rem;">Send Us a Message</h2>
+          <form onsubmit="event.preventDefault(); alert('Message Received! A TradeLinker representative will get back to you within 24 hours.'); this.reset();">
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="cName">Your Name</label>
+              <input type="text" id="cName" class="tl-input" placeholder="Wasi Ullah" required>
+            </div>
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="cEmail">Email Address</label>
+              <input type="email" id="cEmail" class="tl-input" placeholder="user@example.com" required>
+            </div>
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="cSubject">Inquiry Subject</label>
+              <select id="cSubject" class="tl-select" required>
+                <option value="booking">Booking or Service Question</option>
+                <option value="provider_inquiry">Provider Verification & Onboarding</option>
+                <option value="dispute">Report an Issue or Dispute (BR-08)</option>
+                <option value="general">General Support</option>
+              </select>
+            </div>
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="cMessage">Message</label>
+              <textarea id="cMessage" class="tl-textarea" placeholder="Detail your question or concern..." required></textarea>
+            </div>
+            <button type="submit" class="tl-btn tl-btn-primary" style="width: 100%;">Send Inquiry</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="tl-footer">
+    <div class="tl-container">
+      <div class="tl-footer-bottom">
+        <div>&copy; 2026 TradeLinker. Developed by Techminds.</div>
+        <a href="index.html" style="color: #64748B;">Back to Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/icons.js"></script>
+</body>
+</html>

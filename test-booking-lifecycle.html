@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeLinker Booking Lifecycle & State Machine Test Runner</title>
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    body {
+      background: #F8FAFC;
+      font-family: var(--tl-font-sans);
+      padding: 2rem 1rem;
+      color: var(--tl-navy-900);
+    }
+    .test-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: 16px;
+      box-shadow: var(--tl-shadow-lg);
+      border: 1px solid var(--tl-border-subtle);
+      overflow: hidden;
+    }
+    .test-header {
+      background: var(--tl-navy-800);
+      color: #FFFFFF;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .test-body {
+      padding: 24px;
+    }
+    .test-suite-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .summary-card {
+      background: var(--tl-bg-subtle);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .summary-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--tl-navy-800);
+    }
+    .test-case-row {
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all var(--tl-transition-fast);
+      background: #FFFFFF;
+    }
+    .test-case-row.pass {
+      border-left: 4px solid var(--tl-teal-500);
+      background: #F0FDF9;
+    }
+    .test-case-row.fail {
+      border-left: 4px solid #DC2626;
+      background: #FEF2F2;
+    }
+    .test-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--tl-navy-800);
+      margin-bottom: 2px;
+    }
+    .test-desc {
+      font-size: 0.8rem;
+      color: var(--tl-text-secondary);
+    }
+    .log-box {
+      background: var(--tl-navy-950);
+      color: #A7F3D0;
+      font-family: monospace;
+      font-size: 0.8rem;
+      padding: 16px;
+      border-radius: 10px;
+      max-height: 280px;
+      overflow-y: auto;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="test-container">
+    <div class="test-header">
+      <div>
+        <h1 style="font-size: 1.4rem; margin: 0; color: #FFFFFF;">TradeLinker Booking Management Lifecycle Verification</h1>
+        <p style="font-size: 0.85rem; color: var(--tl-teal-200); margin: 4px 0 0 0;">
+          SRS Requirements: FR-10, FR-17, FR-28 to FR-34, FR-36, FR-39, BR-04, BR-05, BR-06
+        </p>
+      </div>
+      <button class="tl-btn tl-btn-primary" id="runTestsBtn" onclick="runAllBookingTests()">
+        Run All Verification Tests
+      </button>
+    </div>
+
+    <div class="test-body">
+      <div class="test-suite-summary">
+        <div class="summary-card">
+          <div class="summary-num" id="totalCount">14</div>
+          <div style="font-size: 0.75rem; color: var(--tl-text-muted);">Total Tests</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num" style="color: var(--tl-teal-600);" id="passCount">0</div>
+          <div style="font-size: 0.75rem; color: var(--tl-text-muted);">Passed</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num" style="color: #DC2626;" id="failCount">0</div>
+          <div style="font-size: 0.75rem; color: var(--tl-text-muted);">Failed</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-num" style="color: var(--tl-gold-600);" id="statusIndicator">Ready</div>
+          <div style="font-size: 0.75rem; color: var(--tl-text-muted);">Status</div>
+        </div>
+      </div>
+
+      <div id="testCasesContainer">
+        <!-- Rendered via JS -->
+      </div>
+
+      <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.85rem; font-weight: 700; color: var(--tl-navy-800);">Execution Console Logs:</span>
+        <button class="tl-btn tl-btn-ghost tl-btn-xs" onclick="document.getElementById('consoleLog').innerHTML = '';">Clear Logs</button>
+      </div>
+      <div class="log-box" id="consoleLog">Ready to execute booking lifecycle tests... Click 'Run All Verification Tests'.</div>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script>
+    const testCases = [
+      {
+        id: "TC-BK-01",
+        title: "Booking Request Creation & Format (FR-28, FR-30, FR-33)",
+        desc: "Validates creation with unique TL-BK-XXXXX ID, status 'pending', and initial audit entry."
+      },
+      {
+        id: "TC-BK-02",
+        title: "Duplicate Submission Prevention",
+        desc: "Ensures duplicate requests with identical details within 5 minutes are rejected."
+      },
+      {
+        id: "TC-BK-03",
+        title: "Provider In-App Notification (FR-36, FR-37)",
+        desc: "Verifies provider receives real-time booking_request notification."
+      },
+      {
+        id: "TC-BK-04",
+        title: "Provider Acceptance Transition (FR-31)",
+        desc: "Advances status from 'pending' to 'accepted' and notifies customer."
+      },
+      {
+        id: "TC-BK-05",
+        title: "Customer Cancellation when 'Accepted' (FR-10)",
+        desc: "Confirms customer can cancel booking when pending or accepted with recorded reason."
+      },
+      {
+        id: "TC-BK-06",
+        title: "Advance Booking to 'In Progress' (BR-05)",
+        desc: "Provider transitions accepted booking to 'in_progress' when work starts."
+      },
+      {
+        id: "TC-BK-07",
+        title: "Cancellation Blocked when 'In Progress' (FR-10)",
+        desc: "Enforces FR-10 cancellation rule: customers CANNOT cancel once work is in progress."
+      },
+      {
+        id: "TC-BK-08",
+        title: "Role-Based Permission Guard (BR-05)",
+        desc: "Prevents unauthorized customers from marking service as 'completed'."
+      },
+      {
+        id: "TC-BK-09",
+        title: "Provider Service Completion (FR-17)",
+        desc: "Provider marks job completed from 'in_progress' and alerts customer."
+      },
+      {
+        id: "TC-BK-10",
+        title: "Terminal State Immutability Lock",
+        desc: "Ensures finalized 'completed' or 'cancelled' bookings cannot transition further."
+      },
+      {
+        id: "TC-BK-11",
+        title: "Verified Rating & Review Submission (BR-06, FR-39)",
+        desc: "Allows customer to rate and review a 'completed' booking, updating provider rating."
+      },
+      {
+        id: "TC-BK-12",
+        title: "Duplicate Review Prevention (BR-06)",
+        desc: "Strictly prevents reviewing the same completed booking more than once."
+      },
+      {
+        id: "TC-BK-13",
+        title: "Review Restriction on Non-Completed Bookings (BR-06)",
+        desc: "Prevents customer from reviewing pending or in-progress service requests."
+      },
+      {
+        id: "TC-BK-14",
+        title: "Immutable Status History Audit Trail (FR-34)",
+        desc: "Validates all transitions contain timestamp, roles, userIds, and transition notes."
+      }
+    ];
+
+    function renderInitialTestList() {
+      const container = document.getElementById('testCasesContainer');
+      container.innerHTML = testCases.map(tc => `
+        <div class="test-case-row" id="row-${tc.id}">
+          <div>
+            <div class="test-title"><span class="tl-badge tl-badge-accepted" style="font-size: 0.7rem; margin-right: 6px;">${tc.id}</span>${tc.title}</div>
+            <div class="test-desc">${tc.desc}</div>
+          </div>
+          <span class="tl-badge tl-badge-pending" id="badge-${tc.id}">Pending</span>
+        </div>
+      `).join('');
+    }
+
+    function log(msg) {
+      const el = document.getElementById('consoleLog');
+      const time = new Date().toLocaleTimeString();
+      el.innerHTML += `\n[${time}] ${msg}`;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    async function runAllBookingTests() {
+      const btn = document.getElementById('runTestsBtn');
+      btn.disabled = true;
+      btn.innerText = "Running Test Suite...";
+      document.getElementById('statusIndicator').innerText = "Running";
+      document.getElementById('statusIndicator').style.color = "var(--tl-navy-800)";
+
+      let passed = 0;
+      let failed = 0;
+
+      const customerId = "usr-cust-001";
+      const providerId = "prov-profile-001";
+      const providerUserId = "usr-prov-001";
+
+      log("=== STARTING TRADELINKER BOOKING LIFECYCLE VERIFICATION SUITE ===");
+
+      // Test 1: Creation & Format
+      try {
+        log("TC-BK-01: Creating new service booking request...");
+        const res1 = TLBookings.createBooking({
+          customerId,
+          providerId,
+          serviceId: "srv-001",
+          serviceTitle: "Electrical Panel Safety Diagnostic",
+          categoryTitle: "Electrical Services",
+          problemDescription: "Frequent voltage fluctuation tripping the 32A safety breaker in hallway.",
+          serviceAddress: "House 29, Street 14, Sector G-10/2, Islamabad",
+          city: "Islamabad",
+          scheduledDate: "2026-10-30",
+          scheduledTimeSlot: "Morning (9 AM - 12 PM)"
+        });
+
+        if (!res1.success) throw new Error("Failed to create booking: " + res1.error);
+        if (!/^TL-BK-\d{4,5}$/.test(res1.booking.id)) throw new Error("ID format invalid: " + res1.booking.id);
+        if (res1.booking.status !== "pending") throw new Error("Expected initial status 'pending', got: " + res1.booking.status);
+        if (!res1.booking.statusHistory || res1.booking.statusHistory.length !== 1) throw new Error("Missing initial statusHistory entry.");
+
+        window.testBooking1 = res1.booking;
+        markTestPass("TC-BK-01");
+        passed++;
+        log(`TC-BK-01 PASS: Booking created with ID ${res1.booking.id} and status 'pending'.`);
+      } catch (e) {
+        markTestFail("TC-BK-01", e.message);
+        failed++;
+        log("TC-BK-01 FAIL: " + e.message);
+      }
+
+      // Test 2: Duplicate Prevention
+      try {
+        log("TC-BK-02: Submitting identical duplicate request immediately...");
+        const res2 = TLBookings.createBooking({
+          customerId,
+          providerId,
+          serviceId: "srv-001",
+          serviceTitle: "Electrical Panel Safety Diagnostic",
+          categoryTitle: "Electrical Services",
+          problemDescription: "Frequent voltage fluctuation tripping the 32A safety breaker in hallway.",
+          serviceAddress: "House 29, Street 14, Sector G-10/2, Islamabad",
+          city: "Islamabad",
+          scheduledDate: "2026-10-30",
+          scheduledTimeSlot: "Morning (9 AM - 12 PM)"
+        });
+
+        if (res2.success) throw new Error("Duplicate submission was allowed but should have been rejected!");
+        markTestPass("TC-BK-02");
+        passed++;
+        log("TC-BK-02 PASS: Duplicate booking correctly blocked: " + res2.error);
+      } catch (e) {
+        markTestFail("TC-BK-02", e.message);
+        failed++;
+        log("TC-BK-02 FAIL: " + e.message);
+      }
+
+      // Test 3: Provider Notification
+      try {
+        log("TC-BK-03: Inspecting provider in-app notifications...");
+        const notifs = TLBookings.getUserNotifications(providerUserId);
+        const match = notifs.find(n => n.bookingId === window.testBooking1.id);
+        if (!match) throw new Error("No notification found for provider regarding booking " + window.testBooking1.id);
+        if (match.type !== "booking_request") throw new Error("Expected notification type 'booking_request', got: " + match.type);
+
+        markTestPass("TC-BK-03");
+        passed++;
+        log(`TC-BK-03 PASS: Provider notification verified: "${match.title}"`);
+      } catch (e) {
+        markTestFail("TC-BK-03", e.message);
+        failed++;
+        log("TC-BK-03 FAIL: " + e.message);
+      }
+
+      // Test 4: Provider Acceptance
+      try {
+        log("TC-BK-04: Provider accepting booking request...");
+        const res4 = TLBookings.transitionStatus({
+          bookingId: window.testBooking1.id,
+          targetStatus: "accepted",
+          actorRole: "provider",
+          actorUserId: providerUserId,
+          reasonNote: "Schedule confirmed for requested morning slot."
+        });
+
+        if (!res4.success) throw new Error("Acceptance transition failed: " + res4.error);
+        if (res4.booking.status !== "accepted") throw new Error("Status should be 'accepted', got: " + res4.booking.status);
+        if (res4.booking.statusHistory.length !== 2) throw new Error("statusHistory should have 2 steps, got: " + res4.booking.statusHistory.length);
+
+        markTestPass("TC-BK-04");
+        passed++;
+        log("TC-BK-04 PASS: Booking status transitioned to 'accepted'.");
+      } catch (e) {
+        markTestFail("TC-BK-04", e.message);
+        failed++;
+        log("TC-BK-04 FAIL: " + e.message);
+      }
+
+      // Test 5: Customer Cancellation when 'Accepted' (FR-10)
+      try {
+        log("TC-BK-05: Testing FR-10 customer cancellation on accepted booking...");
+        // Create auxiliary booking for cancellation test
+        const aux = TLBookings.createBooking({
+          customerId,
+          providerId,
+          serviceId: "srv-002",
+          serviceTitle: "Auxiliary DB Upgrade",
+          categoryTitle: "Electrical Services",
+          problemDescription: "Secondary wiring test for customer cancellation verification.",
+          serviceAddress: "Sector F-8, Islamabad",
+          city: "Islamabad",
+          scheduledDate: "2026-10-31",
+          scheduledTimeSlot: "Afternoon"
+        });
+
+        TLBookings.transitionStatus({
+          bookingId: aux.booking.id,
+          targetStatus: "accepted",
+          actorRole: "provider",
+          actorUserId: providerUserId
+        });
+
+        const cancelRes = TLBookings.transitionStatus({
+          bookingId: aux.booking.id,
+          targetStatus: "cancelled",
+          actorRole: "customer",
+          actorUserId: customerId,
+          reasonNote: "Customer schedule conflict."
+        });
+
+        if (!cancelRes.success) throw new Error("Customer cancellation failed: " + cancelRes.error);
+        if (cancelRes.booking.status !== "cancelled") throw new Error("Status should be 'cancelled'");
+        if (!cancelRes.booking.cancellationReason) throw new Error("cancellationReason not saved");
+
+        markTestPass("TC-BK-05");
+        passed++;
+        log("TC-BK-05 PASS: Customer successfully cancelled accepted booking with reason: " + cancelRes.booking.cancellationReason);
+      } catch (e) {
+        markTestFail("TC-BK-05", e.message);
+        failed++;
+        log("TC-BK-05 FAIL: " + e.message);
+      }
+
+      // Test 6: Advance to 'In Progress'
+      try {
+        log("TC-BK-06: Advancing booking to 'in_progress'...");
+        const res6 = TLBookings.transitionStatus({
+          bookingId: window.testBooking1.id,
+          targetStatus: "in_progress",
+          actorRole: "provider",
+          actorUserId: providerUserId,
+          reasonNote: "Engineer arrived on site and commenced diagnostic."
+        });
+
+        if (!res6.success) throw new Error("Failed to transition to in_progress: " + res6.error);
+        if (res6.booking.status !== "in_progress") throw new Error("Status should be 'in_progress'");
+
+        markTestPass("TC-BK-06");
+        passed++;
+        log("TC-BK-06 PASS: Booking is now 'in_progress'.");
+      } catch (e) {
+        markTestFail("TC-BK-06", e.message);
+        failed++;
+        log("TC-BK-06 FAIL: " + e.message);
+      }
+
+      // Test 7: Customer Cancellation Blocked when 'In Progress' (FR-10)
+      try {
+        log("TC-BK-07: Testing cancellation rejection on 'in_progress' booking (FR-10)...");
+        const res7 = TLBookings.transitionStatus({
+          bookingId: window.testBooking1.id,
+          targetStatus: "cancelled",
+          actorRole: "customer",
+          actorUserId: customerId,
+          reasonNote: "Trying to cancel mid-work."
+        });
+
+        if (res7.success) throw new Error("Cancellation should NOT be allowed when work is in progress!");
+        markTestPass("TC-BK-07");
+        passed++;
+        log("TC-BK-07 PASS: Customer cancellation correctly blocked per FR-10: " + res7.error);
+      } catch (e) {
+        markTestFail("TC-BK-07", e.message);
+        failed++;
+        log("TC-BK-07 FAIL: " + e.message);
+      }
+
+      // Test 8: Role-Based Guard (BR-05)
+      try {
+        log("TC-BK-08: Customer attempting to mark booking as completed...");
+        const res8 = TLBookings.transitionStatus({
+          bookingId: window.testBooking1.id,
+          targetStatus: "completed",
+          actorRole: "customer",
+          actorUserId: customerId,
+          reasonNote: "Customer attempting provider action."
+        });
+
+        if (res8.success) throw new Error("Customer should NOT have permission to complete service jobs!");
+        markTestPass("TC-BK-08");
+        passed++;
+        log("TC-BK-08 PASS: Unauthorized role transition blocked: " + res8.error);
+      } catch (e) {
+        markTestFail("TC-BK-08", e.message);
+        failed++;
+        log("TC-BK-08 FAIL: " + e.message);
+      }
+
+      // Test 9: Provider Service Completion (FR-17)
+      try {
+        log("TC-BK-09: Provider marking service job completed...");
+        const res9 = TLBookings.transitionStatus({
+          bookingId: window.testBooking1.id,
+          targetStatus: "completed",
+          actorRole: "provider",
+          actorUserId: providerUserId,
+          reasonNote: "Wiring diagnostic complete, 32A breaker replaced, safety test certified."
+        });
+
+        if (!res9.success) throw new Error("Completion transition failed: " + res9.error);
+        if (res9.booking.status !== "completed") throw new Error("Status should be 'completed'");
+
+        markTestPass("TC-BK-09");
+        passed++;
+        log("TC-BK-09 PASS: Service job completed successfully (FR-17).");
+      } catch (e) {
+        markTestFail("TC-BK-09", e.message);
+        failed++;
+        log("TC-BK-09 FAIL: " + e.message);
+      }
+
+      // Test 10: Terminal State Lock
+      try {
+        log("TC-BK-10: Attempting to modify completed booking status...");
+        const res10 = TLBookings.transitionStatus({
+          bookingId: window.testBooking1.id,
+          targetStatus: "in_progress",
+          actorRole: "provider",
+          actorUserId: providerUserId
+        });
+
+        if (res10.success) throw new Error("Completed booking should be locked against further changes!");
+        markTestPass("TC-BK-10");
+        passed++;
+        log("TC-BK-10 PASS: Terminal status lock verified: " + res10.error);
+      } catch (e) {
+        markTestFail("TC-BK-10", e.message);
+        failed++;
+        log("TC-BK-10 FAIL: " + e.message);
+      }
+
+      // Test 11: Verified Review Submission (BR-06, FR-39)
+      try {
+        log("TC-BK-11: Customer submitting verified review for completed booking...");
+        const res11 = TLBookings.submitReview({
+          bookingId: window.testBooking1.id,
+          customerId,
+          rating: 5,
+          comment: "Superb diagnostic and quick replacement of faulty breaker. Very professional engineer!"
+        });
+
+        if (!res11.success) throw new Error("Review submission failed: " + res11.error);
+        if (res11.review.rating !== 5) throw new Error("Rating mismatch");
+
+        // Verify provider rating recalculated
+        const providers = TLAuth.getProviders();
+        const p = providers.find(x => x.id === providerId);
+        if (!p || !p.rating) throw new Error("Provider rating was not recalculated");
+
+        markTestPass("TC-BK-11");
+        passed++;
+        log(`TC-BK-11 PASS: Verified review recorded. Provider rating updated to ${p.rating} ★.`);
+      } catch (e) {
+        markTestFail("TC-BK-11", e.message);
+        failed++;
+        log("TC-BK-11 FAIL: " + e.message);
+      }
+
+      // Test 12: Duplicate Review Prevention (BR-06)
+      try {
+        log("TC-BK-12: Customer attempting to review the same booking again...");
+        const res12 = TLBookings.submitReview({
+          bookingId: window.testBooking1.id,
+          customerId,
+          rating: 4,
+          comment: "Submitting second review for same booking."
+        });
+
+        if (res12.success) throw new Error("Duplicate review on same booking should be rejected!");
+        markTestPass("TC-BK-12");
+        passed++;
+        log("TC-BK-12 PASS: Duplicate review blocked per BR-06: " + res12.error);
+      } catch (e) {
+        markTestFail("TC-BK-12", e.message);
+        failed++;
+        log("TC-BK-12 FAIL: " + e.message);
+      }
+
+      // Test 13: Review Restriction on Non-Completed Bookings
+      try {
+        log("TC-BK-13: Attempting review on non-completed booking...");
+        // Create pending booking
+        const pendingBk = TLBookings.createBooking({
+          customerId,
+          providerId,
+          serviceId: "srv-003",
+          serviceTitle: "AC Leak Repair",
+          categoryTitle: "AC and HVAC Services",
+          problemDescription: "Freon gas leak check.",
+          serviceAddress: "Sector F-6, Islamabad",
+          city: "Islamabad",
+          scheduledDate: "2026-11-01",
+          scheduledTimeSlot: "Morning"
+        });
+
+        const res13 = TLBookings.submitReview({
+          bookingId: pendingBk.booking.id,
+          customerId,
+          rating: 5,
+          comment: "Attempting early review on pending job."
+        });
+
+        if (res13.success) throw new Error("Reviews should ONLY be permitted after completion!");
+        markTestPass("TC-BK-13");
+        passed++;
+        log("TC-BK-13 PASS: Non-completed review blocked per BR-06: " + res13.error);
+      } catch (e) {
+        markTestFail("TC-BK-13", e.message);
+        failed++;
+        log("TC-BK-13 FAIL: " + e.message);
+      }
+
+      // Test 14: Immutable Status Audit History (FR-34)
+      try {
+        log("TC-BK-14: Verifying complete immutable audit trail of booking...");
+        const finalBooking = TLBookings.getBookingById(window.testBooking1.id);
+        if (!finalBooking) throw new Error("Booking not found in storage");
+        const history = finalBooking.statusHistory;
+
+        if (!Array.isArray(history) || history.length < 4) {
+          throw new Error(`Expected at least 4 audit transitions (pending->accepted->in_progress->completed), found: ${history.length}`);
+        }
+
+        history.forEach((step, idx) => {
+          if (!step.timestamp || !step.toStatus || !step.changedByRole || !step.changedByUserId) {
+            throw new Error(`Audit step ${idx} is missing mandatory metadata fields!`);
+          }
+        });
+
+        markTestPass("TC-BK-14");
+        passed++;
+        log(`TC-BK-14 PASS: Complete immutable audit history verified with ${history.length} valid events.`);
+      } catch (e) {
+        markTestFail("TC-BK-14", e.message);
+        failed++;
+        log("TC-BK-14 FAIL: " + e.message);
+      }
+
+      // Final summary
+      document.getElementById('passCount').innerText = passed;
+      document.getElementById('failCount').innerText = failed;
+      if (failed === 0) {
+        document.getElementById('statusIndicator').innerText = "100% PASS";
+        document.getElementById('statusIndicator').style.color = "var(--tl-teal-600)";
+        log("==================================================================");
+        log(`VERIFICATION COMPLETE: ALL ${passed} BOOKING LIFECYCLE TESTS PASSED!`);
+        log("TradeLinker Booking System fully complies with SRS specifications.");
+        log("==================================================================");
+      } else {
+        document.getElementById('statusIndicator').innerText = `${failed} FAILED`;
+        document.getElementById('statusIndicator').style.color = "#DC2626";
+      }
+
+      btn.disabled = false;
+      btn.innerText = "Re-Run All Verification Tests";
+    }
+
+    function markTestPass(testId) {
+      const row = document.getElementById(`row-${testId}`);
+      const badge = document.getElementById(`badge-${testId}`);
+      if (row) {
+        row.className = "test-case-row pass";
+      }
+      if (badge) {
+        badge.className = "tl-badge tl-badge-completed";
+        badge.innerText = "✓ PASSED";
+      }
+    }
+
+    function markTestFail(testId, errorMsg) {
+      const row = document.getElementById(`row-${testId}`);
+      const badge = document.getElementById(`badge-${testId}`);
+      if (row) {
+        row.className = "test-case-row fail";
+      }
+      if (badge) {
+        badge.className = "tl-badge tl-badge-cancelled";
+        badge.innerText = "✗ FAILED";
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderInitialTestList();
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('autorun') === '1') {
+        setTimeout(runAllBookingTests, 300);
+      }
+    });
+  </script>
+</body>
+</html>

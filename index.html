@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeLinker — Connecting People with Trusted Professionals</title>
+  <meta name="description" content="TradeLinker connects individuals, hospitals, and organizations with trusted professionals in Construction, Plumbing, Electrical, AC/HVAC, Solar Energy, and Carpentry.">
+  
+  <!-- Design System & Styles -->
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reloader.css">
+  
+  <style>
+    /* Homepage Specific Layouts & Visual Polish */
+    .tl-hero {
+      background: radial-gradient(circle at 85% 20%, rgba(1, 173, 143, 0.12) 0%, transparent 60%),
+                  linear-gradient(180deg, #FFFFFF 0%, var(--tl-bg-page) 100%);
+      padding: var(--tl-space-12) 0 var(--tl-space-16);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tl-hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--tl-space-10);
+      align-items: center;
+    }
+
+    @media (min-width: 992px) {
+      .tl-hero-grid {
+        grid-template-columns: 1.15fr 0.85fr;
+      }
+    }
+
+    .tl-hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--tl-teal-100);
+      color: var(--tl-teal-700);
+      padding: 6px 14px;
+      border-radius: var(--tl-radius-full);
+      font-size: var(--tl-font-size-xs);
+      font-weight: var(--tl-font-weight-bold);
+      margin-bottom: var(--tl-space-4);
+      letter-spacing: 0.02em;
+    }
+
+    .tl-hero-title {
+      font-size: 2.5rem;
+      line-height: 1.15;
+      margin-bottom: var(--tl-space-4);
+      color: var(--tl-navy-800);
+    }
+
+    .tl-hero-title span.text-teal {
+      color: var(--tl-teal-500);
+    }
+
+    @media (min-width: 768px) {
+      .tl-hero-title {
+        font-size: 3.4rem;
+      }
+    }
+
+    .tl-hero-lead {
+      font-size: 1.125rem;
+      line-height: 1.6;
+      color: var(--tl-text-secondary);
+      margin-bottom: var(--tl-space-8);
+      max-width: 580px;
+    }
+
+    .tl-hero-card-visual {
+      background: var(--tl-bg-surface);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: var(--tl-radius-2xl);
+      padding: var(--tl-space-6);
+      box-shadow: var(--tl-shadow-xl);
+      position: relative;
+    }
+
+    .tl-hero-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--tl-space-4);
+      margin-top: var(--tl-space-6);
+      padding-top: var(--tl-space-6);
+      border-top: 1px solid var(--tl-border-subtle);
+    }
+
+    .tl-hero-stat-item h4 {
+      font-size: 1.75rem;
+      color: var(--tl-navy-800);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .tl-hero-stat-item p {
+      font-size: var(--tl-font-size-xs);
+      color: var(--tl-text-muted);
+      margin: 4px 0 0 0;
+      font-weight: 600;
+    }
+
+    /* Trust Ribbon */
+    .tl-trust-ribbon {
+      background: #FFFFFF;
+      border-top: 1px solid var(--tl-border-subtle);
+      border-bottom: 1px solid var(--tl-border-subtle);
+      padding: var(--tl-space-6) 0;
+    }
+
+    .tl-trust-ribbon-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--tl-space-4);
+    }
+
+    /* Section Headers */
+    .tl-section-title-wrap {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto var(--tl-space-12);
+    }
+
+    .tl-section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--tl-font-size-xs);
+      font-weight: var(--tl-font-weight-bold);
+      color: var(--tl-teal-600);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--tl-space-2);
+    }
+
+    .tl-section-h2 {
+      font-size: 2.25rem;
+      color: var(--tl-navy-800);
+      margin-bottom: var(--tl-space-3);
+    }
+
+    .tl-section-desc {
+      font-size: 1.05rem;
+      color: var(--tl-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* How It Works Steps */
+    .tl-steps-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--tl-space-8);
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .tl-steps-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .tl-step-card {
+      background: var(--tl-bg-surface);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: var(--tl-radius-xl);
+      padding: var(--tl-space-8) var(--tl-space-6);
+      text-align: center;
+      position: relative;
+      transition: all var(--tl-transition-normal);
+    }
+
+    .tl-step-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--tl-shadow-lg);
+      border-color: var(--tl-teal-300);
+    }
+
+    .tl-step-num {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--tl-teal-500);
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #FFFFFF;
+      box-shadow: var(--tl-shadow-sm);
+    }
+
+    .tl-step-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--tl-navy-50);
+      color: var(--tl-navy-800);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: var(--tl-space-3) auto var(--tl-space-4);
+    }
+
+    .tl-step-icon svg {
+      width: 30px;
+      height: 30px;
+    }
+
+    /* Why TradeLinker Grid */
+    .tl-why-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--tl-space-6);
+    }
+
+    @media (min-width: 768px) {
+      .tl-why-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1200px) {
+      .tl-why-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .tl-why-card {
+      background: var(--tl-bg-surface);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: var(--tl-radius-lg);
+      padding: var(--tl-space-6);
+      transition: all var(--tl-transition-normal);
+    }
+
+    .tl-why-card:hover {
+      border-color: var(--tl-teal-300);
+      transform: translateY(-4px);
+      box-shadow: var(--tl-shadow-md);
+    }
+
+    .tl-why-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--tl-radius-md);
+      background: var(--tl-teal-100);
+      color: var(--tl-teal-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--tl-space-4);
+    }
+
+    .tl-why-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Provider CTA Banner */
+    .tl-provider-banner {
+      background: linear-gradient(135deg, var(--tl-navy-900) 0%, var(--tl-navy-800) 100%);
+      border-radius: var(--tl-radius-2xl);
+      padding: var(--tl-space-12) var(--tl-space-8);
+      color: #FFFFFF;
+      position: relative;
+      overflow: hidden;
+      margin: var(--tl-space-16) 0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tl-provider-banner::before {
+      content: '';
+      position: absolute;
+      right: -80px;
+      top: -80px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(1, 173, 143, 0.3) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .tl-provider-banner-content {
+      max-width: 640px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .tl-provider-banner h2 {
+      color: #FFFFFF;
+      font-size: 2.25rem;
+      margin-bottom: var(--tl-space-4);
+    }
+
+    .tl-provider-banner p {
+      color: #CBD5E1;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: var(--tl-space-6);
+    }
+
+    /* Contact Preview Box */
+    .tl-contact-strip {
+      background: var(--tl-bg-subtle);
+      border-radius: var(--tl-radius-xl);
+      padding: var(--tl-space-10) var(--tl-space-8);
+      border: 1px solid var(--tl-border-subtle);
+      margin-bottom: var(--tl-space-16);
+    }
+
+    /* Mobile Drawer */
+    .tl-mobile-drawer {
+      position: fixed;
+      top: 76px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #FFFFFF;
+      z-index: var(--tl-z-fixed);
+      display: none;
+      flex-direction: column;
+      padding: var(--tl-space-6);
+      gap: var(--tl-space-4);
+      border-top: 1px solid var(--tl-border-subtle);
+      overflow-y: auto;
+    }
+
+    .tl-mobile-drawer.active {
+      display: flex;
+    }
+
+    .tl-mobile-nav-link {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--tl-navy-800);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--tl-border-subtle);
+    }
+
+    /* Search Results Live Container */
+    #liveSearchResults {
+      margin-top: var(--tl-space-8);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       TradeLinker Responsive Preloader ("Just This" Official Brand Emblem)
+       ========================================================================= -->
+  <div id="tl-page-preloader" class="tl-page-preloader" role="status" aria-live="polite" aria-label="Loading TradeLinker">
+    <div class="tl-standalone-loader">
+      <img src="assets/images/tradelinker-monogram.png" alt="TradeLinker" class="tl-standalone-loader-img">
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       1. Header & Navigation (Shared Element)
+       ========================================================================= -->
+  <header class="tl-navbar" id="siteHeader">
+    <div class="tl-container">
+      <div class="tl-navbar-inner">
+        <!-- TradeLinker Real Logo with Preserved Proportions -->
+        <a href="index.html" class="tl-logo" title="TradeLinker — Connecting People with Trusted Professionals">
+          <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Logo" class="tl-logo-img">
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav aria-label="Main Navigation">
+          <ul class="tl-nav-links">
+            <li><a href="index.html" class="tl-nav-link active">Home</a></li>
+            <li><a href="categories.html" class="tl-nav-link">Services</a></li>
+            <li><a href="search.html" class="tl-nav-link">Find Professionals</a></li>
+            <li><a href="#about" class="tl-nav-link">About</a></li>
+            <li><a href="contact.html" class="tl-nav-link">Contact</a></li>
+          </ul>
+        </nav>
+
+        <!-- Authentication & Actions -->
+        <div class="tl-nav-actions">
+          <a href="auth.html?mode=login" class="tl-btn tl-btn-ghost tl-btn-sm" id="navLoginBtn">
+            Sign In
+          </a>
+          <a href="auth.html?mode=register" class="tl-btn tl-btn-primary tl-btn-sm" id="navRegisterBtn">
+            Register
+          </a>
+
+          <!-- Mobile Hamburger -->
+          <button class="tl-hamburger" id="navMobileToggle" aria-label="Toggle navigation menu" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Navigation -->
+    <div class="tl-mobile-drawer" id="mobileDrawer">
+      <a href="index.html" class="tl-mobile-nav-link" onclick="toggleMobileMenu()">Home</a>
+      <a href="categories.html" class="tl-mobile-nav-link" onclick="toggleMobileMenu()">Services (6 Categories)</a>
+      <a href="search.html" class="tl-mobile-nav-link" onclick="toggleMobileMenu()">Find Professionals</a>
+      <a href="#about" class="tl-mobile-nav-link" onclick="toggleMobileMenu()">About TradeLinker</a>
+      <a href="contact.html" class="tl-mobile-nav-link" onclick="toggleMobileMenu()">Contact & Support</a>
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+        <a href="auth.html?mode=login" class="tl-btn tl-btn-outline" onclick="toggleMobileMenu()">Sign In</a>
+        <a href="auth.html?mode=register" class="tl-btn tl-btn-primary" onclick="toggleMobileMenu()">Register as Customer</a>
+        <a href="auth.html?mode=register&role=provider" class="tl-btn tl-btn-secondary" onclick="toggleMobileMenu()">Register as Service Provider</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       4. Hero Section with Value Proposition
+       ========================================================================= -->
+  <section class="tl-hero" id="homeHero">
+    <div class="tl-container">
+      <div class="tl-hero-grid">
+        <div>
+          <div class="tl-hero-eyebrow">
+            <span data-tl-icon="verified"></span> Trusted Professional Marketplace
+          </div>
+          <h1 class="tl-hero-title">
+            Find. Book. Get It Done. <br>
+            <span class="text-teal">Trusted Professionals</span> for Every Need
+          </h1>
+          <p class="tl-hero-lead">
+            TradeLinker connects individuals, hospitals, and organizations with skilled, verified tradespeople across Pakistan. Search, compare, and book trusted professionals — quickly, easily, and securely.
+          </p>
+
+          <!-- 5. Central Search Interface -->
+          <form class="tl-search-bar" id="heroSearchForm" onsubmit="event.preventDefault(); executeSearch();">
+            <div class="tl-search-field">
+              <span data-tl-icon="search" class="tl-search-icon"></span>
+              <input type="text" id="heroQuery" class="tl-search-input" placeholder="Search services (e.g. Electrical, Solar, Plumbing, Doors)...">
+            </div>
+
+            <div class="tl-search-divider"></div>
+
+            <div class="tl-search-field">
+              <span data-tl-icon="mapPin" class="tl-search-icon"></span>
+              <select class="tl-search-select" id="heroLocation">
+                <option value="all">All Cities</option>
+                <option value="Islamabad">Islamabad</option>
+                <option value="Rawalpindi">Rawalpindi</option>
+                <option value="Lahore">Lahore</option>
+                <option value="Karachi">Karachi</option>
+                <option value="Peshawar">Peshawar</option>
+              </select>
+            </div>
+
+            <div class="tl-search-divider"></div>
+
+            <div class="tl-search-field">
+              <select class="tl-search-select" id="heroCategory">
+                <option value="all">All 6 Categories</option>
+                <option value="construction">Construction Services</option>
+                <option value="plumbing">Plumbing Services</option>
+                <option value="electrical">Electrical Services</option>
+                <option value="hvac">AC & HVAC Services</option>
+                <option value="solar">Solar Energy Services</option>
+                <option value="carpentry">Door Making & Carpentry</option>
+              </select>
+            </div>
+
+            <button type="submit" class="tl-btn tl-btn-primary tl-btn-pill" id="heroSearchSubmitBtn">
+              <span data-tl-icon="search"></span> Search
+            </button>
+          </form>
+
+          <div style="display: flex; gap: 10px; align-items: center; margin-top: 14px; font-size: 0.85rem; color: var(--tl-text-muted);">
+            <span style="font-weight: 700; color: var(--tl-navy-800);">Popular Searches:</span>
+            <a href="search.html?q=wiring&cat=electrical" style="text-decoration: underline;">Full House Wiring</a>,
+            <a href="search.html?q=solar&cat=solar" style="text-decoration: underline;">Solar Panel Setup</a>,
+            <a href="search.html?q=doors&cat=carpentry" style="text-decoration: underline;">Custom Wooden Doors</a>
+          </div>
+        </div>
+
+        <!-- Hero Graphic Visual Card -->
+        <div class="tl-hero-card-visual">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="tl-badge tl-badge-verified">
+                <span data-tl-icon="verified"></span> Verified Credentials
+              </span>
+              <span class="tl-badge tl-badge-premium">
+                <span data-tl-icon="crown"></span> Top Rated
+              </span>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--tl-text-muted); font-weight: 600;">Pakistan Service Coverage</span>
+          </div>
+
+          <!-- Featured Snippet Card inside Hero -->
+          <div style="background: var(--tl-navy-50); border: 1px solid var(--tl-navy-100); border-radius: 14px; padding: 18px;">
+            <div style="display: flex; gap: 14px; align-items: center;">
+              <img src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=120&auto=format&fit=crop" alt="Featured Electrician" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover;">
+              <div style="flex: 1;">
+                <h4 style="font-size: 1.05rem; margin-bottom: 2px;">Engr. Rashid Khan</h4>
+                <div style="font-size: 0.8rem; color: var(--tl-teal-600); font-weight: 600;">Certified Electrical Engineer • 9 Yrs Exp</div>
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; margin-top: 3px;">
+                  <span style="color: var(--tl-gold-500);"><span data-tl-icon="star"></span></span>
+                  <strong>4.9 / 5.0</strong>
+                  <span style="color: var(--tl-text-muted);">(46 Verified Reviews)</span>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 12px; font-size: 0.85rem; color: var(--tl-text-secondary); line-height: 1.4;">
+              "Excellent electrical diagnostics and clean DB panel installation done on schedule in Islamabad."
+            </div>
+          </div>
+
+          <div class="tl-hero-stats-row">
+            <div class="tl-hero-stat-item">
+              <h4 id="statVerified">160+</h4>
+              <p>Verified Pros</p>
+            </div>
+            <div class="tl-hero-stat-item">
+              <h4 id="statJobs">1,400+</h4>
+              <p>Completed Jobs</p>
+            </div>
+            <div class="tl-hero-stat-item">
+              <h4>4.85 ★</h4>
+              <p>Customer Rating</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Search Results (In-Page Dynamic Container) -->
+      <div id="liveSearchResults">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border-bottom: 2px solid var(--tl-border-subtle); padding-bottom: 8px;">
+          <h3 style="color: var(--tl-navy-800);" id="searchResultTitle">Search Results</h3>
+          <button class="tl-btn tl-btn-ghost tl-btn-sm" onclick="clearLiveSearch()">Clear Search &times;</button>
+        </div>
+        <div id="searchResultsGrid" class="provider-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Ribbon Bar -->
+  <section class="tl-trust-ribbon">
+    <div class="tl-container">
+      <div class="tl-trust-ribbon-inner">
+        <div class="tl-trust-pill">
+          <div class="tl-trust-pill-icon"><span data-tl-icon="verified"></span></div>
+          <span>Verified Professionals</span>
+        </div>
+        <div class="tl-trust-pill">
+          <div class="tl-trust-pill-icon"><span data-tl-icon="clock"></span></div>
+          <span>Easy & Transparent Booking</span>
+        </div>
+        <div class="tl-trust-pill">
+          <div class="tl-trust-pill-icon"><span data-tl-icon="star"></span></div>
+          <span>Authentic Customer Ratings</span>
+        </div>
+        <div class="tl-trust-pill">
+          <div class="tl-trust-pill-icon"><span data-tl-icon="secure"></span></div>
+          <span>100% Identity Screened</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       6. Six Core Initial Service Categories (SRS Section 3.4 & BR-09)
+       ========================================================================= -->
+  <section class="tl-container" style="padding: var(--tl-space-16) var(--tl-container-pad);" id="categoriesSection">
+    <div class="tl-section-title-wrap">
+      <span class="tl-section-badge"><span data-tl-icon="check"></span> Service Discovery</span>
+      <h2 class="tl-section-h2">Explore Our Initial Service Categories</h2>
+      <p class="tl-section-desc">
+        TradeLinker launches with six essential trade sectors, thoroughly vetting professionals in each field to guarantee dependable, top-tier craftsmanship.
+      </p>
+    </div>
+
+    <div class="card-grid-6" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--tl-space-6);">
+      <!-- 1. Construction Services -->
+      <a href="search.html?cat=construction" class="tl-category-card" title="Browse Construction Services">
+        <div class="tl-category-icon-box">
+          <span data-tl-icon="construction"></span>
+        </div>
+        <h3 class="tl-category-title">Construction Services</h3>
+        <p style="font-size: 0.85rem; margin-bottom: 8px;">Civil engineers, building contractors, masonry, and structure remodeling.</p>
+        <span class="tl-category-count">18 Active Specialists</span>
+      </a>
+
+      <!-- 2. Plumbing Services -->
+      <a href="search.html?cat=plumbing" class="tl-category-card" title="Browse Plumbing Services">
+        <div class="tl-category-icon-box">
+          <span data-tl-icon="plumbing"></span>
+        </div>
+        <h3 class="tl-category-title">Plumbing Services</h3>
+        <p style="font-size: 0.85rem; margin-bottom: 8px;">Pipe installations, sanitary repairs, water tank setups, and drainage unclogging.</p>
+        <span class="tl-category-count">32 Active Specialists</span>
+      </a>
+
+      <!-- 3. Electrical Services -->
+      <a href="search.html?cat=electrical" class="tl-category-card" title="Browse Electrical Services">
+        <div class="tl-category-icon-box">
+          <span data-tl-icon="electrical"></span>
+        </div>
+        <h3 class="tl-category-title">Electrical Services</h3>
+        <p style="font-size: 0.85rem; margin-bottom: 8px;">Wiring, breaker distributions, lighting, short-circuit diagnostics, and UPS systems.</p>
+        <span class="tl-category-count">41 Active Specialists</span>
+      </a>
+
+      <!-- 4. AC and HVAC Services -->
+      <a href="search.html?cat=hvac" class="tl-category-card" title="Browse AC & HVAC Services">
+        <div class="tl-category-icon-box">
+          <span data-tl-icon="hvac"></span>
+        </div>
+        <h3 class="tl-category-title">AC & HVAC Services</h3>
+        <p style="font-size: 0.85rem; margin-bottom: 8px;">Air conditioner installation, chemical washing, gas charging, and duct repairs.</p>
+        <span class="tl-category-count">24 Active Specialists</span>
+      </a>
+
+      <!-- 5. Solar Energy Services -->
+      <a href="search.html?cat=solar" class="tl-category-card" title="Browse Solar Energy Services">
+        <div class="tl-category-icon-box">
+          <span data-tl-icon="solar"></span>
+        </div>
+        <h3 class="tl-category-title">Solar Energy Services</h3>
+        <p style="font-size: 0.85rem; margin-bottom: 8px;">Turnkey solar panels, net metering certification, inverters, and battery backups.</p>
+        <span class="tl-category-count">27 Active Specialists</span>
+      </a>
+
+      <!-- 6. Wooden Door Making & Carpentry -->
+      <a href="search.html?cat=carpentry" class="tl-category-card" title="Browse Carpentry Services">
+        <div class="tl-category-icon-box">
+          <span data-tl-icon="carpentry"></span>
+        </div>
+        <h3 class="tl-category-title">Door Making & Carpentry</h3>
+        <p style="font-size: 0.85rem; margin-bottom: 8px;">Custom solid wood doors, door frame fitting, architectural woodwork, and lock installs.</p>
+        <span class="tl-category-count">21 Active Specialists</span>
+      </a>
+    </div>
+
+    <div style="text-align: center; margin-top: var(--tl-space-8);">
+      <a href="categories.html" class="tl-btn tl-btn-outline">
+        View Complete Categories Directory <span data-tl-icon="arrowRight"></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       7. Featured Professionals (Demonstration Data Clearly Marked)
+       ========================================================================= -->
+  <section style="background: var(--tl-bg-subtle); padding: var(--tl-space-16) 0;" id="featuredPros">
+    <div class="tl-container">
+      <div class="tl-section-title-wrap">
+        <span class="tl-section-badge"><span data-tl-icon="star"></span> Verified Talent</span>
+        <h2 class="tl-section-h2">Featured Trade Professionals</h2>
+        <p class="tl-section-desc">
+          Browse top-rated professionals vetted for experience, background verification, and quality of service.
+          <br><em style="font-size: 0.85rem; color: var(--tl-teal-600); font-style: normal; font-weight: 600;">(Profiles below are demonstration samples per SRS specifications)</em>
+        </p>
+      </div>
+
+      <div id="featuredProsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--tl-space-6);">
+        <!-- Injected via JavaScript from TLData -->
+      </div>
+
+      <div style="text-align: center; margin-top: var(--tl-space-8);">
+        <a href="search.html" class="tl-btn tl-btn-primary">
+          <span data-tl-icon="search"></span> Search All Verified Professionals
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       8. How Platform Works (3 Simple Steps)
+       ========================================================================= -->
+  <section class="tl-container" style="padding: var(--tl-space-16) var(--tl-container-pad);" id="howItWorks">
+    <div class="tl-section-title-wrap">
+      <span class="tl-section-badge"><span data-tl-icon="clock"></span> Transparent Workflow</span>
+      <h2 class="tl-section-h2">How TradeLinker Works</h2>
+      <p class="tl-section-desc">
+        Experience a straightforward, hassle-free hiring process from discovery to service completion.
+      </p>
+    </div>
+
+    <div class="tl-steps-grid">
+      <div class="tl-step-card">
+        <div class="tl-step-num">1</div>
+        <div class="tl-step-icon">
+          <span data-tl-icon="search"></span>
+        </div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 8px;">1. Find & Compare</h3>
+        <p style="font-size: 0.9rem; line-height: 1.5;">
+          Search by trade category, filter by your city or neighborhood, and review verified credentials, ratings, and past job histories.
+        </p>
+      </div>
+
+      <div class="tl-step-card">
+        <div class="tl-step-num">2</div>
+        <div class="tl-step-icon">
+          <span data-tl-icon="calendar"></span>
+        </div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 8px;">2. Request Booking</h3>
+        <p style="font-size: 0.9rem; line-height: 1.5;">
+          Describe your problem, select your preferred date/time slot, and submit. The service provider receives an instant notification to review and accept.
+        </p>
+      </div>
+
+      <div class="tl-step-card">
+        <div class="tl-step-num">3</div>
+        <div class="tl-step-icon">
+          <span data-tl-icon="check"></span>
+        </div>
+        <h3 style="font-size: 1.25rem; margin-bottom: 8px;">3. Job Done & Review</h3>
+        <p style="font-size: 0.9rem; line-height: 1.5;">
+          The professional arrives and executes the work. Once marked completed, submit a verified rating to help your local community.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       9. Why Choose TradeLinker Section
+       ========================================================================= -->
+  <section style="background: #FFFFFF; padding: var(--tl-space-16) 0; border-top: 1px solid var(--tl-border-subtle); border-bottom: 1px solid var(--tl-border-subtle);" id="about">
+    <div class="tl-container">
+      <div class="tl-hero-grid" style="align-items: center;">
+        <div>
+          <span class="tl-section-badge"><span data-tl-icon="secure"></span> The TradeLinker Advantage</span>
+          <h2 class="tl-section-h2" style="text-align: left;">Built on Trust, Verification & Reliability</h2>
+          <p class="tl-hero-lead" style="margin-bottom: var(--tl-space-6);">
+            Traditional service hiring relies on word-of-mouth with no accountability. TradeLinker introduces modern transparency, document verification, and recorded booking lifecycles.
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+              <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--tl-teal-100); color: var(--tl-teal-600); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span data-tl-icon="verified"></span>
+              </div>
+              <div>
+                <h4 style="font-size: 1.05rem; margin-bottom: 4px;">Admin-Controlled Verification (BR-07)</h4>
+                <p style="font-size: 0.85rem; margin: 0;">Trade certifications, CNIC identity, and experience checks administered by platform operators.</p>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+              <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--tl-teal-100); color: var(--tl-teal-600); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span data-tl-icon="clock"></span>
+              </div>
+              <div>
+                <h4 style="font-size: 1.05rem; margin-bottom: 4px;">Full Booking Lifecycle Tracking (FR-33)</h4>
+                <p style="font-size: 0.85rem; margin: 0;">Real-time status updates: Pending, Accepted, In Progress, Completed, or Cancelled.</p>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 14px; align-items: flex-start;">
+              <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--tl-teal-100); color: var(--tl-teal-600); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span data-tl-icon="star"></span>
+              </div>
+              <div>
+                <h4 style="font-size: 1.05rem; margin-bottom: 4px;">Strict Review Eligibility (BR-06)</h4>
+                <p style="font-size: 0.85rem; margin: 0;">Only customers with verified completed bookings can leave ratings, preventing spam or fake feedback.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <!-- Target Customers Graphic Box (Faithful to Infographic) -->
+          <div style="background: var(--tl-navy-50); border: 1px solid var(--tl-navy-100); border-radius: 20px; padding: 30px;">
+            <h4 style="font-size: 1.15rem; color: var(--tl-navy-800); margin-bottom: 12px;">Who We Serve</h4>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;">
+              <div style="background: #FFFFFF; padding: 14px; border-radius: 12px; border: 1px solid var(--tl-border-subtle);">
+                <strong style="display: block; font-size: 0.9rem; color: var(--tl-navy-800);">Individuals & Homes</strong>
+                <span style="font-size: 0.75rem; color: var(--tl-text-muted);">Home repairs, electrical fixes & remodeling</span>
+              </div>
+              <div style="background: #FFFFFF; padding: 14px; border-radius: 12px; border: 1px solid var(--tl-border-subtle);">
+                <strong style="display: block; font-size: 0.9rem; color: var(--tl-navy-800);">Hospitals & Clinics</strong>
+                <span style="font-size: 0.75rem; color: var(--tl-text-muted);">Backup generators, HVAC & solar setups</span>
+              </div>
+              <div style="background: #FFFFFF; padding: 14px; border-radius: 12px; border: 1px solid var(--tl-border-subtle);">
+                <strong style="display: block; font-size: 0.9rem; color: var(--tl-navy-800);">Offices & Commercial</strong>
+                <span style="font-size: 0.75rem; color: var(--tl-text-muted);">Commercial plumbing & electrical maintenance</span>
+              </div>
+              <div style="background: #FFFFFF; padding: 14px; border-radius: 12px; border: 1px solid var(--tl-border-subtle);">
+                <strong style="display: block; font-size: 0.9rem; color: var(--tl-navy-800);">Property Managers</strong>
+                <span style="font-size: 0.75rem; color: var(--tl-text-muted);">Facility upkeep and structural contracting</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       10. Call-to-Action for Professionals
+       ========================================================================= -->
+  <section class="tl-container">
+    <div class="tl-provider-banner">
+      <div class="tl-provider-banner-content">
+        <span class="tl-badge tl-badge-premium" style="margin-bottom: 1rem;">
+          <span data-tl-icon="crown"></span> Expand Your Business
+        </span>
+        <h2>Are You a Skilled Tradesperson or Contractor?</h2>
+        <p>
+          Join TradeLinker to showcase your skills, connect with high-value customers, receive structured booking requests, and build an authentic online reputation.
+        </p>
+        <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+          <a href="auth.html?mode=register&role=provider" class="tl-btn tl-btn-primary tl-btn-lg">
+            Register as Service Provider <span data-tl-icon="arrowRight"></span>
+          </a>
+          <a href="contact.html?subject=provider_inquiry" class="tl-btn tl-btn-outline-teal tl-btn-lg" style="color: #FFFFFF; border-color: rgba(255,255,255,0.4);">
+            Learn About Verification
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       11. Contact Section
+       ========================================================================= -->
+  <section class="tl-container" id="contactSection">
+    <div class="tl-contact-strip">
+      <div style="display: grid; grid-template-columns: 1fr; gap: var(--tl-space-8); align-items: center;">
+        <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+          <span class="tl-section-badge"><span data-tl-icon="secure"></span> Need Help or Have Inquiries?</span>
+          <h2 style="font-size: 1.85rem; color: var(--tl-navy-800); margin-bottom: 8px;">We Are Here to Assist You</h2>
+          <p style="font-size: 0.95rem; color: var(--tl-text-secondary); margin-bottom: 1.5rem;">
+            Whether you have questions regarding booking a trade professional, dispute resolution, or provider onboarding, our support desk is active across Pakistan.
+          </p>
+          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+            <a href="contact.html" class="tl-btn tl-btn-secondary">
+              Open Support Desk & FAQs
+            </a>
+            <a href="mailto:support@tradelinker.com" class="tl-btn tl-btn-outline">
+              Email Support
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       Booking Request Interactive Modal (Prefilled from Provider Cards)
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="bookingModalBackdrop">
+    <div class="tl-modal" role="dialog" aria-modal="true">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title" id="bookingModalTitle">Submit Booking Request</h3>
+        <button class="tl-modal-close" onclick="closeBookingModal()" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; background: var(--tl-teal-50); padding: 12px; border-radius: 10px;">
+          <span data-tl-icon="verified" style="color: var(--tl-teal-600); width: 24px; height: 24px;"></span>
+          <div>
+            <div style="font-weight: 700; color: var(--tl-navy-800);" id="bookingProviderName">Selected Professional</div>
+            <div style="font-size: 0.8rem; color: var(--tl-text-muted);" id="bookingCategory">Trade Service</div>
+          </div>
+        </div>
+
+        <form id="bookingModalForm" onsubmit="event.preventDefault(); handleModalBookingSubmit();">
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="modalProblemDesc">Problem Description (FR-29)</label>
+            <textarea id="modalProblemDesc" class="tl-textarea" placeholder="Detail the issue (e.g., Short circuit in living room DB box, needs urgent check)..." required></textarea>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="modalAddress">Service Location / Address</label>
+            <input type="text" id="modalAddress" class="tl-input" placeholder="House #, Street, Sector / Colony, City" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="modalDate">Preferred Date</label>
+              <input type="date" id="modalDate" class="tl-input" required>
+            </div>
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="modalTimeSlot">Time Slot</label>
+              <select id="modalTimeSlot" class="tl-select" required>
+                <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+                <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
+                <option value="Evening (3 PM - 6 PM)">Evening (3 PM - 6 PM)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeBookingModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary" id="modalBookingSubmitBtn">
+              <span data-tl-icon="check"></span> Confirm Booking Request
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       Branded Footer (Shared Element)
+       ========================================================================= -->
+  <footer class="tl-footer">
+    <div class="tl-container">
+      <div class="tl-footer-top">
+        <div class="tl-footer-brand">
+          <a href="index.html" class="tl-logo tl-logo-dark">
+            <img src="assets/images/tradelinker-logo-white.png" alt="TradeLinker Logo" class="tl-logo-img" style="height: 44px;">
+          </a>
+          <p>
+            TradeLinker is an independent digital service marketplace connecting homeowners, hospitals, and organizations with verified trade professionals.
+          </p>
+          <div class="tl-footer-badge">
+            <span data-tl-icon="secure" style="color: var(--tl-teal-400);"></span>
+            <span style="font-size: 0.8rem; color: #CBD5E1;">100% Identity & Credential Screening</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="tl-footer-heading">Service Categories</h4>
+          <ul class="tl-footer-links">
+            <li><a href="search.html?cat=construction">Construction Services</a></li>
+            <li><a href="search.html?cat=plumbing">Plumbing Services</a></li>
+            <li><a href="search.html?cat=electrical">Electrical Services</a></li>
+            <li><a href="search.html?cat=hvac">AC & HVAC Services</a></li>
+            <li><a href="search.html?cat=solar">Solar Energy Services</a></li>
+            <li><a href="search.html?cat=carpentry">Door Making & Carpentry</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="tl-footer-heading">Platform</h4>
+          <ul class="tl-footer-links">
+            <li><a href="auth.html?mode=register&role=customer">Customer Registration</a></li>
+            <li><a href="auth.html?mode=register&role=provider">Provider Registration</a></li>
+            <li><a href="categories.html">All Service Categories</a></li>
+            <li><a href="contact.html">Safety & Dispute Scope</a></li>
+            <li><a href="admin-dashboard.html" style="color: var(--tl-teal-300); font-weight: 600;">Administrator Portal</a></li>
+            <li><a href="design-system.html">Design System Tokens</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="tl-footer-heading">Founders & Vision</h4>
+          <p style="font-size: 0.85rem; color: #94A3B8; margin-bottom: 12px;">
+            TradeLinker is conceptualized and developed by <strong>Techminds</strong> (Wasi Ullah & Hamad Ullah).
+          </p>
+          <div class="tl-script-tagline">"Better Services. A Stronger Tomorrow."</div>
+        </div>
+      </div>
+
+      <div class="tl-footer-bottom">
+        <div>
+          &copy; 2026 TradeLinker. All rights reserved. Developed by Techminds.
+        </div>
+        <div style="display: flex; gap: 20px;">
+          <a href="contact.html" style="color: #64748B;">Privacy Policy</a>
+          <a href="contact.html" style="color: #64748B;">Terms of Service</a>
+          <a href="contact.html" style="color: #64748B;">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/reloader.js"></script>
+  <script>
+    // Initialize date picker to tomorrow
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.TLReloader) window.TLReloader.init();
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const dateStr = tomorrow.toISOString().split('T')[0];
+      const dateInput = document.getElementById('modalDate');
+      if (dateInput) dateInput.value = dateStr;
+
+      renderFeaturedPros();
+      updateAuthNavState();
+    });
+
+    // Smooth Preloader Dismissal
+    function dismissPagePreloader() {
+      const preloader = document.getElementById('tl-page-preloader');
+      if (preloader && !preloader.classList.contains('fade-out')) {
+        preloader.classList.add('fade-out');
+        setTimeout(() => {
+          if (preloader && preloader.parentNode) preloader.parentNode.removeChild(preloader);
+        }, 450);
+      }
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(dismissPagePreloader, 600);
+    });
+
+    // Safety fallback
+    setTimeout(dismissPagePreloader, 2000);
+
+    // Session-aware Navbar Navigation
+    function updateAuthNavState() {
+      if (!window.TLAuth) return;
+      const user = window.TLAuth.getCurrentUser();
+      const loginBtn = document.getElementById('navLoginBtn');
+      const regBtn = document.getElementById('navRegisterBtn');
+
+      if (user && loginBtn && regBtn) {
+        const dest = TLConfig.dashboardRoutes[user.role] || 'customer-dashboard.html';
+        loginBtn.innerHTML = `<span data-tl-icon="user"></span> ${user.fullName.split(' ')[0]} (${user.role})`;
+        loginBtn.href = dest;
+        loginBtn.className = 'tl-btn tl-btn-outline-teal tl-btn-sm';
+
+        regBtn.innerText = 'Log Out';
+        regBtn.href = '#';
+        regBtn.onclick = (e) => {
+          e.preventDefault();
+          TLAuth.logout();
+        };
+      }
+    }
+
+    // Mobile Navigation Drawer Toggle
+    function toggleMobileMenu() {
+      const drawer = document.getElementById('mobileDrawer');
+      drawer.classList.toggle('active');
+    }
+
+    // Render Featured Professionals from TLData
+    function renderFeaturedPros() {
+      const container = document.getElementById('featuredProsGrid');
+      if (!container || !window.TLData) return;
+
+      const pros = window.TLData.providers.slice(0, 3); // Top 3 featured
+      container.innerHTML = pros.map(p => `
+        <div class="tl-provider-card" ${p.isPremium ? 'style="border-color: var(--tl-gold-400);"' : ''}>
+          <div class="tl-provider-header">
+            <div class="tl-provider-avatar-wrap">
+              <img src="${p.avatar}" alt="${p.name}" class="tl-provider-avatar">
+              ${p.isVerified ? '<div class="tl-verified-check" title="Identity & Credentials Verified"><span data-tl-icon="check"></span></div>' : ''}
+            </div>
+            <div class="tl-provider-meta">
+              <div class="tl-provider-name">
+                ${p.name}
+                ${p.isPremium ? '<span class="tl-badge tl-badge-premium" style="font-size: 0.65rem; padding: 2px 6px;"><span data-tl-icon="crown"></span> Premium</span>' : ''}
+              </div>
+              <div class="tl-provider-category">${p.categoryTitle} • ${p.experienceYears} Yrs Exp</div>
+              <div class="tl-rating-row">
+                <span class="tl-stars">
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                </span>
+                <span class="tl-rating-val">${p.rating.toFixed(1)}</span>
+                <span class="tl-rating-count">(${p.reviewCount} reviews)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tl-provider-body">
+            ${p.bio}
+          </div>
+
+          <div class="tl-provider-skills">
+            ${p.skills.map(s => `<span class="tl-skill-tag">${s}</span>`).join('')}
+            <span class="tl-skill-tag" style="background: var(--tl-teal-50); color: var(--tl-teal-700);">${p.city}</span>
+          </div>
+
+          <div class="tl-provider-footer">
+            <div class="tl-provider-rate">
+              <span class="tl-rate-amount">${p.priceDisplay}</span>
+              <span class="tl-rate-type">${p.priceType}</span>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <a href="provider-profile.html?id=${p.id}" class="tl-btn tl-btn-outline tl-btn-sm">Profile</a>
+              <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openBookingModal('${p.name}', '${p.categoryTitle}', '${p.id}')">
+                Book Service
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    async function executeSearch() {
+      const q = document.getElementById('heroQuery').value.trim();
+      const loc = document.getElementById('heroLocation').value;
+      const cat = document.getElementById('heroCategory').value;
+      const resultsWrap = document.getElementById('liveSearchResults');
+      const resultsGrid = document.getElementById('searchResultsGrid');
+      const title = document.getElementById('searchResultTitle');
+
+      resultsWrap.style.display = 'block';
+      resultsWrap.scrollIntoView({ behavior: 'smooth' });
+
+      if (window.TLReloader) {
+        window.TLReloader.showInlineLoader(resultsGrid, {
+          text: 'Searching verified professionals...',
+          subtext: `Scanning TradeLinker directory for "${q || 'all categories'}"...`
+        });
+        await new Promise(r => setTimeout(r, 350));
+      }
+
+      // If user provided a query or non-default filter, filter and display results right on homepage
+      const results = window.TLData.searchProviders(q, cat, loc);
+
+      if (results.length === 0) {
+        resultsGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px; background: #FFF; border: 1px dashed var(--tl-border-subtle); border-radius: 16px;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--tl-gold-100); color: var(--tl-gold-600); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+              <span data-tl-icon="search"></span>
+            </div>
+            <h4 style="color: var(--tl-navy-800); margin-bottom: 6px;">No Matching Professionals Found</h4>
+            <p style="color: var(--tl-text-secondary); max-width: 480px; margin: 0 auto 16px;">
+              We couldn't find active professionals matching "${q || 'your criteria'}" in the selected location. Try widening your search or browse our 6 categories.
+            </p>
+            <a href="categories.html" class="tl-btn tl-btn-outline-teal">Browse All Categories</a>
+          </div>
+        `;
+        title.innerText = `No results found for "${q || 'selected criteria'}"`;
+      } else {
+        title.innerText = `Found ${results.length} Matching Professional${results.length > 1 ? 's' : ''}`;
+        resultsGrid.innerHTML = results.map(p => `
+          <div class="tl-provider-card">
+            <div class="tl-provider-header">
+              <div class="tl-provider-avatar-wrap">
+                <img src="${p.avatar}" alt="${p.name}" class="tl-provider-avatar">
+                <div class="tl-verified-check"><span data-tl-icon="check"></span></div>
+              </div>
+              <div class="tl-provider-meta">
+                <div class="tl-provider-name">
+                  ${p.name}
+                  ${p.isPremium ? '<span class="tl-badge tl-badge-premium" style="font-size: 0.65rem; padding: 2px 6px;"><span data-tl-icon="crown"></span> Premium</span>' : ''}
+                </div>
+                <div class="tl-provider-category">${p.categoryTitle} • ${p.experienceYears} Yrs Exp</div>
+                <div class="tl-rating-row">
+                  <span class="tl-stars"><span data-tl-icon="star"></span></span>
+                  <span class="tl-rating-val">${p.rating.toFixed(1)}</span>
+                  <span class="tl-rating-count">(${p.reviewCount} reviews)</span>
+                </div>
+              </div>
+            </div>
+            <div class="tl-provider-body">${p.bio}</div>
+            <div class="tl-provider-skills">
+              ${p.skills.map(s => `<span class="tl-skill-tag">${s}</span>`).join('')}
+              <span class="tl-skill-tag" style="background: var(--tl-teal-50); color: var(--tl-teal-700);">${p.city}</span>
+            </div>
+            <div class="tl-provider-footer">
+              <div class="tl-provider-rate">
+                <span class="tl-rate-amount">${p.priceDisplay}</span>
+                <span class="tl-rate-type">${p.priceType}</span>
+              </div>
+              <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openBookingModal('${p.name}', '${p.categoryTitle}', '${p.id}')">
+                Book Service
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    function clearLiveSearch() {
+      document.getElementById('liveSearchResults').style.display = 'none';
+      document.getElementById('heroSearchForm').reset();
+    }
+
+    // Modal Booking Handling
+    let activeProviderId = null;
+
+    function openBookingModal(name, category, id) {
+      window.location.href = `book-service.html?providerId=${id}`;
+    }
+
+    function closeBookingModal() {
+      document.getElementById('bookingModalBackdrop').classList.remove('active');
+    }
+
+    async function handleModalBookingSubmit() {
+      const desc = document.getElementById('modalProblemDesc').value;
+      const addr = document.getElementById('modalAddress').value;
+      const date = document.getElementById('modalDate').value;
+      const slot = document.getElementById('modalTimeSlot').value;
+      const submitBtn = document.getElementById('modalBookingSubmitBtn');
+
+      if (window.TLReloader) {
+        await window.TLReloader.withLoading('modal-booking-submit', async () => {
+          await new Promise(r => setTimeout(r, 600));
+
+          let bookingId = 'TL-BK-' + Math.floor(1000 + Math.random() * 9000);
+          if (window.TLData && window.TLData.createBooking) {
+            const user = window.TLAuth ? window.TLAuth.getCurrentUser() : null;
+            const newBk = window.TLData.createBooking({
+              customerId: user ? user.id : 'demo-cust-1',
+              customerName: user ? user.fullName : 'Valued Customer',
+              providerId: activeProviderId || 'prov-1',
+              providerName: document.getElementById('bookingProviderName').innerText || 'Verified Professional',
+              category: document.getElementById('bookingCategory').innerText || 'General Trade',
+              problemDescription: desc,
+              location: addr,
+              scheduledDate: `${date} (${slot})`
+            });
+            if (newBk) bookingId = newBk.id;
+          }
+          return bookingId;
+        }, {
+          button: submitBtn,
+          loadingText: 'Submitting Booking...',
+          overlay: true,
+          overlayTitle: 'Creating Booking Request',
+          overlayMsg: 'Connecting with verified professional and securing slot...',
+          form: 'bookingModalForm',
+          onSuccess: (bookingId) => {
+            closeBookingModal();
+            document.getElementById('bookingModalForm').reset();
+            alert(`Booking Request Successfully Submitted!\n\nBooking ID: ${bookingId}\nStatus: Pending (FR-33)\nScheduled Date: ${date} (${slot})\nLocation: ${addr}\n\nThe service provider has been notified and will review your request shortly.`);
+          }
+        });
+      } else {
+        const bookingId = 'TL-BK-' + Math.floor(1000 + Math.random() * 9000);
+        alert(`Booking Request Successfully Submitted!\n\nBooking ID: ${bookingId}\nStatus: Pending (FR-33)\nScheduled Date: ${date} (${slot})\nLocation: ${addr}\n\nThe service provider has been notified and will review your request shortly.`);
+        closeBookingModal();
+        document.getElementById('bookingModalForm').reset();
+      }
+    }
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeBookingModal();
+    });
+  </script>
+</body>
+</html>

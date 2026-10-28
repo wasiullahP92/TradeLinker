@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication & Account Management — TradeLinker</title>
+  <meta name="description" content="Secure account authentication for customers, service providers, and administrators on TradeLinker.">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .auth-page-container {
+      min-height: calc(100vh - 80px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+      background: linear-gradient(180deg, var(--tl-bg-page) 0%, var(--tl-teal-50) 100%);
+    }
+    .auth-box {
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 20px;
+      box-shadow: var(--tl-shadow-xl);
+      width: 100%;
+      max-width: 520px;
+      overflow: hidden;
+    }
+    .auth-nav-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--tl-border-subtle);
+      background: var(--tl-bg-subtle);
+    }
+    .auth-tab {
+      padding: 16px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      background: transparent;
+      color: var(--tl-text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--tl-transition-fast);
+    }
+    .auth-tab.active {
+      background: #FFFFFF;
+      color: var(--tl-navy-800);
+      border-bottom: 2px solid var(--tl-teal-500);
+    }
+    .reg-subtabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1.5rem;
+    }
+    .reg-subtab-btn {
+      padding: 10px;
+      border: 1.5px solid var(--tl-border-subtle);
+      border-radius: 10px;
+      background: #FFFFFF;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all var(--tl-transition-fast);
+    }
+    .reg-subtab-btn.active {
+      border-color: var(--tl-teal-500);
+      background: var(--tl-teal-50);
+    }
+    .reg-subtab-btn strong {
+      font-size: 0.85rem;
+      color: var(--tl-navy-800);
+    }
+    .reg-subtab-btn span {
+      font-size: 0.7rem;
+      color: var(--tl-text-muted);
+    }
+    .auth-alert {
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .auth-alert-error {
+      background: #FEE2E2;
+      border: 1px solid #FECACA;
+      color: #991B1B;
+    }
+    .auth-alert-success {
+      background: #D1FAE5;
+      border: 1px solid #A7F3D0;
+      color: #065F46;
+    }
+    .auth-alert-info {
+      background: var(--tl-teal-50);
+      border: 1px solid var(--tl-teal-200);
+      color: var(--tl-teal-700);
+    }
+    .password-strength {
+      height: 4px;
+      background: #E2E8F0;
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .password-strength-bar {
+      height: 100%;
+      width: 0%;
+      transition: all 0.3s ease;
+    }
+    .quick-test-accounts {
+      background: var(--tl-navy-50);
+      border: 1px solid var(--tl-navy-100);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 20px;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="tl-navbar">
+    <div class="tl-container">
+      <div class="tl-navbar-inner">
+        <a href="index.html" class="tl-logo" title="TradeLinker Home">
+          <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Logo" class="tl-logo-img">
+        </a>
+        <div style="display: flex; gap: 10px;">
+          <button class="tl-btn tl-btn-ghost tl-btn-xs" onclick="openBackendSetupModal()">Backend Setup Guide</button>
+          <a href="index.html" class="tl-btn tl-btn-ghost tl-btn-sm">&larr; Return to Home</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="auth-page-container">
+    <div class="auth-box">
+      <!-- Main Tabs: Sign In vs Register -->
+      <div class="auth-nav-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchAuthMode('login')">Sign In</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchAuthMode('register')">Register Account</button>
+      </div>
+
+      <div style="padding: 28px;">
+        <!-- Global Feedback Message Banner -->
+        <div id="authAlert" class="auth-alert"></div>
+
+        <!-- ===================================================================
+             1. Sign In Form
+             =================================================================== -->
+        <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
+          <h2 style="font-size: 1.45rem; color: var(--tl-navy-800); margin-bottom: 4px;">Welcome Back</h2>
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin-bottom: 20px;">
+            Sign in to access your role-specific dashboard and bookings.
+          </p>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="loginEmail">Email Address or Phone</label>
+            <input type="text" id="loginEmail" class="tl-input" placeholder="e.g. customer@tradelinker.com" required>
+          </div>
+
+          <div class="tl-form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label class="tl-label tl-label-required" for="loginPassword">Password</label>
+              <a href="#" style="font-size: 0.75rem;" onclick="openPasswordResetModal(); return false;">Forgot Password?</a>
+            </div>
+            <input type="password" id="loginPassword" class="tl-input" placeholder="••••••••" required>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.85rem;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="checkbox" id="loginRememberMe" checked> Remember this device
+            </label>
+          </div>
+
+          <button type="submit" class="tl-btn tl-btn-primary" style="width: 100%;" id="loginBtn">
+            Sign In to Dashboard
+          </button>
+
+          <!-- Pre-Seeded Test Credentials Helper -->
+          <div class="quick-test-accounts">
+            <strong style="color: var(--tl-navy-800); display: block; margin-bottom: 6px;">Pre-Configured Test Vault Accounts (SRS Seed):</strong>
+            <div style="display: flex; flex-direction: column; gap: 4px; color: var(--tl-text-secondary);">
+              <div><strong style="color: var(--tl-teal-700);">Customer:</strong> <code>customer@tradelinker.com</code> | <code>CustomerPass2026!</code></div>
+              <div><strong style="color: var(--tl-navy-800);">Provider:</strong> <code>provider@tradelinker.com</code> | <code>ProviderPass2026!</code></div>
+              <div><strong style="color: #6D28D9;">Administrator:</strong> <code>admin@tradelinker.com</code> | <code>AdminTradeLinker2026!</code></div>
+            </div>
+            <div style="margin-top: 8px; font-size: 0.72rem; color: var(--tl-text-muted);">
+              Clicking autofills for quick verification:
+              <a href="#" onclick="fillLogin('customer@tradelinker.com', 'CustomerPass2026!')">Fill Customer</a> | 
+              <a href="#" onclick="fillLogin('provider@tradelinker.com', 'ProviderPass2026!')">Fill Provider</a> | 
+              <a href="#" onclick="fillLogin('admin@tradelinker.com', 'AdminTradeLinker2026!')">Fill Admin</a>
+            </div>
+          </div>
+        </form>
+
+        <!-- ===================================================================
+             2. Separate Registration Flows (Customer vs Service Provider)
+             =================================================================== -->
+        <div id="registerContainer" style="display: none;">
+          <!-- Registration Role Selector -->
+          <div class="reg-subtabs">
+            <div class="reg-subtab-btn active" id="subtabCustomer" onclick="switchRegRole('customer')">
+              <strong>Customer</strong>
+              <span>Hire skilled trade professionals</span>
+            </div>
+            <div class="reg-subtab-btn" id="subtabProvider" onclick="switchRegRole('provider')">
+              <strong>Service Provider</strong>
+              <span>Offer trades & receive jobs</span>
+            </div>
+          </div>
+
+          <!-- Customer Registration Form (FR-01) -->
+          <form id="regCustomerForm" onsubmit="event.preventDefault(); handleCustomerRegistration();">
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="cFullName">Full Name</label>
+              <input type="text" id="cFullName" class="tl-input" placeholder="Wasi Ullah" required>
+            </div>
+
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="cEmail">Email Address</label>
+              <input type="email" id="cEmail" class="tl-input" placeholder="user@example.com" required>
+            </div>
+
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="cPhone">Mobile Phone (Mandatory per SRS)</label>
+              <input type="tel" id="cPhone" class="tl-input" placeholder="0300-1234567" required>
+            </div>
+
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="cCity">City / Location</label>
+              <select id="cCity" class="tl-select" required>
+                <option value="Islamabad">Islamabad</option>
+                <option value="Rawalpindi">Rawalpindi</option>
+                <option value="Lahore">Lahore</option>
+                <option value="Karachi">Karachi</option>
+                <option value="Peshawar">Peshawar</option>
+              </select>
+            </div>
+
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="cPassword">Password (Min 8 Characters)</label>
+              <input type="password" id="cPassword" class="tl-input" placeholder="••••••••" required oninput="checkStrength(this.value, 'cStrengthBar')">
+              <div class="password-strength">
+                <div class="password-strength-bar" id="cStrengthBar"></div>
+              </div>
+            </div>
+
+            <button type="submit" class="tl-btn tl-btn-primary" style="width: 100%;" id="cRegBtn">
+              Register as Customer
+            </button>
+          </form>
+
+          <!-- Service Provider Registration Form (FR-02, FR-11, FR-12) -->
+          <form id="regProviderForm" style="display: none;" onsubmit="event.preventDefault(); handleProviderRegistration();">
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="pFullName">Full Legal Name</label>
+              <input type="text" id="pFullName" class="tl-input" placeholder="Rashid Khan" required>
+            </div>
+
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="pBusinessName">Business / Trade Name</label>
+              <input type="text" id="pBusinessName" class="tl-input" placeholder="e.g. Khan Electrical Works" required>
+            </div>
+
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="pCategory">Primary Trade Category (6 Launch Trades)</label>
+              <select id="pCategory" class="tl-select" required>
+                <option value="">Select a category...</option>
+                <option value="construction">Construction Services</option>
+                <option value="plumbing">Plumbing Services</option>
+                <option value="electrical">Electrical Services</option>
+                <option value="hvac">AC & HVAC Services</option>
+                <option value="solar">Solar Energy Services</option>
+                <option value="carpentry">Wooden Door Making & Carpentry</option>
+              </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="tl-form-group">
+                <label class="tl-label tl-label-required" for="pEmail">Email Address</label>
+                <input type="email" id="pEmail" class="tl-input" placeholder="pro@example.com" required>
+              </div>
+              <div class="tl-form-group">
+                <label class="tl-label tl-label-required" for="pPhone">Mobile Phone</label>
+                <input type="tel" id="pPhone" class="tl-input" placeholder="0300-9988776" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="tl-form-group">
+                <label class="tl-label tl-label-required" for="pCity">Operating City</label>
+                <select id="pCity" class="tl-select" required>
+                  <option value="Islamabad">Islamabad</option>
+                  <option value="Rawalpindi">Rawalpindi</option>
+                  <option value="Lahore">Lahore</option>
+                  <option value="Karachi">Karachi</option>
+                  <option value="Peshawar">Peshawar</option>
+                </select>
+              </div>
+              <div class="tl-form-group">
+                <label class="tl-label tl-label-required" for="pExp">Years of Experience</label>
+                <input type="number" id="pExp" class="tl-input" min="1" max="50" value="5" required>
+              </div>
+            </div>
+
+            <div class="tl-form-group">
+              <label class="tl-label" for="pSkills">Key Skills (Comma separated)</label>
+              <input type="text" id="pSkills" class="tl-input" placeholder="e.g. DB Panels, Inverters, Short Circuit, Smart Home">
+            </div>
+
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required" for="pPassword">Password</label>
+              <input type="password" id="pPassword" class="tl-input" placeholder="••••••••" required oninput="checkStrength(this.value, 'pStrengthBar')">
+              <div class="password-strength">
+                <div class="password-strength-bar" id="pStrengthBar"></div>
+              </div>
+            </div>
+
+            <button type="submit" class="tl-btn tl-btn-primary" style="width: 100%;" id="pRegBtn">
+              Register as Service Provider
+            </button>
+            <p style="font-size: 0.75rem; color: var(--tl-text-muted); margin-top: 8px; text-align: center;">
+              * Note: Provider accounts undergo administrative identity verification per SRS FR-18 before receiving a public Verified badge.
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password Reset Modal (FR-05) -->
+  <div class="tl-modal-backdrop" id="resetModal">
+    <div class="tl-modal">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Password Reset (FR-05)</h3>
+        <button class="tl-modal-close" onclick="closePasswordResetModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <div id="resetFeedback" class="auth-alert" style="display: none;"></div>
+        <p style="font-size: 0.9rem; color: var(--tl-text-secondary); margin-bottom: 16px;">
+          Enter your registered email address. We will verify your account and generate a secure password recovery token.
+        </p>
+        <form onsubmit="event.preventDefault(); handlePasswordResetRequest();">
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Account Email</label>
+            <input type="email" id="resetEmailInput" class="tl-input" placeholder="e.g. customer@tradelinker.com" required>
+          </div>
+          <button type="submit" class="tl-btn tl-btn-primary" style="width: 100%;">
+            Send Password Reset Link
+          </button>
+        </form>
+
+        <div id="resetStep2" style="display: none; margin-top: 20px; border-top: 1px solid var(--tl-border-subtle); padding-top: 16px;">
+          <h4 style="font-size: 1rem; color: var(--tl-navy-800); margin-bottom: 8px;">Enter New Password</h4>
+          <form onsubmit="event.preventDefault(); handlePasswordResetComplete();">
+            <input type="hidden" id="resetActiveToken">
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required">New Password (Min 8 Chars)</label>
+              <input type="password" id="resetNewPass" class="tl-input" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="tl-btn tl-btn-primary" style="width: 100%;">Update Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Production Backend Setup Guide Modal -->
+  <div class="tl-modal-backdrop" id="backendModal">
+    <div class="tl-modal" style="max-width: 620px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Production Backend Integration Guide</h3>
+        <button class="tl-modal-close" onclick="closeBackendSetupModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body" style="font-size: 0.9rem; line-height: 1.6;">
+        <span class="tl-badge tl-badge-verified" style="margin-bottom: 10px;">SRS Tech Stack: Supabase / Firebase</span>
+        <p>
+          TradeLinker is architected with dual-backend support:
+        </p>
+        <ol style="padding-left: 20px; margin-bottom: 16px;">
+          <li><strong>Current Active Mode:</strong> Client-side Cryptographic Sandbox Vault (PBKDF2/SHA-256 salted hashes, zero plain text, isolated sessions).</li>
+          <li><strong>Production Cloud Backend:</strong> Fully compatible with Supabase PostgreSQL Auth.
+            <div style="background: var(--tl-bg-subtle); padding: 10px; border-radius: 8px; margin-top: 6px; font-size: 0.82rem;">
+              1. Open Supabase Dashboard & execute <a href="supabase-schema.sql" target="_blank" style="text-decoration: underline;"><code>supabase-schema.sql</code></a> in SQL Editor.<br>
+              2. Insert your project URL & Anon Key into <code>js/config.js</code>.<br>
+              3. Set <code>authProvider: "supabase"</code>.
+            </div>
+          </li>
+        </ol>
+        <div style="text-align: right;">
+          <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="closeBackendSetupModal()">Got It</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get('mode') || 'login';
+      const role = urlParams.get('role');
+      const authError = urlParams.get('authError');
+
+      if (authError === 'unauthenticated') {
+        showAlert('Please sign in to access that protected portal.', 'error');
+      }
+
+      switchAuthMode(mode);
+      if (role === 'provider') {
+        switchRegRole('provider');
+      }
+    });
+
+    function showAlert(msg, type = 'error') {
+      const alertBox = document.getElementById('authAlert');
+      alertBox.className = `auth-alert auth-alert-${type}`;
+      alertBox.innerText = msg;
+      alertBox.style.display = 'block';
+      alertBox.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function clearAlert() {
+      const alertBox = document.getElementById('authAlert');
+      alertBox.style.display = 'none';
+      alertBox.innerText = '';
+    }
+
+    function switchAuthMode(mode) {
+      clearAlert();
+      const tabLogin = document.getElementById('tabLogin');
+      const tabRegister = document.getElementById('tabRegister');
+      const loginForm = document.getElementById('loginForm');
+      const regContainer = document.getElementById('registerContainer');
+
+      if (mode === 'register') {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        regContainer.style.display = 'block';
+        loginForm.style.display = 'none';
+      } else {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        loginForm.style.display = 'block';
+        regContainer.style.display = 'none';
+      }
+    }
+
+    function switchRegRole(role) {
+      clearAlert();
+      const subCust = document.getElementById('subtabCustomer');
+      const subProv = document.getElementById('subtabProvider');
+      const formCust = document.getElementById('regCustomerForm');
+      const formProv = document.getElementById('regProviderForm');
+
+      if (role === 'provider') {
+        subProv.classList.add('active');
+        subCust.classList.remove('active');
+        formProv.style.display = 'block';
+        formCust.style.display = 'none';
+      } else {
+        subCust.classList.add('active');
+        subProv.classList.remove('active');
+        formCust.style.display = 'block';
+        formProv.style.display = 'none';
+      }
+    }
+
+    function checkStrength(pass, barId) {
+      const bar = document.getElementById(barId);
+      if (!pass) {
+        bar.style.width = '0%';
+        return;
+      }
+      let score = 0;
+      if (pass.length >= 8) score += 40;
+      if (/[A-Z]/.test(pass)) score += 20;
+      if (/[0-9]/.test(pass)) score += 20;
+      if (/[^A-Za-z0-9]/.test(pass)) score += 20;
+
+      bar.style.width = `${score}%`;
+      if (score < 40) bar.style.backgroundColor = '#DC2626';
+      else if (score < 80) bar.style.backgroundColor = '#F59E0B';
+      else bar.style.backgroundColor = '#059669';
+    }
+
+    function fillLogin(email, pass) {
+      document.getElementById('loginEmail').value = email;
+      document.getElementById('loginPassword').value = pass;
+      switchAuthMode('login');
+    }
+
+    // Login Submission
+    async function handleLogin() {
+      clearAlert();
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPassword').value;
+      const remember = document.getElementById('loginRememberMe').checked;
+      const btn = document.getElementById('loginBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="tl-spinner tl-spinner-sm"></span> Signing In...';
+
+      const res = await TLAuth.login(email, pass, remember);
+      btn.disabled = false;
+      btn.innerHTML = 'Sign In to Dashboard';
+
+      if (res.success) {
+        showAlert(`Sign in successful! Redirecting to ${res.user.role.toUpperCase()} portal...`, 'success');
+        setTimeout(() => {
+          window.location.href = res.redirectUrl;
+        }, 600);
+      } else {
+        showAlert(res.error, 'error');
+      }
+    }
+
+    // Customer Registration
+    async function handleCustomerRegistration() {
+      clearAlert();
+      const fullName = document.getElementById('cFullName').value;
+      const email = document.getElementById('cEmail').value;
+      const phone = document.getElementById('cPhone').value;
+      const city = document.getElementById('cCity').value;
+      const password = document.getElementById('cPassword').value;
+      const btn = document.getElementById('cRegBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="tl-spinner tl-spinner-sm"></span> Creating Account...';
+
+      const res = await TLAuth.registerCustomer({ fullName, email, phone, city, password });
+      btn.disabled = false;
+      btn.innerHTML = 'Register as Customer';
+
+      if (res.success) {
+        showAlert('Registration Successful! Redirecting to Customer Dashboard...', 'success');
+        setTimeout(() => {
+          window.location.href = res.redirectUrl;
+        }, 800);
+      } else {
+        showAlert(res.errors.join(' '), 'error');
+      }
+    }
+
+    // Service Provider Registration
+    async function handleProviderRegistration() {
+      clearAlert();
+      const fullName = document.getElementById('pFullName').value;
+      const businessName = document.getElementById('pBusinessName').value;
+      const categoryId = document.getElementById('pCategory').value;
+      const email = document.getElementById('pEmail').value;
+      const phone = document.getElementById('pPhone').value;
+      const city = document.getElementById('pCity').value;
+      const experienceYears = document.getElementById('pExp').value;
+      const skills = document.getElementById('pSkills').value;
+      const password = document.getElementById('pPassword').value;
+      const btn = document.getElementById('pRegBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="tl-spinner tl-spinner-sm"></span> Submitting Application...';
+
+      const res = await TLAuth.registerProvider({
+        fullName,
+        businessName,
+        categoryId,
+        email,
+        phone,
+        city,
+        experienceYears,
+        skills,
+        password
+      });
+
+      btn.disabled = false;
+      btn.innerHTML = 'Register as Service Provider';
+
+      if (res.success) {
+        showAlert('Provider Account Created! Redirecting to Provider Portal...', 'success');
+        setTimeout(() => {
+          window.location.href = res.redirectUrl;
+        }, 800);
+      } else {
+        showAlert(res.errors.join(' '), 'error');
+      }
+    }
+
+    // Password Reset Handlers (FR-05)
+    function openPasswordResetModal() {
+      document.getElementById('resetModal').classList.add('active');
+    }
+    function closePasswordResetModal() {
+      document.getElementById('resetModal').classList.remove('active');
+      document.getElementById('resetFeedback').style.display = 'none';
+      document.getElementById('resetStep2').style.display = 'none';
+    }
+
+    function handlePasswordResetRequest() {
+      const email = document.getElementById('resetEmailInput').value;
+      const res = TLAuth.requestPasswordReset(email);
+      const fb = document.getElementById('resetFeedback');
+      fb.className = 'auth-alert auth-alert-success';
+      fb.style.display = 'block';
+      fb.innerText = res.message;
+
+      if (res.resetToken) {
+        // Unlock step 2 in test environment
+        document.getElementById('resetActiveToken').value = res.resetToken;
+        document.getElementById('resetStep2').style.display = 'block';
+      }
+    }
+
+    async function handlePasswordResetComplete() {
+      const token = document.getElementById('resetActiveToken').value;
+      const newPass = document.getElementById('resetNewPass').value;
+      const res = await TLAuth.completePasswordReset(token, newPass);
+      const fb = document.getElementById('resetFeedback');
+
+      if (res.success) {
+        fb.className = 'auth-alert auth-alert-success';
+        fb.innerText = res.message;
+        setTimeout(() => {
+          closePasswordResetModal();
+          fillLogin(document.getElementById('resetEmailInput').value, newPass);
+        }, 1500);
+      } else {
+        fb.className = 'auth-alert auth-alert-error';
+        fb.innerText = res.error;
+      }
+    }
+
+    function openBackendSetupModal() {
+      document.getElementById('backendModal').classList.add('active');
+    }
+    function closeBackendSetupModal() {
+      document.getElementById('backendModal').classList.remove('active');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Verified Professionals & Trade Services — TradeLinker</title>
+  <meta name="description" content="Discover and book background-verified trade specialists in Construction, Plumbing, Electrical, HVAC, Solar Energy, and Carpentry across Pakistan.">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reloader.css">
+  <style>
+    .search-hero {
+      background: linear-gradient(135deg, var(--tl-navy-950) 0%, var(--tl-navy-800) 100%);
+      padding: 2.5rem 0 2rem;
+      border-bottom: 3px solid var(--tl-teal-500);
+      color: #FFFFFF;
+    }
+    .search-main-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding: 2.5rem 0 5rem;
+    }
+    @media (min-width: 992px) {
+      .search-main-layout {
+        grid-template-columns: 300px 1fr;
+      }
+    }
+    .filter-sidebar {
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 16px;
+      padding: 22px;
+      height: fit-content;
+      box-shadow: var(--tl-shadow-xs);
+    }
+    .filter-section {
+      margin-bottom: 20px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--tl-border-subtle);
+    }
+    .filter-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .filter-heading {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--tl-navy-800);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .filter-checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--tl-text-secondary);
+      margin-bottom: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .filter-checkbox-label input[type="radio"],
+    .filter-checkbox-label input[type="checkbox"] {
+      accent-color: var(--tl-teal-500);
+      cursor: pointer;
+    }
+    .active-pills-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .active-pill {
+      background: var(--tl-teal-50);
+      border: 1px solid var(--tl-teal-200);
+      color: var(--tl-teal-700);
+      padding: 4px 10px;
+      border-radius: var(--tl-radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .active-pill-remove {
+      cursor: pointer;
+      font-weight: bold;
+      color: var(--tl-teal-700);
+    }
+    .results-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--tl-border-subtle);
+    }
+    .provider-search-card {
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 16px;
+      box-shadow: var(--tl-shadow-xs);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: all var(--tl-transition-normal);
+      position: relative;
+    }
+    .provider-search-card:hover {
+      border-color: var(--tl-teal-300);
+      box-shadow: var(--tl-shadow-md);
+      transform: translateY(-2px);
+    }
+    .provider-avatar-fallback {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: var(--tl-navy-800);
+      color: #FFFFFF;
+      font-size: 1.5rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: var(--tl-shadow-sm);
+    }
+    .empty-search-box {
+      text-align: center;
+      padding: 60px 20px;
+      background: #FFFFFF;
+      border: 1.5px dashed var(--tl-border-subtle);
+      border-radius: 18px;
+    }
+    .empty-search-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--tl-gold-100);
+      color: var(--tl-gold-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       Navigation Bar
+       ========================================================================= -->
+  <header class="tl-navbar">
+    <div class="tl-container">
+      <div class="tl-navbar-inner">
+        <a href="index.html" class="tl-logo" title="TradeLinker Home">
+          <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Logo" class="tl-logo-img">
+        </a>
+        <nav aria-label="Main Navigation">
+          <ul class="tl-nav-links">
+            <li><a href="index.html" class="tl-nav-link">Home</a></li>
+            <li><a href="categories.html" class="tl-nav-link">Services</a></li>
+            <li><a href="search.html" class="tl-nav-link active">Find Professionals</a></li>
+            <li><a href="index.html#about" class="tl-nav-link">About</a></li>
+            <li><a href="contact.html" class="tl-nav-link">Contact</a></li>
+          </ul>
+        </nav>
+        <div class="tl-nav-actions">
+          <a href="auth.html?mode=login" class="tl-btn tl-btn-ghost tl-btn-sm" id="navLoginBtn">Sign In</a>
+          <a href="auth.html?mode=register" class="tl-btn tl-btn-primary tl-btn-sm" id="navRegisterBtn">Register</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       Hero Search Bar
+       ========================================================================= -->
+  <section class="search-hero">
+    <div class="tl-container">
+      <div style="max-width: 780px; margin-bottom: 1.5rem;">
+        <span class="tl-badge tl-badge-verified" style="margin-bottom: 8px;">
+          <span data-tl-icon="verified"></span> Verified Trade Discovery Engine (FR-23 to FR-27)
+        </span>
+        <h1 style="color: #FFFFFF; font-size: 2.2rem; margin: 4px 0 8px;">Find Trusted Trade Specialists</h1>
+        <p style="color: #CBD5E1; font-size: 1rem; margin: 0;">
+          Search across professional names, service titles, keywords, and filter by location and verified credentials.
+        </p>
+      </div>
+
+      <!-- Top Primary Search Bar -->
+      <form class="tl-search-bar" id="topSearchForm" onsubmit="event.preventDefault(); triggerSearch();" style="max-width: 960px;">
+        <div class="tl-search-field">
+          <span data-tl-icon="search" class="tl-search-icon"></span>
+          <input type="text" id="topQueryInput" class="tl-search-input" placeholder="Search by name, service title, or keyword (e.g., Rashid, Solar, Leak, DB Panel)...">
+        </div>
+
+        <div class="tl-search-divider"></div>
+
+        <div class="tl-search-field">
+          <span data-tl-icon="mapPin" class="tl-search-icon"></span>
+          <select class="tl-search-select" id="topCitySelect" onchange="triggerSearch()">
+            <option value="all">All Locations (Pakistan)</option>
+            <option value="Islamabad">Islamabad</option>
+            <option value="Rawalpindi">Rawalpindi</option>
+            <option value="Lahore">Lahore</option>
+            <option value="Karachi">Karachi</option>
+            <option value="Peshawar">Peshawar</option>
+          </select>
+        </div>
+
+        <button type="submit" class="tl-btn tl-btn-primary tl-btn-pill">
+          <span data-tl-icon="search"></span> Search
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       Main Search Layout: Multi-Facet Filters & Dynamic Results
+       ========================================================================= -->
+  <main class="tl-container">
+    <div class="search-main-layout">
+
+      <!-- =====================================================================
+           Filter Sidebar (FR-24, FR-25)
+           ===================================================================== -->
+      <aside class="filter-sidebar">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 style="font-size: 1.15rem; color: var(--tl-navy-800); margin: 0;">Filters</h2>
+          <button class="tl-btn tl-btn-ghost tl-btn-xs" onclick="resetAllFilters()">Reset All</button>
+        </div>
+
+        <!-- Filter 1: Service Category (SRS Section 3.4 & BR-09) -->
+        <div class="filter-section">
+          <div class="filter-heading">
+            <span>Trade Category</span>
+          </div>
+          <label class="filter-checkbox-label">
+            <input type="radio" name="catFilter" value="all" checked onchange="triggerSearch()">
+            <span>All 6 Categories</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <input type="radio" name="catFilter" value="construction" onchange="triggerSearch()">
+            <span>Construction Services</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <input type="radio" name="catFilter" value="plumbing" onchange="triggerSearch()">
+            <span>Plumbing Services</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <input type="radio" name="catFilter" value="electrical" onchange="triggerSearch()">
+            <span>Electrical Services</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <input type="radio" name="catFilter" value="hvac" onchange="triggerSearch()">
+            <span>AC & HVAC Services</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <input type="radio" name="catFilter" value="solar" onchange="triggerSearch()">
+            <span>Solar Energy Services</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <input type="radio" name="catFilter" value="carpentry" onchange="triggerSearch()">
+            <span>Door Making & Carpentry</span>
+          </label>
+        </div>
+
+        <!-- Filter 2: Verification Safeguard (BR-07) -->
+        <div class="filter-section">
+          <div class="filter-heading">
+            <span>Trust & Verification</span>
+          </div>
+          <label class="filter-checkbox-label">
+            <input type="checkbox" id="filterVerifiedOnly" onchange="triggerSearch()">
+            <strong>Verified Specialists Only</strong>
+          </label>
+          <label class="filter-checkbox-label">
+            <input type="checkbox" id="filterAvailableOnly" onchange="triggerSearch()">
+            <span>Available for Booking Now</span>
+          </label>
+        </div>
+
+        <!-- Filter 3: Minimum Customer Rating (FR-25) -->
+        <div class="filter-section">
+          <div class="filter-heading">
+            <span>Customer Rating</span>
+          </div>
+          <select id="filterMinRating" class="tl-select" onchange="triggerSearch()" style="padding: 8px 10px; font-size: 0.85rem;">
+            <option value="0">Any Rating Score</option>
+            <option value="4.5">★ 4.5 Stars & Above</option>
+            <option value="4.8">★ 4.8 Stars & Above</option>
+            <option value="5.0">★ 5.0 Perfect Rating</option>
+          </select>
+        </div>
+
+        <!-- Filter 4: Experience Years (FR-25) -->
+        <div class="filter-section">
+          <div class="filter-heading">
+            <span>Experience Level</span>
+          </div>
+          <select id="filterExperience" class="tl-select" onchange="triggerSearch()" style="padding: 8px 10px; font-size: 0.85rem;">
+            <option value="0">Any Experience</option>
+            <option value="3">3+ Years Practical Experience</option>
+            <option value="5">5+ Years Established Specialist</option>
+            <option value="10">10+ Years Master Artisan</option>
+          </select>
+        </div>
+
+        <!-- Filter 5: Pricing Structure (FR-15) -->
+        <div class="filter-section">
+          <div class="filter-heading">
+            <span>Pricing Structure</span>
+          </div>
+          <label class="filter-checkbox-label">
+            <input type="radio" name="pricingTypeFilter" value="all" checked onchange="triggerSearch()">
+            <span>All Pricing Formats</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <input type="radio" name="pricingTypeFilter" value="fixed" onchange="triggerSearch()">
+            <span>Fixed Transparent Rates</span>
+          </label>
+          <label class="filter-checkbox-label">
+            <input type="radio" name="pricingTypeFilter" value="upon_request" onchange="triggerSearch()">
+            <span>Free Quotes / Upon Request</span>
+          </label>
+        </div>
+      </aside>
+
+      <!-- =====================================================================
+           Results Area
+           ===================================================================== -->
+      <section>
+        <!-- Active Filter Pills Bar -->
+        <div class="active-pills-bar" id="activePillsContainer"></div>
+
+        <!-- Results Toolbar -->
+        <div class="results-toolbar">
+          <div>
+            <h3 style="font-size: 1.25rem; color: var(--tl-navy-800); margin: 0;" id="searchHeaderTitle">
+              Active Trade Professionals
+            </h3>
+            <span style="font-size: 0.8rem; color: var(--tl-text-muted);" id="resultCountLabel">
+              Searching database...
+            </span>
+          </div>
+
+          <!-- Sort Dropdown (FR-26) -->
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <label for="sortBySelect" style="font-size: 0.8rem; color: var(--tl-text-muted); font-weight: 600;">Sort By:</label>
+            <select id="sortBySelect" class="tl-select" onchange="triggerSearch()" style="padding: 6px 12px; font-size: 0.85rem; width: auto;">
+              <option value="recommended">Recommended (Verified First)</option>
+              <option value="rating_desc">Highest Rated (5.0 ★)</option>
+              <option value="experience_desc">Most Experienced</option>
+              <option value="price_asc">Price: Low to High</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Loading Shimmer State (shown during query execution) -->
+        <div id="searchLoadingState" style="display: none;">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="background: #FFF; border: 1px solid var(--tl-border-subtle); border-radius: 16px; padding: 22px;">
+              <div style="display: flex; gap: 16px; margin-bottom: 14px;">
+                <div class="tl-skeleton" style="width: 68px; height: 68px; border-radius: 50%;"></div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                  <div class="tl-skeleton" style="height: 20px; width: 40%;"></div>
+                  <div class="tl-skeleton" style="height: 14px; width: 25%;"></div>
+                </div>
+              </div>
+              <div class="tl-skeleton" style="height: 14px; width: 90%; margin-bottom: 8px;"></div>
+              <div class="tl-skeleton" style="height: 14px; width: 60%;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsListContainer">
+          <!-- Dynamically populated via TLSearchEngine -->
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- =========================================================================
+       Booking Request Modal
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="bookingModal">
+    <div class="tl-modal">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Book Service Professional</h3>
+        <button class="tl-modal-close" onclick="closeBookingModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <div style="background: var(--tl-teal-50); padding: 12px; border-radius: 10px; margin-bottom: 16px;">
+          <strong style="color: var(--tl-navy-800);" id="modalTargetName">Professional</strong>
+          <div style="font-size: 0.8rem; color: var(--tl-text-muted);" id="modalTargetCategory">Trade Category</div>
+        </div>
+        <form onsubmit="event.preventDefault(); submitBookingRequest();">
+          <input type="hidden" id="modalProviderId">
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Problem Description</label>
+            <textarea id="modalProblem" class="tl-textarea" placeholder="Detail your service need..." required></textarea>
+          </div>
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Service Address</label>
+            <input type="text" id="modalAddress" class="tl-input" placeholder="House #, Street, Sector / Colony, City" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required">Preferred Date</label>
+              <input type="date" id="modalDate" class="tl-input" required>
+            </div>
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required">Time Slot</label>
+              <select id="modalSlot" class="tl-select" required>
+                <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+                <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
+                <option value="Evening (3 PM - 6 PM)">Evening (3 PM - 6 PM)</option>
+              </select>
+            </div>
+          </div>
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeBookingModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary">Confirm & Submit Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="tl-footer">
+    <div class="tl-container">
+      <div class="tl-footer-bottom">
+        <div>&copy; 2026 TradeLinker. Developed by Techminds.</div>
+        <a href="index.html" style="color: #64748B;">Return to Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/search-engine.js"></script>
+  <script src="js/reloader.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Session awareness in navigation
+      updateNavSession();
+
+      // 2. Parse incoming URL parameters
+      const params = new URLSearchParams(window.location.search);
+      const query = params.get('q') || '';
+      const cat = params.get('cat') || 'all';
+      const loc = params.get('loc') || 'all';
+
+      if (query) document.getElementById('topQueryInput').value = query;
+      if (loc && loc !== 'all') document.getElementById('topCitySelect').value = loc;
+      if (cat && cat !== 'all') {
+        const radio = document.querySelector(`input[name="catFilter"][value="${cat}"]`);
+        if (radio) radio.checked = true;
+      }
+
+      // 3. Default modal date to tomorrow
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById('modalDate').value = tomorrow.toISOString().split('T')[0];
+
+      // 4. Execute initial discovery search
+      triggerSearch();
+    });
+
+    function updateNavSession() {
+      if (!window.TLAuth) return;
+      const user = TLAuth.getCurrentUser();
+      const loginBtn = document.getElementById('navLoginBtn');
+      const regBtn = document.getElementById('navRegisterBtn');
+      if (user && loginBtn && regBtn) {
+        loginBtn.innerHTML = `<span data-tl-icon="user"></span> ${user.fullName.split(' ')[0]}`;
+        loginBtn.href = TLConfig.dashboardRoutes[user.role] || 'customer-dashboard.html';
+        regBtn.innerText = 'Log Out';
+        regBtn.href = '#';
+        regBtn.onclick = (e) => { e.preventDefault(); TLAuth.logout(); };
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // Search Execution Engine
+    // ------------------------------------------------------------------------
+    async function triggerSearch() {
+      const query = document.getElementById('topQueryInput').value.trim();
+      const city = document.getElementById('topCitySelect').value;
+      const catRadio = document.querySelector('input[name="catFilter"]:checked');
+      const category = catRadio ? catRadio.value : 'all';
+      const verifiedOnly = document.getElementById('filterVerifiedOnly').checked;
+      const availableOnly = document.getElementById('filterAvailableOnly').checked;
+      const minRating = document.getElementById('filterMinRating').value;
+      const minExperience = document.getElementById('filterExperience').value;
+      const pricingRadio = document.querySelector('input[name="pricingTypeFilter"]:checked');
+      const pricingType = pricingRadio ? pricingRadio.value : 'all';
+      const sortBy = document.getElementById('sortBySelect').value;
+
+      // Show loading shimmer
+      const loading = document.getElementById('searchLoadingState');
+      const listContainer = document.getElementById('resultsListContainer');
+      loading.style.display = 'block';
+      listContainer.style.opacity = '0.3';
+
+      renderActivePills({ query, city, category, verifiedOnly, minRating, minExperience, pricingType });
+
+      const results = await TLSearchEngine.search({
+        query,
+        city,
+        category,
+        verifiedOnly,
+        availableOnly,
+        minRating,
+        minExperience,
+        pricingType,
+        sortBy
+      });
+
+      loading.style.display = 'none';
+      listContainer.style.opacity = '1';
+      renderResults(results, query);
+    }
+
+    // ------------------------------------------------------------------------
+    // Render Results Cards & Empty State (FR-26, FR-27)
+    // ------------------------------------------------------------------------
+    function renderResults(results, query) {
+      const container = document.getElementById('resultsListContainer');
+      const countLabel = document.getElementById('resultCountLabel');
+      const title = document.getElementById('searchHeaderTitle');
+
+      countLabel.innerText = `${results.length} specialist${results.length === 1 ? '' : 's'} found`;
+      title.innerText = query ? `Results for "${query}"` : 'Verified Trade Specialists';
+
+      if (results.length === 0) {
+        container.innerHTML = `
+          <div class="empty-search-box">
+            <div class="empty-search-icon"><span data-tl-icon="search"></span></div>
+            <h3 style="color: var(--tl-navy-800); margin-bottom: 8px;">No Matching Professionals Found</h3>
+            <p style="color: var(--tl-text-secondary); max-width: 460px; margin: 0 auto 20px; font-size: 0.95rem;">
+              We couldn't find trade specialists matching your current search criteria. Try removing some filters or searching for general terms like "Electrical" or "Plumber".
+            </p>
+            <button class="tl-btn tl-btn-primary" onclick="resetAllFilters()">Reset All Filters</button>
+          </div>
+        `;
+      } else {
+        container.innerHTML = results.map(p => {
+          const isVerified = p.verificationStatus === 'verified' || p.isVerified === true;
+          const initials = (p.name || p.businessName || 'T').charAt(0).toUpperCase();
+          const avatarHtml = p.avatar 
+            ? `<img src="${p.avatar}" alt="${p.name}" class="tl-provider-avatar" style="width: 68px; height: 68px;" onerror="this.onerror=null; this.src=''; this.parentElement.innerHTML='<div class=\\'provider-avatar-fallback\\'>${initials}</div>';">`
+            : `<div class="provider-avatar-fallback">${initials}</div>`;
+
+          return `
+            <div class="provider-search-card" ${p.isPremium ? 'style="border-color: var(--tl-gold-400);"' : ''}>
+              <div style="display: flex; gap: 16px; align-items: flex-start;">
+                <!-- Avatar with Verification Shield -->
+                <div style="position: relative; width: 68px; height: 68px; flex-shrink: 0;">
+                  ${avatarHtml}
+                  ${isVerified ? '<div class="tl-verified-check" title="Verified Professional"><span data-tl-icon="check"></span></div>' : ''}
+                </div>
+
+                <!-- Main Info -->
+                <div style="flex: 1;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                      <h4 style="font-size: 1.2rem; color: var(--tl-navy-800); margin: 0; display: flex; align-items: center; gap: 8px;">
+                        ${p.name || p.businessName}
+                        ${isVerified ? '<span class="tl-badge tl-badge-verified" style="font-size: 0.65rem; padding: 2px 6px;">Verified</span>' : ''}
+                        ${p.isPremium ? '<span class="tl-badge tl-badge-premium" style="font-size: 0.65rem; padding: 2px 6px;"><span data-tl-icon="crown"></span> Premium</span>' : ''}
+                        ${p.isDemonstration ? '<span class="tl-badge" style="background: #F1F5F9; color: #64748B; font-size: 0.65rem;">Demo Profile</span>' : ''}
+                      </h4>
+                      <div style="font-size: 0.85rem; color: var(--tl-teal-600); font-weight: 700; margin-top: 2px;">
+                        ${p.categoryTitle || 'Trade Specialist'} • ${p.experienceYears || 3} Years Experience
+                      </div>
+                    </div>
+
+                    <!-- Pricing Info -->
+                    <div style="text-align: right;">
+                      <div style="font-size: 1.15rem; font-weight: 800; color: var(--tl-navy-800);">
+                        ${p.lowestPrice ? 'PKR ' + p.lowestPrice.toLocaleString() : (p.priceDisplay || 'Upon Request')}
+                      </div>
+                      <div style="font-size: 0.7rem; color: var(--tl-text-muted);">${p.priceType || 'Starting inspection'}</div>
+                    </div>
+                  </div>
+
+                  <!-- Rating Row -->
+                  <div style="display: flex; align-items: center; gap: 8px; margin: 8px 0; font-size: 0.85rem;">
+                    <span style="color: var(--tl-gold-500); display: inline-flex; gap: 2px;">
+                      <span data-tl-icon="star"></span>
+                    </span>
+                    <strong style="color: var(--tl-navy-800);">${(p.rating || 5.0).toFixed(1)}</strong>
+                    <span style="color: var(--tl-text-muted);">(${p.reviewCount || 1} verified reviews)</span>
+                    <span style="color: var(--tl-border-strong);">•</span>
+                    <span style="color: var(--tl-text-secondary);">📍 <strong>${p.city}</strong> (${(p.serviceAreas || []).slice(0, 3).join(', ')})</span>
+                  </div>
+
+                  <!-- Bio -->
+                  <p style="font-size: 0.9rem; color: var(--tl-text-secondary); margin: 0 0 10px 0; line-height: 1.5;">
+                    ${p.bio || p.bioDescription || 'Professional contractor registered on TradeLinker.'}
+                  </p>
+
+                  <!-- Skills Tags -->
+                  <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
+                    ${(p.skills || []).map(s => `<span class="tl-skill-tag">${s}</span>`).join('')}
+                  </div>
+
+                  <!-- Card Action Footer -->
+                  <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--tl-border-subtle); padding-top: 12px;">
+                    <span style="font-size: 0.75rem; color: var(--tl-text-muted);">
+                      ID Screened: <strong>100% Verified Identity (BR-07)</strong>
+                    </span>
+
+                    <div style="display: flex; gap: 8px;">
+                      <a href="provider-profile.html?id=${p.id}" class="tl-btn tl-btn-outline tl-btn-sm">
+                        View Profile
+                      </a>
+                      <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openBookingFromCard('${p.name || p.businessName}', '${p.categoryTitle}', '${p.id}')">
+                        Book Service
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    // ------------------------------------------------------------------------
+    // Active Filter Pills
+    // ------------------------------------------------------------------------
+    function renderActivePills(f) {
+      const container = document.getElementById('activePillsContainer');
+      const pills = [];
+
+      if (f.query) pills.push({ label: `"${f.query}"`, reset: () => { document.getElementById('topQueryInput').value = ''; } });
+      if (f.city && f.city !== 'all') pills.push({ label: `City: ${f.city}`, reset: () => { document.getElementById('topCitySelect').value = 'all'; } });
+      if (f.category && f.category !== 'all') pills.push({ label: `Category: ${f.category}`, reset: () => { document.querySelector('input[name="catFilter"][value="all"]').checked = true; } });
+      if (f.verifiedOnly) pills.push({ label: 'Verified Only', reset: () => { document.getElementById('filterVerifiedOnly').checked = false; } });
+      if (f.minRating && f.minRating !== '0') pills.push({ label: `${f.minRating}+ Stars`, reset: () => { document.getElementById('filterMinRating').value = '0'; } });
+      if (f.minExperience && f.minExperience !== '0') pills.push({ label: `${f.minExperience}+ Yrs Exp`, reset: () => { document.getElementById('filterExperience').value = '0'; } });
+      if (f.pricingType && f.pricingType !== 'all') pills.push({ label: `Pricing: ${f.pricingType}`, reset: () => { document.querySelector('input[name="pricingTypeFilter"][value="all"]').checked = true; } });
+
+      if (pills.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      container.innerHTML = `
+        <span style="font-size: 0.8rem; color: var(--tl-text-muted); font-weight: 700;">Active Filters:</span>
+        ${pills.map((p, idx) => `
+          <span class="active-pill">
+            ${p.label}
+            <span class="active-pill-remove" onclick="removePill(${idx})">&times;</span>
+          </span>
+        `).join('')}
+        <button class="tl-btn tl-btn-ghost tl-btn-xs" onclick="resetAllFilters()" style="color: #DC2626;">Clear All</button>
+      `;
+
+      window._activePillsList = pills;
+    }
+
+    function removePill(idx) {
+      if (window._activePillsList && window._activePillsList[idx]) {
+        window._activePillsList[idx].reset();
+        triggerSearch();
+      }
+    }
+
+    function resetAllFilters() {
+      document.getElementById('topQueryInput').value = '';
+      document.getElementById('topCitySelect').value = 'all';
+      document.querySelector('input[name="catFilter"][value="all"]').checked = true;
+      document.getElementById('filterVerifiedOnly').checked = false;
+      document.getElementById('filterAvailableOnly').checked = false;
+      document.getElementById('filterMinRating').value = '0';
+      document.getElementById('filterExperience').value = '0';
+      document.querySelector('input[name="pricingTypeFilter"][value="all"]').checked = true;
+      document.getElementById('sortBySelect').value = 'recommended';
+      triggerSearch();
+    }
+
+    // ------------------------------------------------------------------------
+    // Booking Action Modal
+    // ------------------------------------------------------------------------
+    function openBookingFromCard(name, category, id) {
+      const user = window.TLAuth ? TLAuth.getCurrentUser() : null;
+      if (!user) {
+        alert('Authentication Required (BR-01): Please sign in to submit a service booking request.');
+        window.location.href = `auth.html?mode=login&returnUrl=${encodeURIComponent('book-service.html?providerId=' + id)}`;
+        return;
+      }
+      window.location.href = `book-service.html?providerId=${id}`;
+    }
+
+    function closeBookingModal() {
+      document.getElementById('bookingModal').classList.remove('active');
+    }
+
+    async function submitBookingRequest() {
+      const submitBtn = event?.target || document.querySelector('#bookingModalForm button[type="submit"]');
+      const user = TLAuth.getCurrentUser();
+      const provId = document.getElementById('modalProviderId').value;
+      const problem = document.getElementById('modalProblem').value;
+      const address = document.getElementById('modalAddress').value;
+      const date = document.getElementById('modalDate').value;
+      const slot = document.getElementById('modalSlot').value;
+      const bId = 'TL-BK-' + Math.floor(1000 + Math.random() * 9000);
+
+      await TLReloader.withLoading(`submit-booking-${provId}`, async () => {
+        const newBooking = {
+          id: bId,
+          providerId: provId,
+          customerId: user.id,
+          customerName: user.fullName,
+          customerPhone: user.phone,
+          serviceTitle: document.getElementById('modalTargetCategory').innerText,
+          problemDescription: problem,
+          serviceAddress: address,
+          scheduledDate: date,
+          scheduledTimeSlot: slot,
+          status: "pending",
+          createdAt: new Date().toISOString()
+        };
+
+        if (window.TLServices) {
+          let bookings = TLServices.getAllBookings();
+          bookings.unshift(newBooking);
+          localStorage.setItem(TLServices.STORAGE_KEYS.BOOKINGS, JSON.stringify(bookings));
+        }
+
+        alert(`Booking Request Successfully Submitted!\n\nBooking ID: ${bId}\nStatus: Pending (FR-33)\nThe service provider has been alerted.`);
+        closeBookingModal();
+        window.location.href = 'customer-dashboard.html';
+      }, {
+        button: submitBtn,
+        loadingText: "Submitting booking request..."
+      });
+    }
+  </script>
+</body>
+</html>

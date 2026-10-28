@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trade Professional Profile — TradeLinker</title>
+  <meta name="description" content="View verified credentials, published service offerings, customer reviews, and booking availability on TradeLinker.">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/reloader.css">
+  <style>
+    .profile-hero {
+      background: linear-gradient(135deg, var(--tl-navy-950) 0%, var(--tl-navy-800) 100%);
+      color: #FFFFFF;
+      padding: 3.5rem 0 3rem;
+      border-bottom: 3px solid var(--tl-teal-500);
+    }
+    .profile-header-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    @media (min-width: 768px) {
+      .profile-header-grid {
+        grid-template-columns: 120px 1fr auto;
+      }
+    }
+    .profile-avatar-large {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--tl-teal-400);
+      box-shadow: var(--tl-shadow-lg);
+    }
+    .profile-body-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding: 3rem 0 5rem;
+    }
+    @media (min-width: 992px) {
+      .profile-body-grid {
+        grid-template-columns: 1fr 340px;
+      }
+    }
+    .content-box {
+      background: #FFFFFF;
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--tl-shadow-xs);
+    }
+    .service-offering-card {
+      border: 1.5px solid var(--tl-border-subtle);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all var(--tl-transition-fast);
+    }
+    .service-offering-card:hover {
+      border-color: var(--tl-teal-400);
+      background: var(--tl-teal-50);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="tl-navbar">
+    <div class="tl-container">
+      <div class="tl-navbar-inner">
+        <a href="index.html" class="tl-logo" title="TradeLinker Home">
+          <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Logo" class="tl-logo-img">
+        </a>
+        <nav aria-label="Main Navigation">
+          <ul class="tl-nav-links">
+            <li><a href="index.html" class="tl-nav-link">Home</a></li>
+            <li><a href="categories.html" class="tl-nav-link">Services</a></li>
+            <li><a href="search.html" class="tl-nav-link">Find Professionals</a></li>
+            <li><a href="contact.html" class="tl-nav-link">Contact</a></li>
+          </ul>
+        </nav>
+        <div class="tl-nav-actions">
+          <a href="search.html" class="tl-btn tl-btn-ghost tl-btn-sm">&larr; Back to Search</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Profile Hero Header -->
+  <section class="profile-hero">
+    <div class="tl-container">
+      <div class="profile-header-grid">
+        <div style="position: relative; width: 110px; margin: 0 auto;">
+          <img src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=200&auto=format&fit=crop" alt="Provider Avatar" class="profile-avatar-large" id="profileAvatar">
+        </div>
+
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
+            <h1 style="color: #FFF; font-size: 2rem; margin: 0;" id="profileBusinessName">Engr. Rashid Khan</h1>
+            <div id="verifiedBadgeSlot"></div>
+          </div>
+          <div style="font-size: 1rem; color: var(--tl-teal-300); font-weight: 600;" id="profileCategoryTitle">Electrical Services • 9 Years Experience</div>
+          <div style="font-size: 0.85rem; color: #CBD5E1; margin-top: 4px;" id="profileLocation">Operating in: Islamabad & Rawalpindi</div>
+        </div>
+
+        <div style="text-align: right;">
+          <button class="tl-btn tl-btn-primary tl-btn-lg" onclick="openProfileBookingModal()">
+            <span data-tl-icon="calendar"></span> Book This Specialist
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Profile Content -->
+  <main class="tl-container">
+    <div class="profile-body-grid">
+      <!-- Left Details Column -->
+      <div>
+        <!-- Professional Bio & Description -->
+        <div class="content-box">
+          <h2 style="font-size: 1.3rem; color: var(--tl-navy-800); margin-bottom: 12px;">About the Professional</h2>
+          <p style="color: var(--tl-text-secondary); line-height: 1.6; margin: 0;" id="profileBio">
+            Certified electrical engineer specializing in domestic distribution boards, inverter backups, short-circuit diagnostics, and smart home wiring. Registered and background-screened on TradeLinker.
+          </p>
+
+          <div style="margin-top: 18px;">
+            <strong style="font-size: 0.85rem; color: var(--tl-navy-800); display: block; margin-bottom: 6px;">Core Competencies & Skills:</strong>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;" id="profileSkillsList">
+              <span class="tl-skill-tag">Wiring</span>
+              <span class="tl-skill-tag">DB Panels</span>
+              <span class="tl-skill-tag">Circuit Diagnostics</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Published Service Offerings (FR-14, FR-15) -->
+        <div class="content-box">
+          <h2 style="font-size: 1.3rem; color: var(--tl-navy-800); margin-bottom: 6px;">Available Service Offerings</h2>
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin-bottom: 18px;">Book an established package or request an on-site diagnosis.</p>
+
+          <div id="profileServicesContainer">
+            <!-- Services injected via JS -->
+          </div>
+        </div>
+
+        <!-- Customer Reviews (FR-40, BR-06) -->
+        <div class="content-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h2 style="font-size: 1.3rem; color: var(--tl-navy-800); margin: 0;">Verified Customer Reviews (FR-40)</h2>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="color: var(--tl-gold-500);"><span data-tl-icon="star"></span></span>
+              <strong style="color: var(--tl-navy-800); font-size: 1.1rem;" id="profileRatingNum">4.9</strong>
+              <span style="color: var(--tl-text-muted); font-size: 0.85rem;" id="profileReviewCount">(46 reviews)</span>
+            </div>
+          </div>
+
+          <div id="profileReviewsContainer">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Sticky Booking Card -->
+      <aside>
+        <div class="content-box" style="position: sticky; top: 100px;">
+          <h3 style="font-size: 1.2rem; color: var(--tl-navy-800); margin-bottom: 12px;">Hire This Professional</h3>
+          
+          <div style="background: var(--tl-teal-50); padding: 12px; border-radius: 10px; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--tl-teal-700); font-weight: 700;">
+              <span data-tl-icon="secure"></span> TradeLinker Protection
+            </div>
+            <p style="font-size: 0.75rem; color: var(--tl-text-muted); margin: 4px 0 0 0;">
+              Your booking status is tracked in real-time. Verified ratings are restricted to completed service jobs.
+            </p>
+          </div>
+
+          <button class="tl-btn tl-btn-primary" style="width: 100%;" onclick="openProfileBookingModal()">
+            Submit Booking Request
+          </button>
+          
+          <div style="margin-top: 14px; text-align: center; font-size: 0.8rem; color: var(--tl-text-muted);">
+            Typical Response Time: <strong>Within 2 Hours</strong>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Booking Modal -->
+  <div class="tl-modal-backdrop" id="bookingModal">
+    <div class="tl-modal">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Request Service Booking</h3>
+        <button class="tl-modal-close" onclick="closeProfileBookingModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <form onsubmit="event.preventDefault(); handleProfileBookingSubmit();">
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Selected Service</label>
+            <select id="modalServiceSelect" class="tl-select" required></select>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Problem Description</label>
+            <textarea id="modalProblemText" class="tl-textarea" placeholder="Detail your specific issue or project needs..." required></textarea>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required">Your Address / Location</label>
+            <input type="text" id="modalAddressText" class="tl-input" placeholder="House #, Street, Sector / Colony, City" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required">Preferred Date</label>
+              <input type="date" id="modalDateVal" class="tl-input" required>
+            </div>
+            <div class="tl-form-group">
+              <label class="tl-label tl-label-required">Time Slot</label>
+              <select id="modalTimeSlotVal" class="tl-select" required>
+                <option value="Morning (9 AM - 12 PM)">Morning (9 AM - 12 PM)</option>
+                <option value="Afternoon (12 PM - 3 PM)">Afternoon (12 PM - 3 PM)</option>
+                <option value="Evening (3 PM - 6 PM)">Evening (3 PM - 6 PM)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeProfileBookingModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary">Submit Booking</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <footer class="tl-footer">
+    <div class="tl-container">
+      <div class="tl-footer-bottom">
+        <div>&copy; 2026 TradeLinker. Developed by Techminds.</div>
+        <a href="index.html" style="color: #64748B;">Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+  <script src="js/reloader.js"></script>
+  <script>
+    let activeProfile = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const provId = urlParams.get('id') || 'prov-profile-001';
+
+      // Load provider profile
+      let providers = [];
+      try {
+        providers = JSON.parse(localStorage.getItem(TLAuth.STORAGE_KEYS.PROVIDERS)) || [];
+      } catch (e) { providers = []; }
+
+      activeProfile = providers.find(p => p.id === provId) || providers[0];
+      if (activeProfile) {
+        renderPublicProfile(activeProfile);
+      }
+
+      // Default date
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById('modalDateVal').value = tomorrow.toISOString().split('T')[0];
+    });
+
+    function renderPublicProfile(p) {
+      document.getElementById('profileBusinessName').innerText = p.businessName;
+      document.getElementById('profileCategoryTitle').innerText = `${p.categoryTitle || 'Trade Specialist'} • ${p.experienceYears || 5} Years Experience`;
+      document.getElementById('profileLocation').innerText = `Operating in: ${(p.serviceAreas || [p.city]).join(', ')}`;
+      document.getElementById('profileBio').innerText = p.bioDescription || 'Experienced trade specialist providing reliable craftsmanship.';
+
+      // Verification Badge (Strict rule: BR-07)
+      const badgeSlot = document.getElementById('verifiedBadgeSlot');
+      if (p.verificationStatus === 'verified') {
+        badgeSlot.innerHTML = '<span class="tl-badge tl-badge-verified"><span data-tl-icon="verified"></span> Verified Professional</span>';
+      } else {
+        badgeSlot.innerHTML = '<span class="tl-badge tl-badge-pending">Verification Pending</span>';
+      }
+
+      // Skills
+      const skillsBox = document.getElementById('profileSkillsList');
+      skillsBox.innerHTML = (p.skills || ['General Trade']).map(s => `
+        <span class="tl-skill-tag">${s}</span>
+      `).join('');
+
+      // Services
+      const services = TLServices.getProviderServices(p.id).filter(s => s.isAvailable);
+      const container = document.getElementById('profileServicesContainer');
+      const select = document.getElementById('modalServiceSelect');
+
+      if (services.length === 0) {
+        container.innerHTML = '<p style="color: var(--tl-text-muted); font-size: 0.9rem;">No specific packages published currently. Custom service requests accepted.</p>';
+        select.innerHTML = '<option value="custom">General Service / On-Site Consultation</option>';
+      } else {
+        container.innerHTML = services.map(s => `
+          <div class="service-offering-card">
+            <div>
+              <h4 style="font-size: 1.05rem; color: var(--tl-navy-800); margin-bottom: 4px;">${s.title}</h4>
+              <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin: 0;">${s.description}</p>
+            </div>
+            <div style="text-align: right; margin-left: 16px;">
+              <strong style="font-size: 1.1rem; color: var(--tl-navy-800); white-space: nowrap;">
+                ${s.pricingType === 'upon_request' ? 'Upon Request' : `PKR ${s.priceAmount.toLocaleString()}`}
+              </strong>
+              <div style="font-size: 0.7rem; color: var(--tl-text-muted); text-transform: capitalize;">${s.pricingType.replace('_', ' ')}</div>
+            </div>
+          </div>
+        `).join('');
+
+        select.innerHTML = services.map(s => `
+          <option value="${s.id}">${s.title} (${s.pricingType === 'upon_request' ? 'Upon Request' : 'PKR ' + s.priceAmount})</option>
+        `).join('');
+      }
+
+      // Render Reviews (BR-06, FR-40)
+      renderProfileReviews(p);
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    function renderProfileReviews(p) {
+      const container = document.getElementById('profileReviewsContainer');
+      const dynamicReviews = typeof TLBookings !== 'undefined' ? TLBookings.getProviderReviews(p.id) : [];
+
+      const baselineReviews = [
+        {
+          customerName: "Hamad Ullah (Completed Job #TL-BK-9182)",
+          rating: 5,
+          comment: "Arrived promptly in Sector F-7, diagnosed the grounding leak in our DB board in under 30 minutes, and replaced the breaker safely. Excellent professionalism."
+        },
+        {
+          customerName: "Dr. Kamran Qureshi (Medical Centre)",
+          rating: 5,
+          comment: "Handled clinic power distribution wiring cleanly. Provided full testing report before sign-off."
+        }
+      ];
+
+      const all = [...dynamicReviews, ...baselineReviews];
+      document.getElementById('profileRatingNum').innerText = p.rating || '4.9';
+      document.getElementById('profileReviewCount').innerText = `(${all.length} reviews)`;
+
+      container.innerHTML = all.map(r => `
+        <div style="border-bottom: 1px solid var(--tl-border-subtle); padding-bottom: 14px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <strong>${r.customerName}</strong>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: var(--tl-gold-500); font-weight: 700;">★ ${r.rating}.0</span>
+              <button class="tl-btn tl-btn-ghost tl-btn-xs" style="color: var(--tl-text-muted); font-size: 0.7rem; padding: 2px 6px;" onclick="reportInappropriateReview('${r.id || 'rev-seed'}', '${r.bookingId || 'TL-BK-seed'}')">
+                🚩 Report
+              </button>
+            </div>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin: 0;">
+            "${r.comment}"
+          </p>
+        </div>
+      `).join('');
+    }
+
+    function reportInappropriateReview(reviewId, bookingId) {
+      const user = TLAuth.getCurrentUser();
+      if (!user) {
+        alert('Authentication Required: Please sign in to flag a review.');
+        return;
+      }
+
+      const reason = prompt('Please enter the reason for reporting this review to administrators (e.g. Abusive language, false claims, promotional spam):');
+      if (!reason || reason.trim().length === 0) return;
+
+      const res = TLCommunication.reportReview({
+        reviewId,
+        bookingId,
+        reporterId: user.id,
+        reporterRole: user.role,
+        reason: reason.trim()
+      });
+
+      if (res.success) {
+        alert('Thank you. The review has been flagged and submitted to the administrator moderation queue (FR-47).');
+      } else {
+        alert('Error: ' + res.error);
+      }
+    }
+
+    function openProfileBookingModal() {
+      // Check authentication (BR-01)
+      const user = TLAuth.getCurrentUser();
+      if (!user) {
+        alert('Authentication Required (BR-01): Please sign in to submit a service booking request.');
+        window.location.href = `auth.html?mode=login&returnUrl=${encodeURIComponent(window.location.href)}`;
+        return;
+      }
+      // Direct customer to the 4-step Booking Wizard (FR-28 to FR-30, UC-02)
+      window.location.href = `book-service.html?providerId=${activeProfile.id}`;
+    }
+
+    function closeProfileBookingModal() {
+      document.getElementById('bookingModal').classList.remove('active');
+    }
+
+    function handleProfileBookingSubmit() {
+      const user = TLAuth.getCurrentUser();
+      const serviceId = document.getElementById('modalServiceSelect').value;
+      const problem = document.getElementById('modalProblemText').value;
+      const address = document.getElementById('modalAddressText').value;
+      const date = document.getElementById('modalDateVal').value;
+      const timeSlot = document.getElementById('modalTimeSlotVal').value;
+
+      const res = TLBookings.createBooking({
+        customerId: user.id,
+        providerId: activeProfile.id,
+        serviceId: serviceId,
+        serviceTitle: document.getElementById('modalServiceSelect').selectedOptions[0].text,
+        categoryTitle: activeProfile.categoryTitle,
+        problemDescription: problem,
+        serviceAddress: address,
+        city: activeProfile.city || "Islamabad",
+        scheduledDate: date,
+        scheduledTimeSlot: timeSlot
+      });
+
+      if (res.success) {
+        alert(`Booking Request Submitted!\n\nBooking ID: ${res.booking.id}\nStatus: PENDING (FR-33)\nThe specialist has received your request.`);
+        closeProfileBookingModal();
+        window.location.href = 'customer-dashboard.html';
+      } else {
+        alert('Booking Error: ' + res.error);
+      }
+    }
+  </script>
+</body>
+</html>

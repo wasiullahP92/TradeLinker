@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeLinker Design System & Brand Guidelines — Techminds</title>
+  <meta name="description" content="Official TradeLinker Design System, Brand Tokens, UI Component Library and Theme Specification.">
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    /* Showcase-specific layout styling */
+    .showcase-banner {
+      background: linear-gradient(135deg, var(--tl-navy-950) 0%, var(--tl-navy-800) 100%);
+      color: #FFFFFF;
+      padding: var(--tl-space-12) 0 var(--tl-space-10);
+      border-bottom: 3px solid var(--tl-teal-500);
+      position: relative;
+      overflow: hidden;
+    }
+    .showcase-banner::after {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(1, 173, 143, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .showcase-section {
+      padding: var(--tl-space-12) 0;
+      border-bottom: 1px solid var(--tl-border-subtle);
+    }
+    .section-header {
+      margin-bottom: var(--tl-space-8);
+    }
+    .section-header h2 {
+      font-size: var(--tl-font-size-2xl);
+      color: var(--tl-navy-800);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-header p {
+      font-size: var(--tl-font-size-base);
+      color: var(--tl-text-secondary);
+      margin-top: 4px;
+    }
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--tl-space-4);
+    }
+    .color-swatch {
+      background: var(--tl-bg-surface);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: var(--tl-radius-md);
+      overflow: hidden;
+      box-shadow: var(--tl-shadow-xs);
+    }
+    .swatch-preview {
+      height: 90px;
+      width: 100%;
+      position: relative;
+    }
+    .swatch-info {
+      padding: 12px;
+    }
+    .swatch-title {
+      font-weight: 700;
+      font-size: var(--tl-font-size-sm);
+      color: var(--tl-navy-800);
+    }
+    .swatch-hex {
+      font-family: monospace;
+      font-size: var(--tl-font-size-xs);
+      color: var(--tl-teal-600);
+      margin-top: 2px;
+    }
+    .swatch-desc {
+      font-size: 0.7rem;
+      color: var(--tl-text-muted);
+      margin-top: 4px;
+    }
+    .component-box {
+      background: var(--tl-bg-surface);
+      border: 1px solid var(--tl-border-subtle);
+      border-radius: var(--tl-radius-lg);
+      padding: var(--tl-space-8);
+      box-shadow: var(--tl-shadow-xs);
+      margin-bottom: var(--tl-space-6);
+    }
+    .component-box-title {
+      font-size: var(--tl-font-size-sm);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--tl-text-muted);
+      margin-bottom: var(--tl-space-4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .demo-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--tl-space-3);
+    }
+    .trust-bar-demo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--tl-space-3);
+      justify-content: center;
+      padding: var(--tl-space-6);
+      background: var(--tl-bg-subtle);
+      border-radius: var(--tl-radius-xl);
+    }
+    .card-grid-6 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--tl-space-6);
+    }
+    .provider-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: var(--tl-space-6);
+    }
+    .interactive-feedback {
+      background: var(--tl-teal-50);
+      border: 1px solid var(--tl-teal-200);
+      border-radius: var(--tl-radius-md);
+      padding: 12px 16px;
+      font-size: var(--tl-font-size-sm);
+      color: var(--tl-teal-700);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: var(--tl-space-4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. Main Navigation Bar (Shared Element)
+       ========================================================================= -->
+  <header class="tl-navbar" id="mainNavbar">
+    <div class="tl-container">
+      <div class="tl-navbar-inner">
+        <!-- Logo Area with Original Proportions -->
+        <a href="index.html" class="tl-logo" title="TradeLinker Home">
+          <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Logo" class="tl-logo-img">
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <ul class="tl-nav-links">
+          <li><a href="index.html" class="tl-nav-link">Home</a></li>
+          <li><a href="categories.html" class="tl-nav-link">Categories</a></li>
+          <li><a href="search.html" class="tl-nav-link">Find Professionals</a></li>
+          <li><a href="contact.html" class="tl-nav-link">Support</a></li>
+          <li><a href="design-system.html" class="tl-nav-link active">Design System</a></li>
+        </ul>
+
+        <!-- Action Items (Role indicator, notification, CTA) -->
+        <div class="tl-nav-actions">
+          <div class="tl-role-switcher" title="Active Platform Role">
+            <span class="tl-role-dot"></span>
+            <span id="roleLabel">Customer View</span>
+          </div>
+
+          <button class="tl-icon-btn" id="notifBtn" aria-label="Notifications" title="Notifications">
+            <span data-tl-icon="bell"></span>
+            <span class="tl-icon-badge">3</span>
+          </button>
+
+          <a href="auth.html" class="tl-btn tl-btn-primary tl-btn-sm" id="authBtn">
+            <span data-tl-icon="user"></span>
+            Sign In
+          </a>
+
+          <button class="tl-hamburger" id="mobileMenuBtn" aria-label="Toggle navigation menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       Hero Showcase Banner
+       ========================================================================= -->
+  <section class="showcase-banner">
+    <div class="tl-container">
+      <span class="tl-badge tl-badge-verified" style="margin-bottom: 1rem;">
+        <span data-tl-icon="verified"></span> Official Techminds Brand System v1.0
+      </span>
+      <h1 style="color: #FFFFFF; margin-bottom: 0.5rem;">TradeLinker Design System</h1>
+      <p style="color: #CBD5E1; max-width: 680px; font-size: 1.15rem; line-height: 1.6;">
+        Standardized design tokens, accessible components, and exact visual identity directly sampled from the official TradeLinker branding and SRS document.
+      </p>
+      <div style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
+        <a href="#colors" class="tl-btn tl-btn-primary tl-btn-sm">Color Tokens</a>
+        <a href="#typography" class="tl-btn tl-btn-outline-teal tl-btn-sm" style="border-color: rgba(255,255,255,0.4); color: #FFF;">Typography</a>
+        <a href="#buttons" class="tl-btn tl-btn-outline-teal tl-btn-sm" style="border-color: rgba(255,255,255,0.4); color: #FFF;">Buttons</a>
+        <a href="#categories" class="tl-btn tl-btn-outline-teal tl-btn-sm" style="border-color: rgba(255,255,255,0.4); color: #FFF;">6 Categories</a>
+        <a href="#badges" class="tl-btn tl-btn-outline-teal tl-btn-sm" style="border-color: rgba(255,255,255,0.4); color: #FFF;">Status Badges</a>
+        <a href="#forms" class="tl-btn tl-btn-outline-teal tl-btn-sm" style="border-color: rgba(255,255,255,0.4); color: #FFF;">Forms</a>
+      </div>
+    </div>
+  </section>
+
+  <main class="tl-container">
+
+    <!-- =======================================================================
+         Section 1: Extracted Brand Colors
+         ======================================================================= -->
+    <section class="showcase-section" id="colors">
+      <div class="section-header">
+        <h2><span data-tl-icon="check"></span> 1. Brand Color Palette (Extracted From Assets)</h2>
+        <p>Pixel-sampled from the original TradeLinker infographic, logo mark, and Techminds profile.</p>
+      </div>
+
+      <div class="color-grid">
+        <div class="color-swatch">
+          <div class="swatch-preview" style="background: #012B52;"></div>
+          <div class="swatch-info">
+            <div class="swatch-title">Primary Brand Navy</div>
+            <div class="swatch-hex">#012B52</div>
+            <div class="swatch-desc">--tl-navy-800: Logo 'Trade', primary headings, footer background</div>
+          </div>
+        </div>
+
+        <div class="color-swatch">
+          <div class="swatch-preview" style="background: #01AD8F;"></div>
+          <div class="swatch-info">
+            <div class="swatch-title">Primary Brand Teal</div>
+            <div class="swatch-hex">#01AD8F</div>
+            <div class="swatch-desc">--tl-teal-500: Logo 'Linker', chain link, primary CTAs, active links</div>
+          </div>
+        </div>
+
+        <div class="color-swatch">
+          <div class="swatch-preview" style="background: #E6F8F5; border-bottom: 1px solid #CBD5E1;"></div>
+          <div class="swatch-info">
+            <div class="swatch-title">Mint Tint / Highlight</div>
+            <div class="swatch-hex">#E6F8F5</div>
+            <div class="swatch-desc">--tl-teal-100: Category icon circles, trust badge fill, subtle alerts</div>
+          </div>
+        </div>
+
+        <div class="color-swatch">
+          <div class="swatch-preview" style="background: #F59E0B;"></div>
+          <div class="swatch-info">
+            <div class="swatch-title">Premium Gold Accent</div>
+            <div class="swatch-hex">#F59E0B</div>
+            <div class="swatch-desc">--tl-gold-500: "Premium Plan" ribbon badge, 5-star ratings</div>
+          </div>
+        </div>
+
+        <div class="color-swatch">
+          <div class="swatch-preview" style="background: #011E38;"></div>
+          <div class="swatch-info">
+            <div class="swatch-title">Deep Night Navy</div>
+            <div class="swatch-hex">#011E38</div>
+            <div class="swatch-desc">--tl-navy-900: Dark banner footer, modal backdrop tone</div>
+          </div>
+        </div>
+
+        <div class="color-swatch">
+          <div class="swatch-preview" style="background: #F8FAFC; border-bottom: 1px solid #CBD5E1;"></div>
+          <div class="swatch-info">
+            <div class="swatch-title">Neutral Canvas</div>
+            <div class="swatch-hex">#F8FAFC</div>
+            <div class="swatch-desc">--tl-bg-page: High-readability subtle canvas background</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         Section 2: Logo and Branding Area
+         ======================================================================= -->
+    <section class="showcase-section" id="logo">
+      <div class="section-header">
+        <h2><span data-tl-icon="verified"></span> 2. Logo & Branding Area</h2>
+        <p>Preserving exact brand proportions across light surfaces, dark banners, and vector fallbacks.</p>
+      </div>
+
+      <div class="component-box">
+        <div class="component-box-title">Light Surface Display (Original Extracted Asset)</div>
+        <div style="background: #FFFFFF; padding: 24px; border-radius: 12px; border: 1px solid var(--tl-border-subtle); display: inline-block;">
+          <a href="#" class="tl-logo">
+            <img src="assets/images/tradelinker-logo.png" alt="TradeLinker Original Logo" class="tl-logo-img" style="height: 52px;">
+          </a>
+        </div>
+      </div>
+
+      <div class="component-box">
+        <div class="component-box-title">Dark Surface Display (Banner & Footer Variation)</div>
+        <div style="background: var(--tl-navy-900); padding: 24px; border-radius: 12px; display: inline-block;">
+          <a href="#" class="tl-logo tl-logo-dark">
+            <img src="assets/images/tradelinker-logo-white.png" alt="TradeLinker White Logo" class="tl-logo-img" style="height: 48px;">
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         Section 3: Hero Search Bar
+         ======================================================================= -->
+    <section class="showcase-section" id="search">
+      <div class="section-header">
+        <h2><span data-tl-icon="search"></span> 3. Composite Search Bar</h2>
+        <p>Reproducing the search mechanism from the mobile mockup and desktop hero section.</p>
+      </div>
+
+      <div class="component-box" style="background: var(--tl-navy-50);">
+        <div class="component-box-title">Interactive Universal Search</div>
+        <form class="tl-search-bar" id="demoSearchForm" onsubmit="event.preventDefault(); handleSearchDemo();">
+          <div class="tl-search-field">
+            <span data-tl-icon="search" class="tl-search-icon"></span>
+            <input type="text" id="demoSearchQuery" class="tl-search-input" placeholder="Search for services (e.g. Electrician, Solar Panel, Carpenter)...">
+          </div>
+
+          <div class="tl-search-divider"></div>
+
+          <div class="tl-search-field">
+            <span data-tl-icon="mapPin" class="tl-search-icon"></span>
+            <select class="tl-search-select" id="demoLocationSelect">
+              <option value="">All Locations</option>
+              <option value="Islamabad">Islamabad</option>
+              <option value="Rawalpindi">Rawalpindi</option>
+              <option value="Lahore">Lahore</option>
+              <option value="Karachi">Karachi</option>
+              <option value="Peshawar">Peshawar</option>
+            </select>
+          </div>
+
+          <div class="tl-search-divider"></div>
+
+          <div class="tl-search-field">
+            <select class="tl-search-select" id="demoCategorySelect">
+              <option value="">All 6 Categories</option>
+              <option value="construction">Construction Services</option>
+              <option value="plumbing">Plumbing Services</option>
+              <option value="electrical">Electrical Services</option>
+              <option value="hvac">AC & HVAC Services</option>
+              <option value="solar">Solar Energy Services</option>
+              <option value="carpentry">Door Making & Carpentry</option>
+            </select>
+          </div>
+
+          <button type="submit" class="tl-btn tl-btn-primary tl-btn-pill">
+            <span data-tl-icon="search"></span> Search
+          </button>
+        </form>
+
+        <div id="searchFeedback" class="interactive-feedback" style="display: none;">
+          <span data-tl-icon="check"></span>
+          <span id="searchFeedbackText"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         Section 4: Primary, Secondary & Specialized Buttons
+         ======================================================================= -->
+    <section class="showcase-section" id="buttons">
+      <div class="section-header">
+        <h2><span data-tl-icon="arrowRight"></span> 4. Button System & States</h2>
+        <p>Curated brand buttons with smooth hover elevations, responsive padding, and accessible focus states.</p>
+      </div>
+
+      <div class="component-box">
+        <div class="component-box-title">Standard Hierarchy</div>
+        <div class="demo-row">
+          <button class="tl-btn tl-btn-primary"><span data-tl-icon="calendar"></span> Book Service</button>
+          <button class="tl-btn tl-btn-secondary"><span data-tl-icon="user"></span> Provider Portal</button>
+          <button class="tl-btn tl-btn-outline">Learn More</button>
+          <button class="tl-btn tl-btn-outline-teal">Browse Category</button>
+          <button class="tl-btn tl-btn-gold"><span data-tl-icon="crown"></span> Upgrade to Premium</button>
+          <button class="tl-btn tl-btn-ghost">Cancel</button>
+        </div>
+      </div>
+
+      <div class="component-box">
+        <div class="component-box-title">Button Sizes & Disabled State</div>
+        <div class="demo-row">
+          <button class="tl-btn tl-btn-primary tl-btn-xs">Extra Small</button>
+          <button class="tl-btn tl-btn-primary tl-btn-sm">Small Button</button>
+          <button class="tl-btn tl-btn-primary">Standard Button</button>
+          <button class="tl-btn tl-btn-primary tl-btn-lg">Large Hero Button</button>
+          <button class="tl-btn tl-btn-primary" disabled><span data-tl-icon="check"></span> Disabled State</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         Section 5: Six Core Initial Service Categories (SRS Section 3.4)
+         ======================================================================= -->
+    <section class="showcase-section" id="categories">
+      <div class="section-header">
+        <h2><span data-tl-icon="construction"></span> 5. Six Initial Service Categories</h2>
+        <p>Mandated in SRS Section 3.4 and Business Rule BR-09, rendered in the infographic circular style.</p>
+      </div>
+
+      <div class="card-grid-6">
+        <!-- 1. Construction Services -->
+        <a href="search.html?cat=construction" class="tl-category-card">
+          <div class="tl-category-icon-box">
+            <span data-tl-icon="construction"></span>
+          </div>
+          <div class="tl-category-title">Construction Services</div>
+          <p style="font-size: 0.85rem; margin-bottom: 8px;">Civil engineers, building contractors & site teams</p>
+          <span class="tl-category-count">14 Active Providers</span>
+        </a>
+
+        <!-- 2. Plumbing Services -->
+        <a href="search.html?cat=plumbing" class="tl-category-card">
+          <div class="tl-category-icon-box">
+            <span data-tl-icon="plumbing"></span>
+          </div>
+          <div class="tl-category-title">Plumbing Services</div>
+          <p style="font-size: 0.85rem; margin-bottom: 8px;">Pipes, drainage networks, leak fixes & fittings</p>
+          <span class="tl-category-count">28 Active Providers</span>
+        </a>
+
+        <!-- 3. Electrical Services -->
+        <a href="search.html?cat=electrical" class="tl-category-card">
+          <div class="tl-category-icon-box">
+            <span data-tl-icon="electrical"></span>
+          </div>
+          <div class="tl-category-title">Electrical Services</div>
+          <p style="font-size: 0.85rem; margin-bottom: 8px;">Wiring, breaker panels, installations & repairs</p>
+          <span class="tl-category-count">35 Active Providers</span>
+        </a>
+
+        <!-- 4. AC and HVAC Services -->
+        <a href="search.html?cat=hvac" class="tl-category-card">
+          <div class="tl-category-icon-box">
+            <span data-tl-icon="hvac"></span>
+          </div>
+          <div class="tl-category-title">AC & HVAC Services</div>
+          <p style="font-size: 0.85rem; margin-bottom: 8px;">AC install, gas charging, HVAC maintenance</p>
+          <span class="tl-category-count">19 Active Providers</span>
+        </a>
+
+        <!-- 5. Solar Energy Services -->
+        <a href="search.html?cat=solar" class="tl-category-card">
+          <div class="tl-category-icon-box">
+            <span data-tl-icon="solar"></span>
+          </div>
+          <div class="tl-category-title">Solar Energy Services</div>
+          <p style="font-size: 0.85rem; margin-bottom: 8px;">Solar panels, net metering, inverters & maintenance</p>
+          <span class="tl-category-count">22 Active Providers</span>
+        </a>
+
+        <!-- 6. Wooden Door Making & Carpentry -->
+        <a href="search.html?cat=carpentry" class="tl-category-card">
+          <div class="tl-category-icon-box">
+            <span data-tl-icon="carpentry"></span>
+          </div>
+          <div class="tl-category-title">Door Making & Carpentry</div>
+          <p style="font-size: 0.85rem; margin-bottom: 8px;">Custom solid doors, frame fitting & woodwork</p>
+          <span class="tl-category-count">16 Active Providers</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         Section 6: Trust Feature Badges (Infographic Bar)
+         ======================================================================= -->
+    <section class="showcase-section" id="trust">
+      <div class="section-header">
+        <h2><span data-tl-icon="verified"></span> 6. Trust Feature Bar</h2>
+        <p>Matching the horizontal trust strip from the official TradeLinker infographic.</p>
+      </div>
+
+      <div class="trust-bar-demo">
+        <div class="tl-trust-pill">
+          <div class="tl-trust-pill-icon"><span data-tl-icon="verified"></span></div>
+          <span>Verified Professionals</span>
+        </div>
+
+        <div class="tl-trust-pill">
+          <div class="tl-trust-pill-icon"><span data-tl-icon="clock"></span></div>
+          <span>Easy Booking</span>
+        </div>
+
+        <div class="tl-trust-pill">
+          <div class="tl-trust-pill-icon"><span data-tl-icon="star"></span></div>
+          <span>Ratings & Reviews</span>
+        </div>
+
+        <div class="tl-trust-pill">
+          <div class="tl-trust-pill-icon"><span data-tl-icon="secure"></span></div>
+          <span>Safe & Secure</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         Section 7: Professional Profile Card
+         ======================================================================= -->
+    <section class="showcase-section" id="providers">
+      <div class="section-header">
+        <h2><span data-tl-icon="user"></span> 7. Professional Profile Cards</h2>
+        <p>Card component for search results and homepage showcases with verified badges and ratings.</p>
+      </div>
+
+      <div class="provider-grid">
+        <!-- Sample Provider 1 -->
+        <div class="tl-provider-card">
+          <div class="tl-provider-header">
+            <div class="tl-provider-avatar-wrap">
+              <img src="https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=150&auto=format&fit=crop" alt="Rashid Khan" class="tl-provider-avatar">
+              <div class="tl-verified-check" title="Verified Professional"><span data-tl-icon="check"></span></div>
+            </div>
+            <div class="tl-provider-meta">
+              <div class="tl-provider-name">
+                Rashid Khan
+                <span class="tl-badge tl-badge-verified" style="font-size: 0.65rem; padding: 2px 6px;">Verified</span>
+              </div>
+              <div class="tl-provider-category">Electrical Services • 8 Yrs Exp</div>
+              <div class="tl-rating-row">
+                <span class="tl-stars">
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                </span>
+                <span class="tl-rating-val">4.9</span>
+                <span class="tl-rating-count">(42 reviews)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tl-provider-body">
+            Licensed electrical engineer specializing in domestic distribution boards, inverter backups, and smart home wiring.
+          </div>
+
+          <div class="tl-provider-skills">
+            <span class="tl-skill-tag">Wiring</span>
+            <span class="tl-skill-tag">DB Panels</span>
+            <span class="tl-skill-tag">Inverters</span>
+            <span class="tl-skill-tag">Islamabad & Rawalpindi</span>
+          </div>
+
+          <div class="tl-provider-footer">
+            <div class="tl-provider-rate">
+              <span class="tl-rate-amount">PKR 1,500</span>
+              <span class="tl-rate-type">Starting inspection fee</span>
+            </div>
+            <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openDemoModal('Rashid Khan', 'Electrical Services')">
+              Book Service
+            </button>
+          </div>
+        </div>
+
+        <!-- Sample Provider 2 (Premium Member) -->
+        <div class="tl-provider-card" style="border-color: var(--tl-gold-400);">
+          <div class="tl-provider-header">
+            <div class="tl-provider-avatar-wrap">
+              <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=150&auto=format&fit=crop" alt="Tariq Solar Solutions" class="tl-provider-avatar">
+              <div class="tl-verified-check" title="Verified Professional"><span data-tl-icon="check"></span></div>
+            </div>
+            <div class="tl-provider-meta">
+              <div class="tl-provider-name">
+                Tariq Solar Works
+                <span class="tl-badge tl-badge-premium" style="font-size: 0.65rem; padding: 2px 6px;">
+                  <span data-tl-icon="crown"></span> Premium
+                </span>
+              </div>
+              <div class="tl-provider-category">Solar Energy Services • 10 Yrs Exp</div>
+              <div class="tl-rating-row">
+                <span class="tl-stars">
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                  <span data-tl-icon="star"></span>
+                </span>
+                <span class="tl-rating-val">5.0</span>
+                <span class="tl-rating-count">(68 reviews)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tl-provider-body">
+            Tier-1 solar panel installation, on-grid net-metering approvals, hybrid lithium storage, and ongoing maintenance.
+          </div>
+
+          <div class="tl-provider-skills">
+            <span class="tl-skill-tag">Solar EPC</span>
+            <span class="tl-skill-tag">Net Metering</span>
+            <span class="tl-skill-tag">Inverters</span>
+            <span class="tl-skill-tag">All Punjab & KPK</span>
+          </div>
+
+          <div class="tl-provider-footer">
+            <div class="tl-provider-rate">
+              <span class="tl-rate-amount">Upon Request</span>
+              <span class="tl-rate-type">Free system audit</span>
+            </div>
+            <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openDemoModal('Tariq Solar Works', 'Solar Energy Services')">
+              Book Service
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         Section 8: Booking Status Badges (FR-33)
+         ======================================================================= -->
+    <section class="showcase-section" id="badges">
+      <div class="section-header">
+        <h2><span data-tl-icon="check"></span> 8. Booking Status Badges (FR-33 Lifecycle)</h2>
+        <p>Standardized visual badges for all 6 lifecycle stages specified in SRS Functional Requirement 33.</p>
+      </div>
+
+      <div class="component-box">
+        <div class="component-box-title">All Booking Status Tokens</div>
+        <div class="demo-row">
+          <span class="tl-badge tl-badge-pending">
+            <span class="tl-badge-dot"></span> Pending
+          </span>
+          <span class="tl-badge tl-badge-accepted">
+            <span class="tl-badge-dot"></span> Accepted
+          </span>
+          <span class="tl-badge tl-badge-inprogress">
+            <span class="tl-badge-dot"></span> In Progress
+          </span>
+          <span class="tl-badge tl-badge-completed">
+            <span class="tl-badge-dot"></span> Completed
+          </span>
+          <span class="tl-badge tl-badge-cancelled">
+            <span class="tl-badge-dot"></span> Cancelled
+          </span>
+          <span class="tl-badge tl-badge-rejected">
+            <span class="tl-badge-dot"></span> Rejected
+          </span>
+          <span class="tl-badge tl-badge-verified">
+            <span data-tl-icon="verified"></span> Verified Professional
+          </span>
+          <span class="tl-badge tl-badge-premium">
+            <span data-tl-icon="crown"></span> Premium Member
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         Section 9: Forms & Validation Messages
+         ======================================================================= -->
+    <section class="showcase-section" id="forms">
+      <div class="section-header">
+        <h2><span data-tl-icon="calendar"></span> 9. Form Controls & Validation States</h2>
+        <p>Standard input fields, select dropdowns, textareas, and active validation feedback.</p>
+      </div>
+
+      <div class="component-box" style="max-width: 640px;">
+        <div class="component-box-title">Form Controls Preview</div>
+        <form id="demoValidationForm" onsubmit="event.preventDefault(); validateFormDemo();">
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="demoName">Full Name</label>
+            <input type="text" id="demoName" class="tl-input" placeholder="e.g. Wasi Ullah">
+            <div id="demoNameFeedback" class="tl-form-feedback"></div>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="demoPhone">Phone Number (Mandatory per SRS)</label>
+            <input type="tel" id="demoPhone" class="tl-input" placeholder="0300-1234567">
+            <div id="demoPhoneFeedback" class="tl-form-feedback"></div>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="demoCategory">Service Category</label>
+            <select id="demoCategory" class="tl-select">
+              <option value="">Select a service category...</option>
+              <option value="construction">Construction Services</option>
+              <option value="plumbing">Plumbing Services</option>
+              <option value="electrical">Electrical Services</option>
+              <option value="hvac">AC and HVAC Services</option>
+              <option value="solar">Solar Energy Services</option>
+              <option value="carpentry">Wooden Door Making and Carpentry</option>
+            </select>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label tl-label-required" for="demoDesc">Problem Description</label>
+            <textarea id="demoDesc" class="tl-textarea" placeholder="Please describe the issue or project requirement in detail..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-top: 1rem;">
+            <button type="submit" class="tl-btn tl-btn-primary">Test Form Validation</button>
+            <button type="button" class="tl-btn tl-btn-outline" onclick="resetFormDemo()">Reset</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         Section 10: Loading Indicators & Reload Controls
+         ======================================================================= -->
+    <section class="showcase-section" id="loading">
+      <div class="section-header">
+        <h2><span data-tl-icon="reload"></span> 10. Loading Indicators & Reload Controls</h2>
+        <p>Interactive reload control, brand spinners, and skeleton placeholders for smooth asynchronous UX.</p>
+      </div>
+
+      <div class="component-box">
+        <div class="component-box-title">Spinners & Reload Actions</div>
+        <div class="demo-row" style="align-items: center; gap: 2rem;">
+          <button class="tl-reload-btn" id="reloadDemoBtn" onclick="triggerReloadDemo()">
+            <span data-tl-icon="reload"></span> Reload Listings
+          </button>
+
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="tl-spinner tl-spinner-sm" title="Small Spinner"></div>
+            <div class="tl-spinner" title="Standard Spinner"></div>
+            <div class="tl-spinner tl-spinner-lg" title="Large Spinner"></div>
+          </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+          <div class="component-box-title">Card Skeleton Shimmer Placeholder</div>
+          <div style="max-width: 360px; background: #FFF; border: 1px solid var(--tl-border-subtle); border-radius: 16px; padding: 20px;">
+            <div style="display: flex; gap: 14px; margin-bottom: 14px;">
+              <div class="tl-skeleton" style="width: 56px; height: 56px; border-radius: 50%;"></div>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                <div class="tl-skeleton" style="height: 16px; width: 70%;"></div>
+                <div class="tl-skeleton" style="height: 12px; width: 45%;"></div>
+              </div>
+            </div>
+            <div class="tl-skeleton" style="height: 12px; width: 100%; margin-bottom: 8px;"></div>
+            <div class="tl-skeleton" style="height: 12px; width: 85%; margin-bottom: 16px;"></div>
+            <div class="tl-skeleton" style="height: 36px; width: 100%; border-radius: 8px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       11. Modal Dialog Showcase
+       ========================================================================= -->
+  <div class="tl-modal-backdrop" id="demoModalBackdrop">
+    <div class="tl-modal" role="dialog" aria-modal="true">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title" id="modalProviderName">Book Professional</h3>
+        <button class="tl-modal-close" onclick="closeDemoModal()" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="tl-modal-body">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; background: var(--tl-teal-50); padding: 12px; border-radius: 10px;">
+          <span data-tl-icon="verified" style="color: var(--tl-teal-600); width: 24px; height: 24px;"></span>
+          <div>
+            <div style="font-weight: 700; color: var(--tl-navy-800);" id="modalCategory">Selected Service</div>
+            <div style="font-size: 0.8rem; color: var(--tl-text-muted);">TradeLinker Verified Service Provider</div>
+          </div>
+        </div>
+
+        <div class="tl-form-group">
+          <label class="tl-label tl-label-required">Problem Summary</label>
+          <input type="text" class="tl-input" placeholder="e.g. Need urgent circuit breaker inspection">
+        </div>
+
+        <div class="tl-form-group">
+          <label class="tl-label tl-label-required">Service Address</label>
+          <input type="text" class="tl-input" placeholder="House #, Street, Sector, City">
+        </div>
+
+        <div class="tl-form-group">
+          <label class="tl-label tl-label-required">Preferred Date</label>
+          <input type="date" class="tl-input" value="2026-10-28">
+        </div>
+      </div>
+      <div class="tl-modal-footer">
+        <button type="button" class="tl-btn tl-btn-ghost" onclick="closeDemoModal()">Cancel</button>
+        <button type="button" class="tl-btn tl-btn-primary" onclick="submitBookingDemo()">Confirm & Submit Request</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       12. Official Branded Footer (Shared Element)
+       ========================================================================= -->
+  <footer class="tl-footer">
+    <div class="tl-container">
+      <div class="tl-footer-top">
+        <div class="tl-footer-brand">
+          <a href="index.html" class="tl-logo tl-logo-dark">
+            <img src="assets/images/tradelinker-logo-white.png" alt="TradeLinker Logo" class="tl-logo-img" style="height: 44px;">
+          </a>
+          <p>
+            TradeLinker is a digital service marketplace connecting individuals, hospitals, and organizations with trusted, verified trade professionals.
+          </p>
+          <div class="tl-footer-badge">
+            <span data-tl-icon="secure" style="color: var(--tl-teal-400);"></span>
+            <span style="font-size: 0.8rem; color: #CBD5E1;">100% Verified Trade Identity & Credential Screening</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="tl-footer-heading">Service Categories</h4>
+          <ul class="tl-footer-links">
+            <li><a href="search.html?cat=construction">Construction Services</a></li>
+            <li><a href="search.html?cat=plumbing">Plumbing Services</a></li>
+            <li><a href="search.html?cat=electrical">Electrical Services</a></li>
+            <li><a href="search.html?cat=hvac">AC & HVAC Services</a></li>
+            <li><a href="search.html?cat=solar">Solar Energy Services</a></li>
+            <li><a href="search.html?cat=carpentry">Door Making & Carpentry</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="tl-footer-heading">Platform</h4>
+          <ul class="tl-footer-links">
+            <li><a href="auth.html?role=customer">Customer Registration</a></li>
+            <li><a href="auth.html?role=provider">Provider Registration</a></li>
+            <li><a href="contact.html">Safety & Dispute Policy</a></li>
+            <li><a href="contact.html">Terms & Verification Scope</a></li>
+            <li><a href="design-system.html">Design System & Tokens</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="tl-footer-heading">Founders & Vision</h4>
+          <p style="font-size: 0.85rem; color: #94A3B8; margin-bottom: 12px;">
+            TradeLinker is conceptualized and engineered by <strong>Techminds</strong> (Wasi Ullah & Hamad Ullah).
+          </p>
+          <div class="tl-script-tagline">"Better Services. A Stronger Tomorrow."</div>
+        </div>
+      </div>
+
+      <div class="tl-footer-bottom">
+        <div>
+          &copy; 2026 TradeLinker. All rights reserved. Built with precision for Techminds.
+        </div>
+        <div style="display: flex; gap: 20px;">
+          <a href="#" style="color: #64748B;">Privacy Policy</a>
+          <a href="#" style="color: #64748B;">Terms of Service</a>
+          <a href="contact.html" style="color: #64748B;">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/icons.js"></script>
+  <script>
+    // Demo Interactive Handlers
+    function handleSearchDemo() {
+      const q = document.getElementById('demoSearchQuery').value || 'All services';
+      const loc = document.getElementById('demoLocationSelect').value || 'Any Location';
+      const cat = document.getElementById('demoCategorySelect').value || 'Any Category';
+      
+      const feedback = document.getElementById('searchFeedback');
+      const text = document.getElementById('searchFeedbackText');
+      feedback.style.display = 'flex';
+      text.innerText = `Search dispatched: Query="${q}" | Location="${loc}" | Category="${cat}". Ready for search results routing.`;
+    }
+
+    function openDemoModal(name, category) {
+      document.getElementById('modalProviderName').innerText = 'Book ' + name;
+      document.getElementById('modalCategory').innerText = category;
+      const modal = document.getElementById('demoModalBackdrop');
+      modal.classList.add('active');
+    }
+
+    function closeDemoModal() {
+      document.getElementById('demoModalBackdrop').classList.remove('active');
+    }
+
+    function submitBookingDemo() {
+      alert('Demo Booking Request Generated: Status assigned "Pending", assigned ID "TL-BK-7821". In-app notification dispatched to Provider.');
+      closeDemoModal();
+    }
+
+    function validateFormDemo() {
+      const name = document.getElementById('demoName');
+      const phone = document.getElementById('demoPhone');
+      const nameFb = document.getElementById('demoNameFeedback');
+      const phoneFb = document.getElementById('demoPhoneFeedback');
+
+      let isValid = true;
+      if (!name.value.trim()) {
+        name.classList.add('tl-input-error');
+        nameFb.innerHTML = '<span class="tl-feedback-error">Please provide customer full name.</span>';
+        isValid = false;
+      } else {
+        name.classList.remove('tl-input-error');
+        nameFb.innerHTML = '<span class="tl-feedback-success">Valid name format.</span>';
+      }
+
+      if (!phone.value.trim() || phone.value.length < 8) {
+        phone.classList.add('tl-input-error');
+        phoneFb.innerHTML = '<span class="tl-feedback-error">Valid phone number is mandatory for trade communications.</span>';
+        isValid = false;
+      } else {
+        phone.classList.remove('tl-input-error');
+        phoneFb.innerHTML = '<span class="tl-feedback-success">Phone format verified.</span>';
+      }
+
+      if (isValid) {
+        alert('Validation Successful! All mandatory fields meet SRS criteria.');
+      }
+    }
+
+    function resetFormDemo() {
+      document.getElementById('demoValidationForm').reset();
+      document.getElementById('demoName').classList.remove('tl-input-error');
+      document.getElementById('demoPhone').classList.remove('tl-input-error');
+      document.getElementById('demoNameFeedback').innerHTML = '';
+      document.getElementById('demoPhoneFeedback').innerHTML = '';
+    }
+
+    function triggerReloadDemo() {
+      const btn = document.getElementById('reloadDemoBtn');
+      btn.classList.add('loading');
+      btn.innerHTML = '<span class="tl-spinner tl-spinner-sm"></span> Refreshing Data...';
+      setTimeout(() => {
+        btn.classList.remove('loading');
+        btn.innerHTML = '<span data-tl-icon="check"></span> Data Synchronized';
+        TLIcons.renderAll();
+        setTimeout(() => {
+          btn.innerHTML = '<span data-tl-icon="reload"></span> Reload Listings';
+          TLIcons.renderAll();
+        }, 1500);
+      }, 1200);
+    }
+
+    // Role switcher demo toggle
+    let currentRoleIndex = 0;
+    const roles = ['Customer View', 'Service Provider View', 'Administrator View'];
+    document.querySelector('.tl-role-switcher').addEventListener('click', () => {
+      currentRoleIndex = (currentRoleIndex + 1) % roles.length;
+      document.getElementById('roleLabel').innerText = roles[currentRoleIndex];
+    });
+
+    // Close modal on escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDemoModal();
+    });
+  </script>
+</body>
+</html>

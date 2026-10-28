@@ -1,0 +1,92 @@
+<html><head></head><body>// Test file to simulate clicks and actions on admin-dashboard.html
+
+
+<title>Admin Action Verifier</title>
+
+<iframe id="adminFrame" src="admin-dashboard.html" style="width: 1200px; height: 900px;"></iframe>
+<div id="results"></div>
+<script>
+window.addEventListener('load', async () => {
+  const frame = document.getElementById('adminFrame');
+  await new Promise(r => setTimeout(r, 1500));
+  const doc = frame.contentDocument || frame.contentWindow.document;
+  const win = frame.contentWindow;
+
+  const logs = [];
+  function log(msg) { logs.push(msg); console.log(msg); }
+
+  log("1. Checking KPIs rendered:");
+  const kpiCust = doc.getElementById('kpiTotalCustomers')?.innerText;
+  const kpiProv = doc.getElementById('kpiTotalProviders')?.innerText;
+  const kpiCat = doc.getElementById('kpiTotalCategories')?.innerText;
+  const kpiSrv = doc.getElementById('kpiTotalServices')?.innerText;
+  const kpiBook = doc.getElementById('kpiTotalBookings')?.innerText;
+  log(`Customers: ${kpiCust}, Providers: ${kpiProv}, Categories: ${kpiCat}, Services: ${kpiSrv}, Bookings: ${kpiBook}`);
+
+  log("2. Testing switchAdminSection('categories'):");
+  try {
+    win.switchAdminSection('categories');
+    const paneCat = doc.getElementById('pane-categories');
+    const isActive = paneCat.classList.contains('active');
+    log(`Categories pane active: ${isActive}`);
+    const tableRows = doc.querySelectorAll('#categoriesManagementTbody tr').length;
+    log(`Category rows rendered: ${tableRows}`);
+  } catch(e) {
+    log(`Error switching to categories: ${e.message}`);
+  }
+
+  log("3. Testing switchAdminSection('providers'):");
+  try {
+    win.switchAdminSection('providers');
+    const paneProv = doc.getElementById('pane-providers');
+    log(`Providers pane active: ${paneProv.classList.contains('active')}`);
+    const provRows = doc.querySelectorAll('#providersManagementTbody tr').length;
+    log(`Provider rows rendered: ${provRows}`);
+  } catch(e) {
+    log(`Error switching to providers: ${e.message}`);
+  }
+
+  log("4. Testing switchAdminSection('customers'):");
+  try {
+    win.switchAdminSection('customers');
+    const custRows = doc.querySelectorAll('#customersManagementTbody tr').length;
+    log(`Customer rows rendered: ${custRows}`);
+  } catch(e) {
+    log(`Error switching to customers: ${e.message}`);
+  }
+
+  log("5. Testing switchAdminSection('listings'):");
+  try {
+    win.switchAdminSection('listings');
+    const listRows = doc.querySelectorAll('#listingsManagementTbody tr').length;
+    log(`Listings rows rendered: ${listRows}`);
+  } catch(e) {
+    log(`Error switching to listings: ${e.message}`);
+  }
+
+  log("6. Testing switchAdminSection('bookings'):");
+  try {
+    win.switchAdminSection('bookings');
+    const bookRows = doc.querySelectorAll('#bookingsManagementTbody tr').length;
+    log(`Booking rows rendered: ${bookRows}`);
+  } catch(e) {
+    log(`Error switching to bookings: ${e.message}`);
+  }
+
+  log("7. Testing openAddCategoryModal():");
+  try {
+    win.openAddCategoryModal();
+    const modal = doc.getElementById('addCategoryModal');
+    log(`Add Category modal active: ${modal.classList.contains('active')}`);
+    win.closeAddCategoryModal();
+    log(`Add Category modal closed: ${!modal.classList.contains('active')}`);
+  } catch(e) {
+    log(`Error opening add category modal: ${e.message}`);
+  }
+
+  document.getElementById('results').innerHTML = '<pre id="finalLogs">' + logs.join('\n') + '</pre>';
+});
+</script>
+
+
+</body></html>
