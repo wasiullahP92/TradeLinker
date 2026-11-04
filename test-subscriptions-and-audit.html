@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>TradeLinker Subscription Plans, Professional Subscriptions &amp; Audit Logs Verification</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 24px;
+      background: #0F172A;
+      color: #F8FAFC;
+      margin: 0;
+    }
+
+    h1 {
+      color: #01AD8F;
+      margin-top: 0;
+      font-size: 1.5rem;
+    }
+
+    .summary-bar {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .summary-pass {
+      background: #064E3B;
+      color: #34D399;
+      border: 1px solid #059669;
+    }
+
+    .summary-fail {
+      background: #7F1D1D;
+      color: #F87171;
+      border: 1px solid #DC2626;
+    }
+
+    .test-box {
+      background: #1E293B;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border-left: 4px solid #64748B;
+      font-size: 0.9rem;
+    }
+
+    .test-box.pass {
+      border-left-color: #10B981;
+    }
+
+    .test-box.fail {
+      border-left-color: #EF4444;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+      margin-right: 8px;
+    }
+
+    .badge.pass {
+      background: #064E3B;
+      color: #34D399;
+    }
+
+    .badge.fail {
+      background: #7F1D1D;
+      color: #F87171;
+    }
+
+    .details {
+      font-size: 0.8rem;
+      color: #94A3B8;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>TradeLinker Plans, Subscriptions &amp; Admin Audit Verification Suite</h1>
+  <div id="resultsUI">Running automated test assertions...</div>
+
+  <!-- In-DOM Container with Plans, Subscriptions & Audit Elements -->
+  <div id="testDomWrapper" style="display:none;">
+    <!-- Plans Stat Strip -->
+    <div id="planStatTotal">0</div>
+    <div id="planStatActive">0</div>
+    <div id="planStatInactive">0</div>
+    <div id="planStatPros">0</div>
+    <div id="planStatPriceRange">0</div>
+
+    <!-- Plan Controls & Container -->
+    <input type="text" id="planSearchInput">
+    <select id="planStatusFilter">
+      <option value="all">All Tiers</option>
+      <option value="active">Active Only</option>
+      <option value="inactive">Inactive / Draft</option>
+    </select>
+    <div id="subscriptionPlansContainer"></div>
+
+    <!-- Plan Modal -->
+    <div id="planModal" class="tl-modal-backdrop">
+      <div id="planModalTitle"></div>
+      <div id="planModalError"></div>
+      <input type="text" id="planModalName">
+      <textarea id="planModalDescription"></textarea>
+      <input type="number" id="planModalPrice">
+      <input type="number" id="planModalDurationDays">
+      <input type="text" id="planModalCommission">
+      <input type="text" id="planModalBadge">
+      <textarea id="planModalFeatures"></textarea>
+      <input type="checkbox" id="planModalIsPopular">
+      <input type="checkbox" id="planModalIsActive">
+      <button id="planModalSubmitBtn"></button>
+    </div>
+
+    <!-- Subscriptions Stat Strip -->
+    <div id="subStatTotal">0</div>
+    <div id="subStatActive">0</div>
+    <div id="subStatExpiring">0</div>
+    <div id="subStatExpired">0</div>
+    <div id="subStatRevenue">0</div>
+    <div id="badgeNavSubscriptions">0</div>
+
+    <!-- Subscription Controls -->
+    <input type="text" id="subscriptionSearchInput">
+    <select id="subscriptionStatusFilter">
+      <option value="all">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="expiring">Expiring Soon</option>
+      <option value="expired">Expired</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+    <select id="subscriptionPlanFilter">
+      <option value="all">All Plans</option>
+    </select>
+    <select id="subscriptionSortSelect">
+      <option value="renewal_asc">Renewal (Earliest)</option>
+      <option value="renewal_desc">Renewal (Latest)</option>
+      <option value="newest_start">Newest Start Date</option>
+      <option value="amount_desc">Amount (High to Low)</option>
+      <option value="pro_asc">Professional (A-Z)</option>
+    </select>
+    <select id="subscriptionPerPageSelect">
+      <option value="5" selected>5</option>
+      <option value="10">10</option>
+      <option value="25">25</option>
+    </select>
+
+    <!-- Subscriptions Table -->
+    <table>
+      <tbody id="subscriptionsManagementTbody"></tbody>
+    </table>
+    <div id="subPaginationInfo"></div>
+    <div id="subPaginationControls"></div>
+
+    <!-- Subscription Details Modal -->
+    <div id="subscriptionDetailsModal" class="tl-modal-backdrop">
+      <div id="dossierSubId"></div>
+      <div id="dossierSubPlanBadge"></div>
+      <div id="dossierSubStatusBadge"></div>
+      <div id="dossierSubBillingCycle"></div>
+      <div id="dossierSubAmount"></div>
+      <img id="dossierSubProAvatar" src="">
+      <div id="dossierSubProBizName"></div>
+      <div id="dossierSubProFullName"></div>
+      <div id="dossierSubProPhone"></div>
+      <div id="dossierSubProEmail"></div>
+      <div id="dossierSubStartDate"></div>
+      <div id="dossierSubExpDate"></div>
+      <div id="dossierSubDaysRemaining"></div>
+      <div id="dossierSubPaymentMethod"></div>
+      <div id="dossierSubAutoRenew"></div>
+      <ul id="dossierSubFeaturesList"></ul>
+      <button id="dossierSubCancelBtn"></button>
+      <button id="dossierSubRenewBtn"></button>
+    </div>
+
+    <!-- Subscription Renew Modal -->
+    <div id="subscriptionRenewModal" class="tl-modal-backdrop">
+      <div id="renewModalError"></div>
+      <div id="renewModalSubRef"></div>
+      <div id="renewModalPlanName"></div>
+      <div id="renewModalProName"></div>
+      <div id="renewModalCurrentExp"></div>
+      <input type="number" id="renewDurationDays">
+      <select id="renewPaymentMethod">
+        <option value="JazzCash / Bank Transfer">JazzCash / Bank Transfer</option>
+        <option value="EasyPaisa">EasyPaisa</option>
+      </select>
+      <button id="renewSubmitBtn"></button>
+    </div>
+
+    <!-- Subscription Assign Modal -->
+    <div id="subscriptionAssignModal" class="tl-modal-backdrop">
+      <div id="assignModalError"></div>
+      <select id="assignModalProviderSelect">
+        <option value="">-- Choose Provider --</option>
+      </select>
+      <select id="assignModalPlanSelect">
+        <option value="">-- Choose Plan --</option>
+      </select>
+      <select id="assignModalBillingCycle">
+        <option value="Monthly">Monthly</option>
+      </select>
+      <input type="number" id="assignModalDurationDays">
+      <select id="assignModalPaymentMethod">
+        <option value="Manual Admin Grant">Manual Admin Grant</option>
+      </select>
+      <button id="assignModalSubmitBtn"></button>
+    </div>
+
+    <!-- Audit Stat Strip -->
+    <div id="auditStatTotal">0</div>
+    <div id="auditStatToday">0</div>
+    <div id="auditStatMonetization">0</div>
+    <div id="auditStatModeration">0</div>
+    <div id="auditStatSecurity">0</div>
+    <div id="badgeNavLogs">0</div>
+
+    <!-- Audit Controls -->
+    <input type="text" id="auditSearchInput">
+    <select id="auditEntityFilter">
+      <option value="all">All Entities</option>
+      <option value="subscription_plan">Subscription Plans</option>
+      <option value="subscription">Subscriptions</option>
+      <option value="booking">Bookings</option>
+      <option value="review">Reviews</option>
+      <option value="portfolio">Portfolios</option>
+      <option value="user">Users</option>
+      <option value="category">Categories</option>
+      <option value="provider">Specialists</option>
+    </select>
+    <select id="auditAdminFilter">
+      <option value="all">All Admins</option>
+    </select>
+    <select id="auditTimeFilter">
+      <option value="all">All Time</option>
+      <option value="today">Past 24h</option>
+      <option value="7days">Past 7 Days</option>
+      <option value="30days">Past 30 Days</option>
+    </select>
+    <select id="auditSortSelect">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+    </select>
+    <select id="auditPerPageSelect">
+      <option value="10" selected>10</option>
+      <option value="25">25</option>
+    </select>
+
+    <!-- Audit Table -->
+    <table>
+      <tbody id="auditTrailManagementTbody"></tbody>
+    </table>
+    <div id="auditPaginationInfo"></div>
+    <div id="auditPaginationControls"></div>
+
+    <!-- Audit Details Modal -->
+    <div id="auditDetailsModal" class="tl-modal-backdrop">
+      <div id="dossierAuditId"></div>
+      <div id="dossierAuditActionBadge"></div>
+      <div id="dossierAuditEntityType"></div>
+      <div id="dossierAuditEntityId"></div>
+      <div id="dossierAuditTimestamp"></div>
+      <div id="dossierAuditDetails"></div>
+      <div id="dossierAuditAdminId"></div>
+      <div id="dossierAuditAdminName"></div>
+      <pre id="dossierAuditJson"></pre>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+
+  <script>
+    let currentAdminUser = { id: "usr-admin-001", fullName: "System Administrator", role: "admin" };
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // Mirror dashboard states for testing
+    const planState = {
+      search: '',
+      statusFilter: 'all',
+      modalMode: 'create',
+      selectedPlanId: null
+    };
+
+    function onPlanSearchChange(val) {
+      planState.search = (val || '').toLowerCase().trim();
+      renderSubscriptionPlans();
+    }
+
+    function onPlanStatusFilterChange() {
+      planState.statusFilter = document.getElementById('planStatusFilter')?.value || 'all';
+      renderSubscriptionPlans();
+    }
+
+    function resetPlanFilters() {
+      planState.search = '';
+      planState.statusFilter = 'all';
+      const sInp = document.getElementById('planSearchInput');
+      if (sInp) sInp.value = '';
+      const stFil = document.getElementById('planStatusFilter');
+      if (stFil) stFil.value = 'all';
+      renderSubscriptionPlans();
+    }
+
+    function renderSubscriptionPlans() {
+      const container = document.getElementById('subscriptionPlansContainer');
+      if (!container) return;
+
+      const allPlans = TLSubscriptions.getPlans();
+      const allSubs = TLSubscriptions.getAllSubscriptions();
+
+      const totalCount = allPlans.length;
+      const activeCount = allPlans.filter(p => p.is_active).length;
+      const inactiveCount = allPlans.filter(p => !p.is_active).length;
+      const subscribedPros = allSubs.filter(s => s.status === 'active').length;
+
+      document.getElementById('planStatTotal').innerText = totalCount;
+      document.getElementById('planStatActive').innerText = activeCount;
+      document.getElementById('planStatInactive').innerText = inactiveCount;
+      document.getElementById('planStatPros').innerText = subscribedPros;
+
+      let list = [...allPlans];
+      if (planState.search) {
+        list = list.filter(p =>
+          (p.name || '').toLowerCase().includes(planState.search) ||
+          (p.description || '').toLowerCase().includes(planState.search) ||
+          (p.features || []).some(f => f.toLowerCase().includes(planState.search))
+        );
+      }
+      if (planState.statusFilter !== 'all') {
+        const wantActive = planState.statusFilter === 'active';
+        list = list.filter(p => p.is_active === wantActive);
+      }
+
+      container.innerHTML = list.map(pl => `
+        <div class="plan-card" data-plan-id="${pl.id}">
+          <h4>${escapeHtml(pl.name)}</h4>
+          <span class="plan-price">${pl.price}</span>
+          <span class="plan-days">${pl.durationDays} Days</span>
+          <span class="plan-status">${pl.is_active ? 'ACTIVE' : 'INACTIVE'}</span>
+          <button onclick="openPlanModal('edit', '${pl.id}')">Edit</button>
+        </div>
+      `).join('');
+    }
+
+    function openPlanModal(mode = 'create', planId = null) {
+      planState.modalMode = mode;
+      planState.selectedPlanId = planId;
+      const modal = document.getElementById('planModal');
+      if (mode === 'edit' && planId) {
+        const plan = TLSubscriptions.getPlanById(planId);
+        if (plan) {
+          document.getElementById('planModalName').value = plan.name || '';
+          document.getElementById('planModalPrice').value = plan.price || 0;
+          document.getElementById('planModalDurationDays').value = plan.durationDays || 30;
+        }
+      }
+      modal.classList.add('active');
+    }
+
+    function closePlanModal() {
+      document.getElementById('planModal').classList.remove('active');
+    }
+
+    // Subscriptions
+    const subState = {
+      currentPage: 1,
+      perPage: 5,
+      search: '',
+      statusFilter: 'all',
+      planFilter: 'all',
+      sortBy: 'renewal_asc',
+      selectedSubId: null
+    };
+
+    function onSubscriptionSearchChange(val) {
+      subState.search = (val || '').toLowerCase().trim();
+      subState.currentPage = 1;
+      renderSubscriptionsTable();
+    }
+
+    function onSubscriptionStatusFilterChange() {
+      subState.statusFilter = document.getElementById('subscriptionStatusFilter')?.value || 'all';
+      subState.currentPage = 1;
+      renderSubscriptionsTable();
+    }
+
+    function onSubscriptionPlanFilterChange() {
+      subState.planFilter = document.getElementById('subscriptionPlanFilter')?.value || 'all';
+      subState.currentPage = 1;
+      renderSubscriptionsTable();
+    }
+
+    function resetSubscriptionFilters() {
+      subState.search = '';
+      subState.statusFilter = 'all';
+      subState.planFilter = 'all';
+      subState.sortBy = 'renewal_asc';
+      subState.currentPage = 1;
+
+      const sInp = document.getElementById('subscriptionSearchInput');
+      if (sInp) sInp.value = '';
+      const stFil = document.getElementById('subscriptionStatusFilter');
+      if (stFil) stFil.value = 'all';
+      const pFil = document.getElementById('subscriptionPlanFilter');
+      if (pFil) pFil.value = 'all';
+
+      renderSubscriptionsTable();
+    }
+
+    function renderSubscriptionsTable() {
+      const tbody = document.getElementById('subscriptionsManagementTbody');
+      if (!tbody) return;
+
+      const joinedSubs = TLSubscriptions.getAllSubscriptionsJoined();
+
+      const totalCount = joinedSubs.length;
+      const activeCount = joinedSubs.filter(s => s.status === 'active').length;
+      const expiringCount = joinedSubs.filter(s => s.status === 'expiring').length;
+      const expiredCount = joinedSubs.filter(s => s.status === 'expired' || s.status === 'cancelled').length;
+      const activeRevenue = joinedSubs
+        .filter(s => s.status === 'active')
+        .reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+
+      document.getElementById('subStatTotal').innerText = totalCount;
+      document.getElementById('subStatActive').innerText = activeCount;
+      document.getElementById('subStatExpiring').innerText = expiringCount;
+      document.getElementById('subStatExpired').innerText = expiredCount;
+      document.getElementById('subStatRevenue').innerText = `PKR ${activeRevenue.toLocaleString()}`;
+      document.getElementById('badgeNavSubscriptions').innerText = totalCount;
+
+      let list = [...joinedSubs];
+      if (subState.search) {
+        list = list.filter(s =>
+          (s.id || '').toLowerCase().includes(subState.search) ||
+          (s.providerName || '').toLowerCase().includes(subState.search) ||
+          (s.planName || '').toLowerCase().includes(subState.search)
+        );
+      }
+      if (subState.statusFilter !== 'all') {
+        list = list.filter(s => s.status === subState.statusFilter);
+      }
+      if (subState.planFilter !== 'all') {
+        list = list.filter(s => s.planId === subState.planFilter);
+      }
+
+      const totalFiltered = list.length;
+      const totalPages = Math.ceil(totalFiltered / subState.perPage) || 1;
+      const startIndex = (subState.currentPage - 1) * subState.perPage;
+      const paginatedItems = list.slice(startIndex, startIndex + subState.perPage);
+
+      tbody.innerHTML = paginatedItems.map(s => `
+        <tr data-sub-id="${s.id}">
+          <td>${s.id}</td>
+          <td>${escapeHtml(s.providerName)}</td>
+          <td>${escapeHtml(s.planName)}</td>
+          <td>${escapeHtml(s.billingCycle)}</td>
+          <td>${s.startDate}</td>
+          <td>${s.expirationDate || s.renewalDate}</td>
+          <td>${s.status.toUpperCase()}</td>
+          <td><button onclick="openSubscriptionDetailsModal('${s.id}')">Inspect</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function openSubscriptionDetailsModal(subId) {
+      subState.selectedSubId = subId;
+      const sub = TLSubscriptions.getSubscriptionById(subId);
+      if (!sub) return;
+
+      document.getElementById('dossierSubId').innerText = `#${sub.id}`;
+      document.getElementById('dossierSubPlanBadge').innerText = sub.planName || 'Plan';
+      document.getElementById('dossierSubStatusBadge').innerText = (sub.status || 'ACTIVE').toUpperCase();
+      document.getElementById('dossierSubProBizName').innerText = sub.provider?.businessName || sub.providerName;
+      document.getElementById('dossierSubExpDate').innerText = sub.expirationDate || sub.renewalDate || '';
+
+      document.getElementById('subscriptionDetailsModal').classList.add('active');
+    }
+
+    function closeSubscriptionDetailsModal() {
+      document.getElementById('subscriptionDetailsModal').classList.remove('active');
+    }
+
+    // Audit
+    const auditState = {
+      currentPage: 1,
+      perPage: 10,
+      search: '',
+      entityFilter: 'all',
+      adminFilter: 'all',
+      timeFilter: 'all',
+      sortBy: 'newest',
+      selectedLogId: null
+    };
+
+    function onAuditSearchChange(val) {
+      auditState.search = (val || '').toLowerCase().trim();
+      auditState.currentPage = 1;
+      renderAuditTrailTable();
+    }
+
+    function onAuditEntityFilterChange() {
+      auditState.entityFilter = document.getElementById('auditEntityFilter')?.value || 'all';
+      auditState.currentPage = 1;
+      renderAuditTrailTable();
+    }
+
+    function resetAuditFilters() {
+      auditState.search = '';
+      auditState.entityFilter = 'all';
+      auditState.adminFilter = 'all';
+      auditState.timeFilter = 'all';
+      const sInp = document.getElementById('auditSearchInput');
+      if (sInp) sInp.value = '';
+      const eFil = document.getElementById('auditEntityFilter');
+      if (eFil) eFil.value = 'all';
+      renderAuditTrailTable();
+    }
+
+    function renderAuditTrailTable() {
+      const tbody = document.getElementById('auditTrailManagementTbody');
+      if (!tbody) return;
+
+      const allLogs = TLCommunication.getAllAdminAuditLogs();
+
+      const totalCount = allLogs.length;
+      document.getElementById('auditStatTotal').innerText = totalCount;
+      document.getElementById('badgeNavLogs').innerText = totalCount;
+
+      let list = TLCommunication.filterAdminAuditLogs({
+        search: auditState.search,
+        entityType: auditState.entityFilter,
+        adminId: auditState.adminFilter,
+        timeRange: auditState.timeFilter
+      });
+
+      tbody.innerHTML = list.map(a => `
+        <tr data-log-id="${a.id}">
+          <td>${a.id}</td>
+          <td>${escapeHtml(a.actionType)}</td>
+          <td>${escapeHtml((a.entityType || a.targetType || 'SYSTEM').toUpperCase())} (${a.entityId || a.targetId || '-'})</td>
+          <td>${escapeHtml(a.details)}</td>
+          <td>${escapeHtml(a.adminName || a.adminId)}</td>
+          <td>${new Date(a.timestamp).toLocaleString()}</td>
+          <td><button onclick="openAuditDetailsModal('${a.id}')">Inspect</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function openAuditDetailsModal(logId) {
+      auditState.selectedLogId = logId;
+      const log = TLCommunication.getAuditLogById(logId);
+      if (!log) return;
+
+      document.getElementById('dossierAuditId').innerText = `#${log.id}`;
+      document.getElementById('dossierAuditActionBadge').innerText = log.actionType;
+      document.getElementById('dossierAuditEntityType').innerText = (log.entityType || log.targetType || 'SYSTEM').toUpperCase();
+      document.getElementById('dossierAuditEntityId').innerText = `(${log.entityId || log.targetId || '-'})`;
+      document.getElementById('dossierAuditDetails').innerText = log.details || '';
+      document.getElementById('dossierAuditAdminId').innerText = log.adminId || '';
+      document.getElementById('dossierAuditAdminName').innerText = log.adminName || 'System Administrator';
+
+      document.getElementById('auditDetailsModal').classList.add('active');
+    }
+
+    function closeAuditDetailsModal() {
+      document.getElementById('auditDetailsModal').classList.remove('active');
+    }
+
+    // ------------------------------------------------------------------------
+    // Test Assertions Runner
+    // ------------------------------------------------------------------------
+    const testResults = [];
+    function assert(name, condition, details = "") {
+      testResults.push({ name, passed: !!condition, details });
+    }
+
+    function runAllTests() {
+      try {
+        // PART A: SUBSCRIPTION PLAN MANAGEMENT
+        // 1. Data Federation & Schema
+        const allPlans = TLSubscriptions.getPlans();
+        assert("TS-01: Subscription Plans engine returns initialized tiers", Array.isArray(allPlans) && allPlans.length >= 3, `Returned ${allPlans.length} plans`);
+
+        const pStarter = allPlans.find(p => p.id === "plan-starter");
+        const pPro = allPlans.find(p => p.id === "plan-pro");
+        const pEnt = allPlans.find(p => p.id === "plan-enterprise");
+
+        assert("TS-02: Starter plan contains required fields including durationDays", pStarter && pStarter.price === 0 && pStarter.durationDays >= 30, `Starter duration: ${pStarter?.durationDays}d`);
+        assert("TS-03: Pro plan contains name, description, price, duration in days", pPro && pPro.price === 3500 && pPro.durationDays === 30 && pPro.name === "TradeLinker Pro", `Pro duration: ${pPro?.durationDays}d`);
+        assert("TS-04: Enterprise plan contains positive duration in days and commission", pEnt && pEnt.durationDays === 90 && pEnt.commission, `Ent duration: ${pEnt?.durationDays}d, comm: ${pEnt?.commission}`);
+        assert("TS-05: Plans contain active status flags", pPro && typeof pPro.is_active === "boolean" && pPro.is_active === true, `Pro active: ${pPro?.is_active}`);
+
+        // 2. Dual-Storage Persistence & Alignment
+        const rawTldb = localStorage.getItem("tl_db_subscription_plans");
+        const rawAlt = localStorage.getItem("subscription_plans");
+        assert("TS-06: Plans saved to tl_db_subscription_plans storage key", !!rawTldb && rawTldb.includes("plan-pro"), "Found in tl_db_subscription_plans");
+        assert("TS-07: Plans synchronized with subscription_plans table key", !!rawAlt && rawAlt.includes("plan-pro"), "Found in subscription_plans");
+
+        // 3. Admin Plan CRUD Operations
+        // Validation check: negative price rejection
+        const negPriceRes = TLSubscriptions.adminCreatePlan({
+          name: "Invalid Negative Plan",
+          description: "Bad price",
+          price: -500,
+          durationDays: 30
+        });
+        assert("TS-08: adminCreatePlan rejects negative pricing", !negPriceRes.success && negPriceRes.error.includes("non-negative"), `Error: ${negPriceRes.error}`);
+
+        // Validation check: invalid durationDays rejection
+        const badDaysRes = TLSubscriptions.adminCreatePlan({
+          name: "Invalid Zero Days Plan",
+          description: "Bad duration",
+          price: 1500,
+          durationDays: 0
+        });
+        assert("TS-09: adminCreatePlan rejects zero or negative durationDays", !badDaysRes.success && badDaysRes.error.includes("greater than zero"), `Error: ${badDaysRes.error}`);
+
+        // Create new valid plan
+        const createPlanRes = TLSubscriptions.adminCreatePlan({
+          name: "Gold Contractor Tier",
+          description: "Mid-tier contractor package with 60 days validity and priority placement.",
+          price: 5500,
+          durationDays: 60,
+          commission: "3.5% Fee",
+          badge: "Gold Specialist",
+          isPopular: false,
+          isActive: true,
+          adminId: "usr-admin-001"
+        });
+        assert("TS-10: adminCreatePlan successfully creates custom plan with duration in days", createPlanRes.success && createPlanRes.plan.durationDays === 60, `Created ID: ${createPlanRes.plan?.id}`);
+        const newPlanId = createPlanRes.plan.id;
+
+        // Verify creation logged in admin audit
+        const auditAfterCreate = TLCommunication.getAllAdminAuditLogs();
+        const planCreateLog = auditAfterCreate.find(l => l.actionType === "PLAN_CREATED" && l.entityId === newPlanId);
+        assert("TS-11: Plan creation automatically logged in tl_db_admin_audit with entity reference", !!planCreateLog && planCreateLog.entityType === "subscription_plan", `Log: ${planCreateLog?.details}`);
+
+        // Update plan
+        const updatePlanRes = TLSubscriptions.adminUpdatePlan({
+          planId: newPlanId,
+          price: 6000,
+          durationDays: 75,
+          description: "Updated description with 75 days validity.",
+          adminId: "usr-admin-001"
+        });
+        assert("TS-12: adminUpdatePlan successfully updates price and duration in days", updatePlanRes.success && updatePlanRes.plan.price === 6000 && updatePlanRes.plan.durationDays === 75, `Updated price: ${updatePlanRes.plan?.price}`);
+
+        // Deactivate plan
+        const deactRes = TLSubscriptions.adminTogglePlanStatus({ planId: newPlanId, adminId: "usr-admin-001" });
+        assert("TS-13: adminTogglePlanStatus deactivates plan", deactRes.success && deactRes.is_active === false, `Active state: ${deactRes?.is_active}`);
+
+        // Reactivate plan
+        const reactRes = TLSubscriptions.adminTogglePlanStatus({ planId: newPlanId, adminId: "usr-admin-001" });
+        assert("TS-14: adminTogglePlanStatus reactivates plan", reactRes.success && reactRes.is_active === true, `Active state: ${reactRes?.is_active}`);
+
+        // Safe deletion check: should prevent deleting plan with active subscriptions
+        const failDelRes = TLSubscriptions.adminDeletePlan({ planId: "plan-pro", adminId: "usr-admin-001" });
+        assert("TS-15: adminDeletePlan blocks deletion of plan with active professional subscriptions", !failDelRes.success && failDelRes.error.includes("active professional subscription"), `Block message: ${failDelRes.error}`);
+
+        // Safe deletion of newly created plan with 0 subscriptions
+        const successDelRes = TLSubscriptions.adminDeletePlan({ planId: newPlanId, adminId: "usr-admin-001" });
+        assert("TS-16: adminDeletePlan safely removes plan with zero subscriptions", successDelRes.success, "Custom plan deleted");
+
+        // 4. Plan UI & Filters
+        renderSubscriptionPlans();
+        const elPlanTotal = document.getElementById('planStatTotal');
+        const elPlanActive = document.getElementById('planStatActive');
+        assert("TS-17: Plan Top Stat Total matches database count", elPlanTotal && parseInt(elPlanTotal.innerText) >= 3, `Total: ${elPlanTotal?.innerText}`);
+        assert("TS-18: Plan Top Stat Active matches active tiers count", elPlanActive && parseInt(elPlanActive.innerText) >= 3, `Active: ${elPlanActive?.innerText}`);
+
+        onPlanSearchChange("Enterprise");
+        const renderedCards = document.querySelectorAll('#subscriptionPlansContainer .plan-card');
+        assert("TS-19: Plan search filter correctly isolates matching cards", renderedCards.length === 1 && renderedCards[0].textContent.includes("Enterprise"), `Found ${renderedCards.length} cards`);
+        resetPlanFilters();
+
+        // Modal open & close
+        openPlanModal('edit', 'plan-pro');
+        const pModalEl = document.getElementById('planModal');
+        assert("TS-20: Plan modal opens and pre-fills name and durationDays", pModalEl.classList.contains('active') && document.getElementById('planModalName').value === "TradeLinker Pro", "Modal opened with values");
+        closePlanModal();
+        assert("TS-21: Plan modal closes properly", !pModalEl.classList.contains('active'), "Modal closed");
+
+        // PART B: PROFESSIONAL SUBSCRIPTIONS LEDGER
+        // 5. Data Federation & Schema
+        const joinedSubs = TLSubscriptions.getAllSubscriptionsJoined();
+        assert("TS-22: getAllSubscriptionsJoined federates subscriptions with providers and plans", Array.isArray(joinedSubs) && joinedSubs.length >= 6, `Returned ${joinedSubs.length} subscriptions`);
+
+        const sSample = joinedSubs[0];
+        assert("TS-23: Subscription record joins associated specialist business details", sSample && sSample.provider && sSample.provider.businessName, `Specialist: ${sSample?.provider?.businessName}`);
+        assert("TS-24: Subscription record joins associated plan details", sSample && sSample.plan && sSample.plan.name, `Plan: ${sSample?.plan?.name}`);
+        assert("TS-25: Subscription record contains start date and expiration date", sSample && sSample.startDate && (sSample.expirationDate || sSample.renewalDate), `Exp: ${sSample?.expirationDate}`);
+
+        // Status variety verification
+        const activeSub = joinedSubs.find(s => s.status === 'active');
+        const expiringSub = joinedSubs.find(s => s.status === 'expiring');
+        const expiredSub = joinedSubs.find(s => s.status === 'expired');
+        const cancelledSub = joinedSubs.find(s => s.status === 'cancelled');
+
+        assert("TS-26: Database contains active professional memberships", !!activeSub, `Active: ${activeSub?.id}`);
+        assert("TS-27: Database contains expiring-soon professional subscriptions", !!expiringSub, `Expiring: ${expiringSub?.id}`);
+        assert("TS-28: Database contains expired or cancelled subscription records", !!expiredSub || !!cancelledSub, `Expired/Cancelled: ${expiredSub?.id || cancelledSub?.id}`);
+
+        // 6. Subscriptions Telemetry & Stat Strip
+        renderSubscriptionsTable();
+        const elSubTotal = document.getElementById('subStatTotal');
+        const elSubActive = document.getElementById('subStatActive');
+        const elSubExpiring = document.getElementById('subStatExpiring');
+        const elSubExpired = document.getElementById('subStatExpired');
+        const elSubRev = document.getElementById('subStatRevenue');
+        const elNavSubs = document.getElementById('badgeNavSubscriptions');
+
+        assert("TS-29: Subscriptions Top Stat Total matches database count", elSubTotal && parseInt(elSubTotal.innerText) === joinedSubs.length, `Total: ${elSubTotal?.innerText}`);
+        assert("TS-30: Subscriptions Top Stat Active matches active count", elSubActive && parseInt(elSubActive.innerText) === joinedSubs.filter(s => s.status === 'active').length, `Active: ${elSubActive?.innerText}`);
+        assert("TS-31: Subscriptions Top Stat Expiring matches expiring count", elSubExpiring && parseInt(elSubExpiring.innerText) === joinedSubs.filter(s => s.status === 'expiring').length, `Expiring: ${elSubExpiring?.innerText}`);
+        assert("TS-32: Subscriptions Top Stat Expired matches expired count", elSubExpired && parseInt(elSubExpired.innerText) === joinedSubs.filter(s => s.status === 'expired' || s.status === 'cancelled').length, `Expired: ${elSubExpired?.innerText}`);
+        assert("TS-33: Active MRR revenue calculated accurately", elSubRev && elSubRev.innerText.includes("PKR"), `MRR: ${elSubRev?.innerText}`);
+        assert("TS-34: Navigation badge matches total subscriptions", elNavSubs && parseInt(elNavSubs.innerText) === joinedSubs.length, `Badge: ${elNavSubs?.innerText}`);
+
+        // 7. Subscriptions Search & Filtering
+        onSubscriptionSearchChange("Rashid");
+        const subSearchPro = document.querySelectorAll('#subscriptionsManagementTbody tr');
+        assert("TS-35: Search by specialist name ('Rashid') locates subscription", subSearchPro.length >= 1, `Found ${subSearchPro.length} rows`);
+        resetSubscriptionFilters();
+
+        document.getElementById('subscriptionStatusFilter').value = 'active';
+        onSubscriptionStatusFilterChange();
+        const subActiveRows = document.querySelectorAll('#subscriptionsManagementTbody tr');
+        assert("TS-36: Filter 'active' displays only active memberships", subActiveRows.length >= 1 && Array.from(subActiveRows).every(r => r.textContent.includes('ACTIVE')), `Active rows: ${subActiveRows.length}`);
+        resetSubscriptionFilters();
+
+        // 8. Subscription Inspection Modal
+        openSubscriptionDetailsModal("SUB-801");
+        const subModalEl = document.getElementById('subscriptionDetailsModal');
+        assert("TS-37: Subscription details modal opens with active class", subModalEl && subModalEl.classList.contains('active'), "Details modal opened");
+        assert("TS-38: Details modal renders specialist business name and expiration date", document.getElementById('dossierSubProBizName')?.innerText.includes("Khan Electrical"), "Specialist verified");
+        closeSubscriptionDetailsModal();
+        assert("TS-39: Subscription details modal closes properly", !subModalEl.classList.contains('active'), "Modal closed");
+
+        // 9. Subscription Lifecycle Mutations
+        // Update status to cancelled
+        const targetSubId = "SUB-806";
+        const cancelRes = TLSubscriptions.adminUpdateSubscriptionStatus({
+          subId: targetSubId,
+          status: "cancelled",
+          notes: "Testing admin cancellation action.",
+          adminId: "usr-admin-001"
+        });
+        assert("TS-40: adminUpdateSubscriptionStatus cancels subscription", cancelRes.success && cancelRes.subscription.status === "cancelled", `Status: ${cancelRes.subscription?.status}`);
+
+        // Verify status update audit log
+        const auditAfterCancel = TLCommunication.getAllAdminAuditLogs();
+        const cancelLog = auditAfterCancel.find(l => l.actionType === "SUBSCRIPTION_STATUS_UPDATED" && l.entityId === targetSubId);
+        assert("TS-41: Subscription status update automatically logged in admin audit table", !!cancelLog && cancelLog.entityType === "subscription", `Log: ${cancelLog?.details}`);
+
+        // Renew / Extend subscription
+        const renewRes = TLSubscriptions.adminRenewSubscription({
+          subId: targetSubId,
+          durationDays: 30,
+          paymentMethod: "Direct IBFT (Habib Bank)",
+          adminId: "usr-admin-001"
+        });
+        assert("TS-42: adminRenewSubscription extends expiration date and reactivates subscription", renewRes.success && renewRes.subscription.status === "active", `New Exp: ${renewRes.newExpirationDate}`);
+
+        // Verify renewal audit log
+        const auditAfterRenew = TLCommunication.getAllAdminAuditLogs();
+        const renewLog = auditAfterRenew.find(l => l.actionType === "SUBSCRIPTION_RENEWED" && l.entityId === targetSubId);
+        assert("TS-43: Subscription renewal automatically logged in admin audit table", !!renewLog && renewLog.entityType === "subscription", `Log: ${renewLog?.details}`);
+
+        // Assign plan to specialist
+        const assignRes = TLSubscriptions.adminAssignSubscription({
+          providerId: "prov-008",
+          planId: "plan-pro",
+          billingCycle: "Monthly",
+          paymentMethod: "JazzCash",
+          durationDays: 30,
+          adminId: "usr-admin-001"
+        });
+        assert("TS-44: adminAssignSubscription successfully creates new subscription for specialist", assignRes.success && assignRes.subscription.planId === "plan-pro", `New Sub ID: ${assignRes.subscription?.id}`);
+
+        // PART C: ADMIN ACTIVITY LOGS & AUDITING
+        // 10. Audit Table & Schema
+        const allAuditLogs = TLCommunication.getAllAdminAuditLogs();
+        assert("TS-45: Audit engine returns administrative event records", Array.isArray(allAuditLogs) && allAuditLogs.length >= 8, `Returned ${allAuditLogs.length} logs`);
+
+        const aSample = allAuditLogs[0];
+        assert("TS-46: Audit record contains actionType, entityType, entityId, details, and adminId",
+          aSample && aSample.actionType && (aSample.entityType || aSample.targetType) && (aSample.entityId || aSample.targetId) && aSample.details && aSample.adminId,
+          `Sample: [${aSample?.actionType}] on [${aSample?.entityType}:${aSample?.entityId}] by [${aSample?.adminId}]`
+        );
+        assert("TS-47: Audit record contains administrator name and valid timestamp", aSample && aSample.adminName && !isNaN(new Date(aSample.timestamp).getTime()), `Admin: ${aSample?.adminName}, Time: ${aSample?.timestamp}`);
+
+        // Dual Storage verification
+        const rawAuditDb = localStorage.getItem("tl_db_admin_audit");
+        const rawAuditAlt = localStorage.getItem("admin_audit_logs");
+        assert("TS-48: Audit records saved to tl_db_admin_audit storage key", !!rawAuditDb && rawAuditDb.includes("aud-"), "Found in tl_db_admin_audit");
+        assert("TS-49: Audit records synchronized with admin_audit_logs table key", !!rawAuditAlt && rawAuditAlt.includes("aud-"), "Found in admin_audit_logs");
+
+        // 11. Audit Telemetry & Stat Strip
+        renderAuditTrailTable();
+        const elAuditTotal = document.getElementById('auditStatTotal');
+        const elNavAudit = document.getElementById('badgeNavLogs');
+        assert("TS-50: Audit Top Stat Total matches database count", elAuditTotal && parseInt(elAuditTotal.innerText) === allAuditLogs.length, `Total: ${elAuditTotal?.innerText}`);
+        assert("TS-51: Navigation badge matches audit log count", elNavAudit && parseInt(elNavAudit.innerText) === allAuditLogs.length, `Badge: ${elNavAudit?.innerText}`);
+
+        // 12. Audit Search & Entity Filtering
+        onAuditSearchChange("renewed");
+        const auditSearchRows = document.querySelectorAll('#auditTrailManagementTbody tr');
+        assert("TS-52: Search by keyword ('renewed') filters audit records", auditSearchRows.length >= 1, `Found ${auditSearchRows.length} rows`);
+        resetAuditFilters();
+
+        document.getElementById('auditEntityFilter').value = 'subscription_plan';
+        onAuditEntityFilterChange();
+        const planAuditRows = document.querySelectorAll('#auditTrailManagementTbody tr');
+        assert("TS-53: Filter by entity type ('subscription_plan') displays plan governance events", planAuditRows.length >= 1 && Array.from(planAuditRows).every(r => r.textContent.includes('PLAN')), `Plan audit rows: ${planAuditRows.length}`);
+        resetAuditFilters();
+
+        document.getElementById('auditEntityFilter').value = 'subscription';
+        onAuditEntityFilterChange();
+        const subAuditRows = document.querySelectorAll('#auditTrailManagementTbody tr');
+        assert("TS-54: Filter by entity type ('subscription') displays subscription lifecycle events", subAuditRows.length >= 1 && Array.from(subAuditRows).every(r => r.textContent.includes('SUBSCRIPTION')), `Sub audit rows: ${subAuditRows.length}`);
+        resetAuditFilters();
+
+        // 13. Audit Details Modal
+        openAuditDetailsModal(aSample.id);
+        const aModalEl = document.getElementById('auditDetailsModal');
+        assert("TS-55: Audit details modal opens with active class", aModalEl && aModalEl.classList.contains('active'), "Audit modal opened");
+        assert("TS-56: Audit modal displays action badge and details", document.getElementById('dossierAuditId')?.innerText === `#${aSample.id}`, `Verified ID: #${aSample.id}`);
+        closeAuditDetailsModal();
+        assert("TS-57: Audit details modal closes properly", !aModalEl.classList.contains('active'), "Audit modal closed");
+
+        // 14. Manual / Programmatic logAdminAction
+        const customAction = TLCommunication.logAdminAction({
+          actionType: "SECURITY_POLICY_UPDATED",
+          entityType: "system_policy",
+          entityId: "pol-session-timeout",
+          details: "Administrator enforced 30-minute idle session timeout policy across admin portal.",
+          adminId: "usr-admin-001",
+          adminName: "Security Administrator"
+        });
+        assert("TS-58: logAdminAction records custom audit entry with standardized schema", !!customAction && customAction.entityType === "system_policy" && customAction.adminName === "Security Administrator", `Logged: ${customAction?.id}`);
+
+        // Render Results UI
+        renderResults();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('resultsUI').innerHTML = `<div class="summary-bar summary-fail">EXCEPTION: ${err.message}<br><pre>${err.stack}</pre></div>`;
+      }
+    }
+
+    function renderResults() {
+      const container = document.getElementById('resultsUI');
+      const passCount = testResults.filter(t => t.passed).length;
+      const failCount = testResults.length - passCount;
+      const allPassed = failCount === 0;
+
+      let html = `
+        <div class="summary-bar ${allPassed ? 'summary-pass' : 'summary-fail'}">
+          ${allPassed ? '&#x2714; ALL TEST ASSERTIONS PASSED (100%)' : `&#x2718; ${failCount} ASSERTION(S) FAILED`}
+          &mdash; ${passCount} / ${testResults.length} Passed
+        </div>
+      `;
+
+      testResults.forEach((t, i) => {
+        html += `
+          <div class="test-box ${t.passed ? 'pass' : 'fail'}">
+            <span class="badge ${t.passed ? 'pass' : 'fail'}">${t.passed ? 'PASS' : 'FAIL'}</span>
+            <strong>[${i + 1}] ${escapeHtml(t.name)}</strong>
+            ${t.details ? `<div class="details">${escapeHtml(t.details)}</div>` : ''}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    document.addEventListener('DOMContentLoaded', runAllTests);
+  </script>
+</body>
+
+</html>

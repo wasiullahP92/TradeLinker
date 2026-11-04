@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -2838,18 +2838,79 @@
              ------------------------------------------------------------------- -->
         <section class="admin-tab-pane" id="pane-plans">
           <div class="admin-card">
-            <div class="admin-card-header">
+            <!-- Executive KPI Strip for Plans -->
+            <div class="admin-kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 1.5rem;">
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(1, 173, 143, 0.12); color: var(--tl-teal-600);">
+                  <span data-tl-icon="award"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="planStatTotal">0</div>
+                  <div class="admin-kpi-lbl">Total Plans</div>
+                </div>
+              </div>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">
+                  <span data-tl-icon="check-circle"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="planStatActive">0</div>
+                  <div class="admin-kpi-lbl">Active Tiers</div>
+                </div>
+              </div>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(239, 68, 68, 0.12); color: #EF4444;">
+                  <span data-tl-icon="x-circle"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="planStatInactive">0</div>
+                  <div class="admin-kpi-lbl">Inactive / Draft</div>
+                </div>
+              </div>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #F59E0B;">
+                  <span data-tl-icon="users"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="planStatPros">0</div>
+                  <div class="admin-kpi-lbl">Subscribed Pros</div>
+                </div>
+              </div>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(1, 43, 82, 0.08); color: var(--tl-navy-800);">
+                  <span data-tl-icon="sparkles"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="planStatPriceRange" style="font-size: 1.15rem;">Free - PKR 9k</div>
+                  <div class="admin-kpi-lbl">Pricing Spectrum</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Toolbar Header -->
+            <div class="admin-card-header" style="flex-wrap: wrap; gap: 12px;">
               <div>
                 <h1 class="admin-card-title">Subscription Plans & Monetization Tiers</h1>
                 <p class="admin-card-desc">Configure recurring membership plans, commission discount rates, and verified privileges for professionals.</p>
               </div>
-              <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="alert('Plan configuration saved to TradeLinker monetization engine.')">
-                + Create New Plan
-              </button>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <input type="text" id="planSearchInput" class="tl-input" placeholder="Search plans or privileges..." style="max-width: 220px;" oninput="onPlanSearchChange(this.value)">
+                <select id="planStatusFilter" class="tl-select" style="max-width: 140px;" onchange="onPlanStatusFilterChange()">
+                  <option value="all">All Tiers</option>
+                  <option value="active">Active Only</option>
+                  <option value="inactive">Inactive / Draft</option>
+                </select>
+                <button class="tl-btn tl-btn-ghost tl-btn-sm" onclick="resetPlanFilters()" title="Reset plan filters">
+                  <span data-tl-icon="rotate-ccw"></span> Reset
+                </button>
+                <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openPlanModal('create')">
+                  + Create New Plan
+                </button>
+              </div>
             </div>
 
             <!-- Plan Cards Grid -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;" id="subscriptionPlansContainer">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1rem;" id="subscriptionPlansContainer">
               <!-- Rendered via JS -->
             </div>
           </div>
@@ -2860,22 +2921,95 @@
              ------------------------------------------------------------------- -->
         <section class="admin-tab-pane" id="pane-subscriptions">
           <div class="admin-card">
-            <div class="admin-card-header">
+            <!-- Executive KPI Strip for Subscriptions -->
+            <div class="admin-kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 1.5rem;">
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(1, 173, 143, 0.12); color: var(--tl-teal-600);">
+                  <span data-tl-icon="badge"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="subStatTotal">0</div>
+                  <div class="admin-kpi-lbl">Total Subscriptions</div>
+                </div>
+              </div>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">
+                  <span data-tl-icon="check-circle"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="subStatActive">0</div>
+                  <div class="admin-kpi-lbl">Active Memberships</div>
+                </div>
+              </div>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #F59E0B;">
+                  <span data-tl-icon="clock"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="subStatExpiring">0</div>
+                  <div class="admin-kpi-lbl">Expiring Soon</div>
+                </div>
+              </div>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(239, 68, 68, 0.12); color: #EF4444;">
+                  <span data-tl-icon="alert-circle"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="subStatExpired">0</div>
+                  <div class="admin-kpi-lbl">Expired / Cancelled</div>
+                </div>
+              </div>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(1, 43, 82, 0.08); color: var(--tl-navy-800);">
+                  <span data-tl-icon="award"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="subStatRevenue" style="font-size: 1.15rem;">PKR 0</div>
+                  <div class="admin-kpi-lbl">Active Subscribed MRR</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Toolbar Header -->
+            <div class="admin-card-header" style="flex-wrap: wrap; gap: 12px;">
               <div>
                 <h1 class="admin-card-title">Professional Subscriptions Ledger</h1>
                 <p class="admin-card-desc">Track active professional memberships, billing renewal dates, and subscription status.</p>
               </div>
-              <div style="display: flex; gap: 8px;">
-                <input type="text" id="subscriptionSearchInput" class="tl-input" placeholder="Search professional or plan..." style="max-width: 240px;" oninput="renderSubscriptionsTable()">
-                <select id="subscriptionStatusFilter" class="tl-select" style="max-width: 160px;" onchange="renderSubscriptionsTable()">
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <input type="text" id="subscriptionSearchInput" class="tl-input" placeholder="Search professional, plan, or ID..." style="max-width: 220px;" oninput="onSubscriptionSearchChange(this.value)">
+                <select id="subscriptionStatusFilter" class="tl-select" style="max-width: 140px;" onchange="onSubscriptionStatusFilterChange()">
                   <option value="all">All Statuses</option>
                   <option value="active">Active</option>
                   <option value="expiring">Expiring Soon</option>
+                  <option value="expired">Expired</option>
                   <option value="cancelled">Cancelled</option>
                 </select>
+                <select id="subscriptionPlanFilter" class="tl-select" style="max-width: 160px;" onchange="onSubscriptionPlanFilterChange()">
+                  <option value="all">All Plans</option>
+                </select>
+                <select id="subscriptionSortSelect" class="tl-select" style="max-width: 170px;" onchange="onSubscriptionSortChange(this.value)">
+                  <option value="renewal_asc">Renewal (Earliest)</option>
+                  <option value="renewal_desc">Renewal (Latest)</option>
+                  <option value="newest_start">Newest Start Date</option>
+                  <option value="amount_desc">Amount (High to Low)</option>
+                  <option value="pro_asc">Professional (A-Z)</option>
+                </select>
+                <select id="subscriptionPerPageSelect" class="tl-select" style="max-width: 90px;" onchange="onSubscriptionPerPageChange(this.value)">
+                  <option value="5">5 / pg</option>
+                  <option value="10" selected>10 / pg</option>
+                  <option value="25">25 / pg</option>
+                </select>
+                <button class="tl-btn tl-btn-ghost tl-btn-sm" onclick="resetSubscriptionFilters()" title="Reset all filters">
+                  <span data-tl-icon="rotate-ccw"></span> Reset
+                </button>
+                <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openSubscriptionAssignModal()">
+                  + Enroll Professional
+                </button>
               </div>
             </div>
 
+            <!-- Subscriptions Table -->
             <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead>
@@ -2885,7 +3019,7 @@
                     <th>Tier / Plan</th>
                     <th>Billing Cycle</th>
                     <th>Start Date</th>
-                    <th>Next Renewal</th>
+                    <th>Expiration / Renewal</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
@@ -2895,6 +3029,12 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Pagination Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; flex-wrap: wrap; gap: 10px;">
+              <div id="subPaginationInfo" style="font-size: 0.85rem; color: #64748B;">Showing 0 to 0 of 0 subscriptions</div>
+              <div id="subPaginationControls" style="display: flex; gap: 6px;"></div>
+            </div>
           </div>
         </section>
 
@@ -2903,24 +3043,105 @@
              ------------------------------------------------------------------- -->
         <section class="admin-tab-pane" id="pane-logs">
           <div class="admin-card">
-            <div class="admin-card-header">
-              <div>
-                <h1 class="admin-card-title">Immutable Administrative Activity Logs</h1>
-                <p class="admin-card-desc">Audit record tracking all verification approvals, user suspensions, and category updates (FR-44, FR-48).</p>
+            <!-- Executive KPI Strip for Activity Logs -->
+            <div class="admin-kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 1.5rem;">
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(1, 173, 143, 0.12); color: var(--tl-teal-600);">
+                  <span data-tl-icon="shield"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="auditStatTotal">0</div>
+                  <div class="admin-kpi-lbl">Total Audit Events</div>
+                </div>
               </div>
-              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <input type="text" id="auditSearchInput" class="tl-input" placeholder="Search action or details..." style="max-width: 240px;" oninput="renderAuditTrailTable()">
-                <select id="auditActionFilter" class="tl-select" style="max-width: 180px;" onchange="renderAuditTrailTable()">
-                  <option value="all">All Actions</option>
-                  <option value="PROVIDER_VERIFIED">Verification</option>
-                  <option value="DISPUTE_RESOLVED">Disputes</option>
-                  <option value="CATEGORY">Categories</option>
-                  <option value="USER_STATUS">Suspension</option>
-                </select>
-                <button class="tl-btn tl-btn-outline tl-btn-sm" onclick="exportAuditTrailCsv()">Export CSV</button>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">
+                  <span data-tl-icon="clock"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="auditStatToday">0</div>
+                  <div class="admin-kpi-lbl">Events Today</div>
+                </div>
+              </div>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.12); color: #3B82F6;">
+                  <span data-tl-icon="award"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="auditStatMonetization">0</div>
+                  <div class="admin-kpi-lbl">Plans & Subscriptions</div>
+                </div>
+              </div>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #F59E0B;">
+                  <span data-tl-icon="star"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="auditStatModeration">0</div>
+                  <div class="admin-kpi-lbl">Content Moderation</div>
+                </div>
+              </div>
+              <div class="admin-kpi-card">
+                <div class="admin-kpi-icon-wrap" style="background: rgba(239, 68, 68, 0.12); color: #EF4444;">
+                  <span data-tl-icon="users"></span>
+                </div>
+                <div>
+                  <div class="admin-kpi-val" id="auditStatSecurity">0</div>
+                  <div class="admin-kpi-lbl">Security & Users</div>
+                </div>
               </div>
             </div>
 
+            <!-- Toolbar Header -->
+            <div class="admin-card-header" style="flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h1 class="admin-card-title">Immutable Administrative Activity Logs</h1>
+                <p class="admin-card-desc">Audit record tracking all verification approvals, user suspensions, plan changes, and subscription ledger events (FR-44, FR-48).</p>
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                <input type="text" id="auditSearchInput" class="tl-input" placeholder="Search action, details, actor..." style="max-width: 220px;" oninput="onAuditSearchChange(this.value)">
+                <select id="auditEntityFilter" class="tl-select" style="max-width: 160px;" onchange="onAuditEntityFilterChange()">
+                  <option value="all">All Entities</option>
+                  <option value="subscription_plan">Subscription Plans</option>
+                  <option value="subscription">Subscriptions</option>
+                  <option value="booking">Bookings</option>
+                  <option value="review">Reviews</option>
+                  <option value="portfolio">Portfolios</option>
+                  <option value="user">Users</option>
+                  <option value="category">Categories</option>
+                  <option value="provider">Specialists</option>
+                </select>
+                <select id="auditAdminFilter" class="tl-select" style="max-width: 150px;" onchange="onAuditAdminFilterChange()">
+                  <option value="all">All Admins</option>
+                </select>
+                <select id="auditTimeFilter" class="tl-select" style="max-width: 130px;" onchange="onAuditTimeFilterChange()">
+                  <option value="all">All Time</option>
+                  <option value="today">Past 24h</option>
+                  <option value="7days">Past 7 Days</option>
+                  <option value="30days">Past 30 Days</option>
+                </select>
+                <select id="auditSortSelect" class="tl-select" style="max-width: 140px;" onchange="onAuditSortChange(this.value)">
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                </select>
+                <select id="auditPerPageSelect" class="tl-select" style="max-width: 90px;" onchange="onAuditPerPageChange(this.value)">
+                  <option value="10" selected>10 / pg</option>
+                  <option value="25">25 / pg</option>
+                  <option value="50">50 / pg</option>
+                </select>
+                <button class="tl-btn tl-btn-outline tl-btn-sm" onclick="exportAuditTrailCsv()" title="Export all logs as CSV">
+                  <span data-tl-icon="download"></span> CSV
+                </button>
+                <button class="tl-btn tl-btn-outline tl-btn-sm" onclick="exportAuditTrailJson()" title="Export all logs as JSON">
+                  <span data-tl-icon="code"></span> JSON
+                </button>
+                <button class="tl-btn tl-btn-ghost tl-btn-sm" onclick="resetAuditFilters()" title="Reset all audit filters">
+                  <span data-tl-icon="rotate-ccw"></span> Reset
+                </button>
+              </div>
+            </div>
+
+            <!-- Audit Trail Table -->
             <div class="admin-table-wrap">
               <table class="admin-table">
                 <thead>
@@ -2931,12 +3152,19 @@
                     <th>Administrative Details</th>
                     <th>Admin Actor</th>
                     <th>Timestamp</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody id="auditTrailManagementTbody">
                   <!-- Rendered via JS -->
                 </tbody>
               </table>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; flex-wrap: wrap; gap: 10px;">
+              <div id="auditPaginationInfo" style="font-size: 0.85rem; color: #64748B;">Showing 0 to 0 of 0 audit logs</div>
+              <div id="auditPaginationControls" style="display: flex; gap: 6px;"></div>
             </div>
           </div>
         </section>
@@ -4474,6 +4702,333 @@
     </div>
   </div>
 
+  <!-- ===================================================================
+       SUBSCRIPTION PLAN MODAL (CREATE / EDIT)
+       =================================================================== -->
+  <div class="tl-modal-backdrop" id="planModal">
+    <div class="tl-modal" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title" id="planModalTitle">Create Subscription Plan</h3>
+        <button class="tl-modal-close" onclick="closePlanModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body" style="padding: 1rem 0;">
+        <div id="planModalError" class="tl-alert tl-alert-danger" style="display:none; margin-bottom: 1rem;"></div>
+
+        <form id="planModalForm" onsubmit="handlePlanFormSubmit(event)">
+          <div class="tl-form-group">
+            <label class="tl-label">Plan Name <span style="color:#EF4444;">*</span></label>
+            <input type="text" id="planModalName" class="tl-input" placeholder="e.g. TradeLinker Pro, Enterprise Contractor" required>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label">Plan Description <span style="color:#EF4444;">*</span></label>
+            <textarea id="planModalDescription" class="tl-textarea" rows="2" placeholder="Brief overview of plan target audience and privileges..." required></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="tl-form-group">
+              <label class="tl-label">Price (PKR) <span style="color:#EF4444;">*</span></label>
+              <input type="number" id="planModalPrice" class="tl-input" min="0" step="50" placeholder="0 for Free" required>
+              <div style="font-size: 0.72rem; color: #94A3B8; margin-top: 3px;">Set 0 for a perpetual free tier.</div>
+            </div>
+
+            <div class="tl-form-group">
+              <label class="tl-label">Duration in Days <span style="color:#EF4444;">*</span></label>
+              <input type="number" id="planModalDurationDays" class="tl-input" min="1" max="1825" placeholder="30, 90, 365" required>
+              <div style="font-size: 0.72rem; color: #94A3B8; margin-top: 3px;">Standard: 30 (month), 90 (quarter), 365 (year).</div>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="tl-form-group">
+              <label class="tl-label">Platform Commission Rate</label>
+              <input type="text" id="planModalCommission" class="tl-input" placeholder="e.g. 4% Fee, 2.5% Fee">
+            </div>
+
+            <div class="tl-form-group">
+              <label class="tl-label">Badge Label</label>
+              <input type="text" id="planModalBadge" class="tl-input" placeholder="e.g. Verified Pro, Top Tier">
+            </div>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label">Plan Features & Entitlements (one per line)</label>
+            <textarea id="planModalFeatures" class="tl-textarea" rows="4" placeholder="Priority category search placement&#10;Unlimited active service listings&#10;Verified Specialist trust badge&#10;Direct client phone lead alerts"></textarea>
+          </div>
+
+          <div style="display: flex; gap: 24px; align-items: center; margin-top: 1rem; padding: 12px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px;">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; color: var(--tl-navy-900);">
+              <input type="checkbox" id="planModalIsPopular" style="width: 16px; height: 16px;">
+              Highlight as Popular / Recommended Plan
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; color: var(--tl-navy-900);">
+              <input type="checkbox" id="planModalIsActive" checked style="width: 16px; height: 16px;">
+              Active (Visible for Enrollment)
+            </label>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem; display: flex; justify-content: flex-end; gap: 8px;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closePlanModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary" id="planModalSubmitBtn">Save Subscription Plan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SUBSCRIPTION DETAILS INSPECTION MODAL
+       =================================================================== -->
+  <div class="tl-modal-backdrop" id="subscriptionDetailsModal">
+    <div class="tl-modal" style="max-width: 780px; max-height: 92vh; overflow-y: auto;">
+      <div class="tl-modal-header">
+        <div>
+          <span style="font-size: 0.72rem; font-weight: 800; color: #64748B; text-transform: uppercase;">Membership Dossier</span>
+          <h3 class="tl-modal-title" id="dossierSubId">SUB-800</h3>
+        </div>
+        <button class="tl-modal-close" onclick="closeSubscriptionDetailsModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body" style="padding: 1rem 0;">
+        <!-- Top Status Strip -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1.25rem;">
+          <div>
+            <div style="font-size: 0.72rem; color: #64748B;">Plan Tier</div>
+            <strong id="dossierSubPlanBadge" style="font-size: 1rem; color: var(--tl-navy-900);">TradeLinker Pro</strong>
+          </div>
+          <div>
+            <div style="font-size: 0.72rem; color: #64748B;">Current Status</div>
+            <span id="dossierSubStatusBadge" class="tl-badge tl-badge-completed">ACTIVE</span>
+          </div>
+          <div>
+            <div style="font-size: 0.72rem; color: #64748B;">Billing Cycle</div>
+            <strong id="dossierSubBillingCycle" style="font-size: 0.95rem; color: var(--tl-navy-900);">Monthly</strong>
+          </div>
+          <div>
+            <div style="font-size: 0.72rem; color: #64748B;">Price / Fee</div>
+            <strong id="dossierSubAmount" style="font-size: 1.1rem; color: var(--tl-teal-600);">PKR 3,500</strong>
+          </div>
+        </div>
+
+        <!-- 2-Column Info Grid -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;">
+          <!-- Professional Card -->
+          <div style="background: #FFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px;">
+            <div style="font-size: 0.75rem; font-weight: 800; color: #64748B; text-transform: uppercase; margin-bottom: 8px;">Enrolled Specialist</div>
+            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 10px;">
+              <img id="dossierSubProAvatar" src="assets/images/specialists/default-avatar.png" alt="Specialist" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--tl-teal-500);">
+              <div>
+                <h4 id="dossierSubProBizName" style="margin: 0; font-size: 0.95rem; color: var(--tl-navy-900);">Khan Electrical</h4>
+                <div id="dossierSubProFullName" style="font-size: 0.8rem; color: #64748B;">Engr. Rashid Khan</div>
+              </div>
+            </div>
+            <div style="font-size: 0.82rem; line-height: 1.7; color: var(--tl-navy-950);">
+              <div><strong>Phone:</strong> <span id="dossierSubProPhone">+92 300 1234567</span></div>
+              <div><strong>Email:</strong> <span id="dossierSubProEmail">rashid@tradelinker.pk</span></div>
+            </div>
+          </div>
+
+          <!-- Subscription Dates & Payment Card -->
+          <div style="background: #FFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px;">
+            <div style="font-size: 0.75rem; font-weight: 800; color: #64748B; text-transform: uppercase; margin-bottom: 8px;">Validity & Billing</div>
+            <div style="font-size: 0.82rem; line-height: 1.8; color: var(--tl-navy-950);">
+              <div><strong>Start Date:</strong> <span id="dossierSubStartDate">2026-10-01</span></div>
+              <div><strong>Expiration Date:</strong> <span id="dossierSubExpDate" style="color: #047857; font-weight: 700;">2026-11-01</span></div>
+              <div><strong>Days Remaining:</strong> <span id="dossierSubDaysRemaining" class="tl-badge tl-badge-accepted">12 Days</span></div>
+              <div><strong>Payment Method:</strong> <span id="dossierSubPaymentMethod">JazzCash / Bank Transfer</span></div>
+              <div><strong>Auto-Renewal:</strong> <span id="dossierSubAutoRenew">Enabled</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plan Features Entitlements -->
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: #64748B; text-transform: uppercase; margin-bottom: 6px;">Plan Entitlements & Features</div>
+          <ul id="dossierSubFeaturesList" style="margin: 0; padding-left: 20px; font-size: 0.82rem; color: #334155; line-height: 1.7;">
+            <li>Priority category placement in search results</li>
+            <li>Unlimited active service listings</li>
+          </ul>
+        </div>
+
+        <!-- Administrative Actions Bar -->
+        <div style="display: flex; justify-content: flex-end; gap: 10px; align-items: center; border-top: 1px solid #E2E8F0; padding-top: 1rem;">
+          <button type="button" class="tl-btn tl-btn-ghost" onclick="closeSubscriptionDetailsModal()">Close</button>
+          <button type="button" class="tl-btn tl-btn-outline" style="color: #EF4444; border-color: #EF4444;" id="dossierSubCancelBtn" onclick="handleDossierSubCancel()">Cancel Subscription</button>
+          <button type="button" class="tl-btn tl-btn-primary" id="dossierSubRenewBtn" onclick="handleDossierSubRenew()">Renew / Extend Days</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SUBSCRIPTION RENEWAL MODAL
+       =================================================================== -->
+  <div class="tl-modal-backdrop" id="subscriptionRenewModal">
+    <div class="tl-modal" style="max-width: 500px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Renew Professional Subscription</h3>
+        <button class="tl-modal-close" onclick="closeSubscriptionRenewModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body" style="padding: 1rem 0;">
+        <div id="renewModalError" class="tl-alert tl-alert-danger" style="display:none; margin-bottom: 1rem;"></div>
+
+        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 12px; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="font-family: monospace; font-weight: 800; font-size: 0.95rem; color: var(--tl-navy-900);" id="renewModalSubRef">SUB-801</span>
+            <span id="renewModalPlanName" class="tl-badge tl-badge-completed">TradeLinker Pro</span>
+          </div>
+          <strong id="renewModalProName" style="font-size: 0.9rem; color: var(--tl-navy-900); display: block;">Engr. Rashid Khan</strong>
+          <div style="font-size: 0.78rem; color: #64748B;">Current Expiration: <span id="renewModalCurrentExp" style="font-weight: 700;">2026-11-01</span></div>
+        </div>
+
+        <form id="subscriptionRenewForm" onsubmit="handleSubscriptionRenewSubmit(event)">
+          <div class="tl-form-group">
+            <label class="tl-label">Days to Extend <span style="color:#EF4444;">*</span></label>
+            <input type="number" id="renewDurationDays" class="tl-input" min="1" max="1825" value="30" required>
+            <div style="font-size: 0.72rem; color: #94A3B8; margin-top: 3px;">Extends expiration by selected number of days.</div>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label">Payment / Settlement Method</label>
+            <select id="renewPaymentMethod" class="tl-select">
+              <option value="JazzCash / Bank Transfer">JazzCash / Bank Transfer</option>
+              <option value="EasyPaisa">EasyPaisa</option>
+              <option value="Direct IBFT (Habib Bank)">Direct IBFT (Habib Bank)</option>
+              <option value="Meezan Bank Raast">Meezan Bank Raast</option>
+              <option value="Bank Al Habib">Bank Al Habib</option>
+              <option value="Free Promotional Grant">Free Promotional Grant</option>
+            </select>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem; display: flex; justify-content: flex-end; gap: 8px;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeSubscriptionRenewModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary" id="renewSubmitBtn">Confirm Renewal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SUBSCRIPTION ASSIGN / ENROLL MODAL
+       =================================================================== -->
+  <div class="tl-modal-backdrop" id="subscriptionAssignModal">
+    <div class="tl-modal" style="max-width: 540px;">
+      <div class="tl-modal-header">
+        <h3 class="tl-modal-title">Enroll Professional in Plan</h3>
+        <button class="tl-modal-close" onclick="closeSubscriptionAssignModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body" style="padding: 1rem 0;">
+        <div id="assignModalError" class="tl-alert tl-alert-danger" style="display:none; margin-bottom: 1rem;"></div>
+
+        <form id="subscriptionAssignForm" onsubmit="handleSubscriptionAssignSubmit(event)">
+          <div class="tl-form-group">
+            <label class="tl-label">Select Professional <span style="color:#EF4444;">*</span></label>
+            <select id="assignModalProviderSelect" class="tl-select" required>
+              <option value="">-- Choose Professional Specialist --</option>
+            </select>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label">Select Subscription Plan <span style="color:#EF4444;">*</span></label>
+            <select id="assignModalPlanSelect" class="tl-select" required onchange="onAssignPlanSelectChange()">
+              <option value="">-- Choose Subscription Tier --</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="tl-form-group">
+              <label class="tl-label">Billing Cycle</label>
+              <select id="assignModalBillingCycle" class="tl-select">
+                <option value="Monthly">Monthly</option>
+                <option value="Quarterly">Quarterly</option>
+                <option value="Yearly">Yearly</option>
+                <option value="Forever">Forever (Free Tier)</option>
+              </select>
+            </div>
+
+            <div class="tl-form-group">
+              <label class="tl-label">Duration in Days</label>
+              <input type="number" id="assignModalDurationDays" class="tl-input" min="1" value="30" required>
+            </div>
+          </div>
+
+          <div class="tl-form-group">
+            <label class="tl-label">Payment Channel</label>
+            <select id="assignModalPaymentMethod" class="tl-select">
+              <option value="JazzCash / Bank Transfer">JazzCash / Bank Transfer</option>
+              <option value="EasyPaisa">EasyPaisa</option>
+              <option value="Direct IBFT (Habib Bank)">Direct IBFT (Habib Bank)</option>
+              <option value="Meezan Bank Raast">Meezan Bank Raast</option>
+              <option value="Manual Admin Grant">Manual Admin Grant</option>
+            </select>
+          </div>
+
+          <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem; display: flex; justify-content: flex-end; gap: 8px;">
+            <button type="button" class="tl-btn tl-btn-ghost" onclick="closeSubscriptionAssignModal()">Cancel</button>
+            <button type="submit" class="tl-btn tl-btn-primary" id="assignModalSubmitBtn">Enroll Specialist</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       ADMIN AUDIT LOG DETAILS MODAL
+       =================================================================== -->
+  <div class="tl-modal-backdrop" id="auditDetailsModal">
+    <div class="tl-modal" style="max-width: 660px; max-height: 90vh; overflow-y: auto;">
+      <div class="tl-modal-header">
+        <div>
+          <span style="font-size: 0.72rem; font-weight: 800; color: #64748B; text-transform: uppercase;">Audit Event Record</span>
+          <h3 class="tl-modal-title" id="dossierAuditId">aud-000</h3>
+        </div>
+        <button class="tl-modal-close" onclick="closeAuditDetailsModal()">&times;</button>
+      </div>
+      <div class="tl-modal-body" style="padding: 1rem 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; margin-bottom: 1.25rem;">
+          <div>
+            <div style="font-size: 0.72rem; color: #64748B;">Action Type</div>
+            <span id="dossierAuditActionBadge" class="tl-badge" style="background:var(--tl-navy-800); color:#FFF; font-size:0.75rem;">ADMIN_ACTION</span>
+          </div>
+          <div>
+            <div style="font-size: 0.72rem; color: #64748B;">Target Entity</div>
+            <strong id="dossierAuditEntityType" style="font-size: 0.88rem; color: var(--tl-navy-900);">PLAN</strong>
+            <span id="dossierAuditEntityId" style="font-family: monospace; font-size: 0.8rem; color: #64748B;">(plan-pro)</span>
+          </div>
+          <div>
+            <div style="font-size: 0.72rem; color: #64748B;">Timestamp</div>
+            <div id="dossierAuditTimestamp" style="font-size: 0.8rem; color: var(--tl-navy-900); font-weight: 600;">2026-11-04 20:00</div>
+          </div>
+        </div>
+
+        <div style="background: #FFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: #64748B; text-transform: uppercase; margin-bottom: 6px;">Administrative Details</div>
+          <p id="dossierAuditDetails" style="font-size: 0.9rem; color: var(--tl-navy-950); line-height: 1.6; margin: 0;">Full action description recorded by the governance engine.</p>
+        </div>
+
+        <div style="background: #FFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px; margin-bottom: 1.25rem;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: #64748B; text-transform: uppercase; margin-bottom: 6px;">Administrator Actor</div>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <span class="tl-badge" style="background:#F1F5F9; color:#011425; font-size: 0.85rem;" id="dossierAuditAdminId">usr-admin-001</span>
+            <strong id="dossierAuditAdminName" style="color: var(--tl-navy-900); font-size: 0.9rem;">System Administrator</strong>
+          </div>
+        </div>
+
+        <div style="background: #0F172A; color: #38BDF8; border-radius: 8px; padding: 14px; margin-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 0.72rem; font-weight: 800; color: #94A3B8; text-transform: uppercase;">Raw Audit Snapshot (JSON)</span>
+            <button type="button" class="tl-btn tl-btn-ghost tl-btn-xs" style="color: #38BDF8;" onclick="copyAuditJson()">Copy JSON</button>
+          </div>
+          <pre id="dossierAuditJson" style="margin: 0; font-family: monospace; font-size: 0.78rem; overflow-x: auto; max-height: 180px;"></pre>
+        </div>
+
+        <div class="tl-modal-footer" style="margin: 1.5rem -1.5rem -1.5rem -1.5rem; padding: 1rem 1.5rem; display: flex; justify-content: flex-end;">
+          <button type="button" class="tl-btn tl-btn-ghost" onclick="closeAuditDetailsModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="js/icons.js"></script>
   <script src="js/config.js"></script>
@@ -4731,6 +5286,10 @@
       const auditLogs = TLCommunication.getAllAdminAuditLogs();
       const bLogs = document.getElementById('badgeNavLogs');
       if (bLogs) bLogs.innerText = auditLogs.length;
+
+      const totalSubs = (typeof TLSubscriptions !== 'undefined') ? TLSubscriptions.getAllSubscriptions().length : 0;
+      const bSubs = document.getElementById('badgeNavSubscriptions');
+      if (bSubs) bSubs.innerText = totalSubs;
 
       // Render Charts & Feeds
       renderUserRegistrationsChart(users);
@@ -9612,104 +10171,1054 @@
     }
 
     // ------------------------------------------------------------------------
-    // 11. Subscription Plans & Subscriptions
+    // 11. Subscription Plans Management Engine
     // ------------------------------------------------------------------------
+    const planState = {
+      search: '',
+      statusFilter: 'all',
+      modalMode: 'create',
+      selectedPlanId: null
+    };
+
+    function onPlanSearchChange(val) {
+      planState.search = (val || '').toLowerCase().trim();
+      renderSubscriptionPlans();
+    }
+
+    function onPlanStatusFilterChange() {
+      planState.statusFilter = document.getElementById('planStatusFilter')?.value || 'all';
+      renderSubscriptionPlans();
+    }
+
+    function resetPlanFilters() {
+      planState.search = '';
+      planState.statusFilter = 'all';
+      const sInp = document.getElementById('planSearchInput');
+      if (sInp) sInp.value = '';
+      const stFil = document.getElementById('planStatusFilter');
+      if (stFil) stFil.value = 'all';
+      renderSubscriptionPlans();
+    }
+
     function renderSubscriptionPlans() {
       const container = document.getElementById('subscriptionPlansContainer');
       if (!container) return;
 
-      const plans = (typeof TLSubscriptions !== 'undefined') ? TLSubscriptions.getPlans() : [];
+      const allPlans = (typeof TLSubscriptions !== 'undefined') ? TLSubscriptions.getPlans() : [];
+      const allSubs = (typeof TLSubscriptions !== 'undefined') ? TLSubscriptions.getAllSubscriptions() : [];
 
-      container.innerHTML = plans.map(pl => `
-        <div class="admin-card" style="border: 2px solid ${pl.isPopular ? 'var(--tl-teal-500)' : 'var(--tl-border-subtle)'};">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span class="tl-badge ${pl.badgeClass || 'tl-badge-accepted'}">${pl.badge}</span>
-            <span style="font-size:0.8rem; font-weight:700; color:#64748B;">${pl.prosCount || 'Active Plan'}</span>
+      // Update KPI strip
+      const totalCount = allPlans.length;
+      const activeCount = allPlans.filter(p => p.is_active).length;
+      const inactiveCount = allPlans.filter(p => !p.is_active).length;
+      const subscribedPros = allSubs.filter(s => s.status === 'active').length;
+
+      const elTotal = document.getElementById('planStatTotal');
+      if (elTotal) elTotal.innerText = totalCount;
+      const elActive = document.getElementById('planStatActive');
+      if (elActive) elActive.innerText = activeCount;
+      const elInactive = document.getElementById('planStatInactive');
+      if (elInactive) elInactive.innerText = inactiveCount;
+      const elPros = document.getElementById('planStatPros');
+      if (elPros) elPros.innerText = subscribedPros;
+
+      const prices = allPlans.map(p => Number(p.price) || 0);
+      const minPrice = prices.length ? Math.min(...prices) : 0;
+      const maxPrice = prices.length ? Math.max(...prices) : 0;
+      const elSpectrum = document.getElementById('planStatPriceRange');
+      if (elSpectrum) {
+        elSpectrum.innerText = minPrice === 0
+          ? `Free - PKR ${(maxPrice / 1000).toFixed(0)}k`
+          : `PKR ${minPrice} - PKR ${(maxPrice / 1000).toFixed(0)}k`;
+      }
+
+      // Filter plans
+      let list = [...allPlans];
+      if (planState.search) {
+        list = list.filter(p =>
+          (p.name || '').toLowerCase().includes(planState.search) ||
+          (p.description || '').toLowerCase().includes(planState.search) ||
+          (p.badge || '').toLowerCase().includes(planState.search) ||
+          (p.features || []).some(f => f.toLowerCase().includes(planState.search))
+        );
+      }
+
+      if (planState.statusFilter !== 'all') {
+        const wantActive = planState.statusFilter === 'active';
+        list = list.filter(p => p.is_active === wantActive);
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 48px 24px; background: #FFF; border: 1px dashed #CBD5E1; border-radius: 12px;">
+            <div style="font-size: 1.1rem; font-weight: 700; color: var(--tl-navy-900); margin-bottom: 6px;">No subscription plans match your filter.</div>
+            <p style="font-size: 0.85rem; color: #64748B; margin-bottom: 16px;">Try adjusting search terms or create a new monetization plan.</p>
+            <button class="tl-btn tl-btn-primary tl-btn-sm" onclick="openPlanModal('create')">+ Create New Plan</button>
           </div>
-          <h3 style="font-size:1.2rem; font-weight:800; color:var(--tl-navy-800); margin:12px 0 4px;">${pl.name}</h3>
-          <div style="font-size:1.6rem; font-weight:800; color:var(--tl-teal-700);">${pl.priceDisplay} <span style="font-size:0.85rem; font-weight:500; color:#94A3B8;">${pl.period}</span></div>
-          <p style="font-size:0.82rem; color:var(--tl-text-secondary); margin:8px 0 12px;">${pl.description || ''}</p>
-          <ul style="font-size:0.82rem; color:var(--tl-text-secondary); margin:12px 0; padding-left:18px; line-height:1.7;">
-            <li>Platform Commission: <strong>${pl.commission}</strong></li>
-            ${(pl.features || []).map(f => `<li>${f}</li>`).join('')}
-          </ul>
-          <button class="tl-btn ${pl.isPopular ? 'tl-btn-primary' : 'tl-btn-outline'} tl-btn-sm" style="width:100%;" onclick="alert('Plan settings opened for ${pl.name}')">Edit Plan Settings</button>
-        </div>
-      `).join('');
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(pl => {
+        const attachedActiveSubs = allSubs.filter(s => s.planId === pl.id && s.status === 'active').length;
+        const durationLbl = pl.durationDays ? `${pl.durationDays} Days` : (pl.period || '30 Days');
+        const priceFmt = pl.price === 0 ? 'Free' : `PKR ${Number(pl.price).toLocaleString()}`;
+
+        return `
+          <div class="admin-card" style="border: 2px solid ${pl.isPopular ? 'var(--tl-teal-500)' : (pl.is_active ? 'var(--tl-border-subtle)' : '#FECACA')}; background: ${pl.is_active ? '#FFFFFF' : '#FFF5F5'}; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <span class="tl-badge ${pl.badgeClass || 'tl-badge-accepted'}">${escapeHtml(pl.badge || 'Plan')}</span>
+                  ${pl.isPopular ? '<span class="tl-badge tl-badge-completed">POPULAR</span>' : ''}
+                </div>
+                <span class="tl-badge ${pl.is_active ? 'tl-badge-completed' : 'tl-badge-cancelled'}">
+                  ${pl.is_active ? 'ACTIVE' : 'INACTIVE'}
+                </span>
+              </div>
+
+              <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--tl-navy-900); margin: 8px 0 4px;">${escapeHtml(pl.name)}</h3>
+              <div style="font-size: 1.65rem; font-weight: 800; color: var(--tl-teal-700); margin-bottom: 6px;">
+                ${priceFmt}
+                <span style="font-size: 0.82rem; font-weight: 600; color: #64748B;">/ ${durationLbl}</span>
+              </div>
+
+              <p style="font-size: 0.82rem; color: var(--tl-text-secondary); margin: 6px 0 12px; line-height: 1.5;">${escapeHtml(pl.description || '')}</p>
+
+              <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 0.78rem; display: flex; justify-content: space-between;">
+                <span>Commission: <strong>${escapeHtml(pl.commission || '5% Fee')}</strong></span>
+                <span>Enrolled: <strong>${attachedActiveSubs} Active Pros</strong></span>
+              </div>
+
+              <div style="font-size: 0.78rem; font-weight: 700; color: var(--tl-navy-800); margin-bottom: 6px; text-transform: uppercase;">Key Entitlements:</div>
+              <ul style="font-size: 0.82rem; color: #334155; margin: 0 0 16px; padding-left: 18px; line-height: 1.65;">
+                ${(pl.features || []).map(f => `<li>${escapeHtml(f)}</li>`).join('')}
+              </ul>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; border-top: 1px solid #E2E8F0; padding-top: 12px; margin-top: 8px;">
+              <button class="tl-btn tl-btn-outline tl-btn-xs" style="grid-column: 1 / -1;" onclick="openPlanModal('edit', '${pl.id}')">
+                <span data-tl-icon="edit-3"></span> Edit Plan Settings
+              </button>
+              <button class="tl-btn ${pl.is_active ? 'tl-btn-ghost' : 'tl-btn-outline-teal'} tl-btn-xs" onclick="togglePlanStatus('${pl.id}')">
+                ${pl.is_active ? 'Deactivate' : 'Activate'}
+              </button>
+              <button class="tl-btn tl-btn-ghost tl-btn-xs" style="color: #EF4444;" onclick="handleDeletePlan('${pl.id}')">
+                Delete
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    function openPlanModal(mode = 'create', planId = null) {
+      planState.modalMode = mode;
+      planState.selectedPlanId = planId;
+      const modal = document.getElementById('planModal');
+      const errEl = document.getElementById('planModalError');
+      if (errEl) errEl.style.display = 'none';
+
+      const titleEl = document.getElementById('planModalTitle');
+      const btnSubmit = document.getElementById('planModalSubmitBtn');
+
+      if (mode === 'edit' && planId) {
+        const plan = TLSubscriptions.getPlanById(planId);
+        if (!plan) return;
+        if (titleEl) titleEl.innerText = `Edit Plan: ${plan.name}`;
+        if (btnSubmit) btnSubmit.innerText = 'Save Plan Updates';
+
+        document.getElementById('planModalName').value = plan.name || '';
+        document.getElementById('planModalDescription').value = plan.description || '';
+        document.getElementById('planModalPrice').value = plan.price || 0;
+        document.getElementById('planModalDurationDays').value = plan.durationDays || 30;
+        document.getElementById('planModalCommission').value = plan.commission || '4% Fee';
+        document.getElementById('planModalBadge').value = plan.badge || 'Pro';
+        document.getElementById('planModalFeatures').value = (plan.features || []).join('\n');
+        document.getElementById('planModalIsPopular').checked = !!plan.isPopular;
+        document.getElementById('planModalIsActive').checked = plan.is_active !== false;
+      } else {
+        if (titleEl) titleEl.innerText = 'Create Subscription Plan';
+        if (btnSubmit) btnSubmit.innerText = 'Publish Subscription Plan';
+
+        document.getElementById('planModalName').value = '';
+        document.getElementById('planModalDescription').value = '';
+        document.getElementById('planModalPrice').value = '3500';
+        document.getElementById('planModalDurationDays').value = '30';
+        document.getElementById('planModalCommission').value = '4% Fee';
+        document.getElementById('planModalBadge').value = 'Pro';
+        document.getElementById('planModalFeatures').value = 'Priority search placement\nUnlimited active listings\nVerified Specialist badge';
+        document.getElementById('planModalIsPopular').checked = false;
+        document.getElementById('planModalIsActive').checked = true;
+      }
+
+      if (modal) modal.classList.add('active');
+    }
+
+    function closePlanModal() {
+      const modal = document.getElementById('planModal');
+      if (modal) modal.classList.remove('active');
+      planState.selectedPlanId = null;
+    }
+
+    function handlePlanFormSubmit(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('planModalError');
+      if (errEl) errEl.style.display = 'none';
+
+      const name = document.getElementById('planModalName').value.trim();
+      const description = document.getElementById('planModalDescription').value.trim();
+      const price = parseFloat(document.getElementById('planModalPrice').value);
+      const durationDays = parseInt(document.getElementById('planModalDurationDays').value, 10);
+      const commission = document.getElementById('planModalCommission').value.trim();
+      const badge = document.getElementById('planModalBadge').value.trim();
+      const featuresRaw = document.getElementById('planModalFeatures').value;
+      const isPopular = document.getElementById('planModalIsPopular').checked;
+      const isActive = document.getElementById('planModalIsActive').checked;
+      const adminId = currentAdminUser ? currentAdminUser.id : 'usr-admin-001';
+
+      const features = featuresRaw.split('\n').map(s => s.trim()).filter(Boolean);
+
+      let res;
+      if (planState.modalMode === 'edit' && planState.selectedPlanId) {
+        res = TLSubscriptions.adminUpdatePlan({
+          planId: planState.selectedPlanId,
+          name,
+          description,
+          price,
+          durationDays,
+          commission,
+          badge,
+          features,
+          isPopular,
+          isActive,
+          adminId
+        });
+      } else {
+        res = TLSubscriptions.adminCreatePlan({
+          name,
+          description,
+          price,
+          durationDays,
+          commission,
+          badge,
+          features,
+          isPopular,
+          isActive,
+          adminId
+        });
+      }
+
+      if (!res.success) {
+        if (errEl) {
+          errEl.innerText = res.error || 'Failed to save subscription plan.';
+          errEl.style.display = 'block';
+        }
+        return;
+      }
+
+      closePlanModal();
+      renderSubscriptionPlans();
+      renderSubscriptionsTable();
+      renderAuditTrailTable();
+      loadExecutiveKPIs();
+      alert(`Subscription plan '${name}' saved successfully.`);
+    }
+
+    function togglePlanStatus(planId) {
+      const adminId = currentAdminUser ? currentAdminUser.id : 'usr-admin-001';
+      const res = TLSubscriptions.adminTogglePlanStatus({ planId, adminId });
+      if (res.success) {
+        renderSubscriptionPlans();
+        renderAuditTrailTable();
+      } else {
+        alert(res.error || 'Failed to toggle plan status.');
+      }
+    }
+
+    function handleDeletePlan(planId) {
+      const plan = TLSubscriptions.getPlanById(planId);
+      if (!plan) return;
+      if (!confirm(`Are you sure you want to permanently delete plan '${plan.name}'?`)) return;
+
+      const adminId = currentAdminUser ? currentAdminUser.id : 'usr-admin-001';
+      const res = TLSubscriptions.adminDeletePlan({ planId, adminId });
+      if (res.success) {
+        renderSubscriptionPlans();
+        renderAuditTrailTable();
+        alert(`Plan '${plan.name}' was removed.`);
+      } else {
+        alert(res.error || 'Cannot delete plan.');
+      }
+    }
+
+    // ------------------------------------------------------------------------
+    // 12. Professional Subscriptions Ledger Engine
+    // ------------------------------------------------------------------------
+    const subState = {
+      currentPage: 1,
+      perPage: 10,
+      search: '',
+      statusFilter: 'all',
+      planFilter: 'all',
+      sortBy: 'renewal_asc',
+      selectedSubId: null
+    };
+
+    function onSubscriptionSearchChange(val) {
+      subState.search = (val || '').toLowerCase().trim();
+      subState.currentPage = 1;
+      renderSubscriptionsTable();
+    }
+
+    function onSubscriptionStatusFilterChange() {
+      subState.statusFilter = document.getElementById('subscriptionStatusFilter')?.value || 'all';
+      subState.currentPage = 1;
+      renderSubscriptionsTable();
+    }
+
+    function onSubscriptionPlanFilterChange() {
+      subState.planFilter = document.getElementById('subscriptionPlanFilter')?.value || 'all';
+      subState.currentPage = 1;
+      renderSubscriptionsTable();
+    }
+
+    function onSubscriptionSortChange(val) {
+      subState.sortBy = val || 'renewal_asc';
+      renderSubscriptionsTable();
+    }
+
+    function onSubscriptionPerPageChange(val) {
+      subState.perPage = parseInt(val, 10) || 10;
+      subState.currentPage = 1;
+      renderSubscriptionsTable();
+    }
+
+    function resetSubscriptionFilters() {
+      subState.search = '';
+      subState.statusFilter = 'all';
+      subState.planFilter = 'all';
+      subState.sortBy = 'renewal_asc';
+      subState.currentPage = 1;
+      subState.perPage = 10;
+
+      const sInp = document.getElementById('subscriptionSearchInput');
+      if (sInp) sInp.value = '';
+      const stFil = document.getElementById('subscriptionStatusFilter');
+      if (stFil) stFil.value = 'all';
+      const pFil = document.getElementById('subscriptionPlanFilter');
+      if (pFil) pFil.value = 'all';
+      const sSel = document.getElementById('subscriptionSortSelect');
+      if (sSel) sSel.value = 'renewal_asc';
+      const ppSel = document.getElementById('subscriptionPerPageSelect');
+      if (ppSel) ppSel.value = '10';
+
+      renderSubscriptionsTable();
+    }
+
+    function getSubscriptionBadgeClass(status) {
+      if (status === 'active') return 'tl-badge-completed';
+      if (status === 'expiring') return 'tl-badge-in-progress';
+      if (status === 'expired') return 'tl-badge-cancelled';
+      if (status === 'cancelled') return 'tl-badge-cancelled';
+      return 'tl-badge-accepted';
     }
 
     function renderSubscriptionsTable() {
       const tbody = document.getElementById('subscriptionsManagementTbody');
       if (!tbody) return;
 
-      const subs = (typeof TLSubscriptions !== 'undefined') ? TLSubscriptions.getAllSubscriptions() : [];
+      const joinedSubs = (typeof TLSubscriptions !== 'undefined') ? TLSubscriptions.getAllSubscriptionsJoined() : [];
+      const plans = (typeof TLSubscriptions !== 'undefined') ? TLSubscriptions.getPlans() : [];
 
-      if (subs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#94A3B8; padding:20px;">No subscription records found.</td></tr>';
+      // Populate plan filter select
+      const planFilterSelect = document.getElementById('subscriptionPlanFilter');
+      if (planFilterSelect && planFilterSelect.options.length <= 1) {
+        plans.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.id;
+          opt.textContent = p.name;
+          planFilterSelect.appendChild(opt);
+        });
+      }
+
+      // Update KPI telemetry
+      const totalCount = joinedSubs.length;
+      const activeCount = joinedSubs.filter(s => s.status === 'active').length;
+      const expiringCount = joinedSubs.filter(s => s.status === 'expiring').length;
+      const expiredCount = joinedSubs.filter(s => s.status === 'expired' || s.status === 'cancelled').length;
+      const activeRevenue = joinedSubs
+        .filter(s => s.status === 'active')
+        .reduce((sum, s) => sum + (Number(s.amount) || 0), 0);
+
+      const elTotal = document.getElementById('subStatTotal');
+      if (elTotal) elTotal.innerText = totalCount;
+      const elActive = document.getElementById('subStatActive');
+      if (elActive) elActive.innerText = activeCount;
+      const elExpiring = document.getElementById('subStatExpiring');
+      if (elExpiring) elExpiring.innerText = expiringCount;
+      const elExpired = document.getElementById('subStatExpired');
+      if (elExpired) elExpired.innerText = expiredCount;
+      const elRevenue = document.getElementById('subStatRevenue');
+      if (elRevenue) elRevenue.innerText = `PKR ${activeRevenue.toLocaleString()}`;
+
+      const bNavSubs = document.getElementById('badgeNavSubscriptions');
+      if (bNavSubs) bNavSubs.innerText = totalCount;
+
+      // Filter
+      let list = [...joinedSubs];
+      if (subState.search) {
+        list = list.filter(s =>
+          (s.id || '').toLowerCase().includes(subState.search) ||
+          (s.providerName || '').toLowerCase().includes(subState.search) ||
+          (s.businessName || '').toLowerCase().includes(subState.search) ||
+          (s.planName || '').toLowerCase().includes(subState.search) ||
+          (s.categoryTitle || '').toLowerCase().includes(subState.search)
+        );
+      }
+
+      if (subState.statusFilter !== 'all') {
+        list = list.filter(s => s.status === subState.statusFilter);
+      }
+
+      if (subState.planFilter !== 'all') {
+        list = list.filter(s => s.planId === subState.planFilter);
+      }
+
+      // Sort
+      list.sort((a, b) => {
+        if (subState.sortBy === 'renewal_asc') return new Date(a.expirationDate || 0) - new Date(b.expirationDate || 0);
+        if (subState.sortBy === 'renewal_desc') return new Date(b.expirationDate || 0) - new Date(a.expirationDate || 0);
+        if (subState.sortBy === 'newest_start') return new Date(b.startDate || 0) - new Date(a.startDate || 0);
+        if (subState.sortBy === 'amount_desc') return (Number(b.amount) || 0) - (Number(a.amount) || 0);
+        if (subState.sortBy === 'pro_asc') return (a.providerName || '').localeCompare(b.providerName || '');
+        return 0;
+      });
+
+      // Pagination
+      const totalFiltered = list.length;
+      const totalPages = Math.ceil(totalFiltered / subState.perPage) || 1;
+      if (subState.currentPage > totalPages) subState.currentPage = totalPages;
+      const startIndex = (subState.currentPage - 1) * subState.perPage;
+      const paginatedItems = list.slice(startIndex, startIndex + subState.perPage);
+
+      if (paginatedItems.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#94A3B8; padding:32px;">No professional subscription records found matching your filters.</td></tr>';
+      } else {
+        tbody.innerHTML = paginatedItems.map(s => {
+          const pro = s.provider || {};
+          const proAvatar = pro.avatar || 'assets/images/specialists/default-avatar.png';
+          const proName = escapeHtml(pro.businessName || s.providerName);
+          const legalName = escapeHtml(pro.fullName || s.providerName);
+          const expDate = s.expirationDate || s.renewalDate || 'N/A';
+          const amountFmt = s.amount === 0 ? 'Free' : `PKR ${Number(s.amount).toLocaleString()}`;
+
+          return `
+            <tr data-sub-id="${s.id}">
+              <td>
+                <span class="tl-badge" style="font-family:monospace; font-weight:800; background:#F1F5F9; color:var(--tl-navy-900);">${s.id}</span>
+              </td>
+              <td>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <img src="${proAvatar}" alt="${proName}" style="width:34px; height:34px; border-radius:50%; object-fit:cover; border:1px solid #CBD5E1;">
+                  <div>
+                    <div style="font-weight:700; color:var(--tl-navy-900); font-size:0.85rem;">${proName}</div>
+                    <div style="font-size:0.72rem; color:#64748B;">${legalName} &bull; ${escapeHtml(s.categoryTitle || 'Specialist')}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="tl-badge tl-badge-accepted" style="font-weight:700;">${escapeHtml(s.planName || 'Plan')}</span>
+                <div style="font-size:0.72rem; color:var(--tl-teal-700); font-weight:700; margin-top:2px;">${amountFmt}</div>
+              </td>
+              <td style="font-size:0.82rem;">
+                <div>${escapeHtml(s.billingCycle || 'Monthly')}</div>
+                <div style="font-size:0.7rem; color:#94A3B8;">${escapeHtml(s.paymentMethod || 'Manual')}</div>
+              </td>
+              <td style="font-size:0.82rem; color:var(--tl-text-secondary);">${s.startDate || '-'}</td>
+              <td style="font-size:0.82rem; font-weight:600;">
+                <div>${expDate}</div>
+                ${s.status === 'expiring' ? '<span class="tl-badge tl-badge-in-progress" style="font-size:10px; padding:1px 5px;">Expiring Soon</span>' : ''}
+              </td>
+              <td>
+                <span class="tl-badge ${getSubscriptionBadgeClass(s.status)}">${s.status.toUpperCase()}</span>
+              </td>
+              <td>
+                <div style="display:flex; gap:6px;">
+                  <button class="tl-btn tl-btn-outline tl-btn-xs" onclick="openSubscriptionDetailsModal('${s.id}')">Inspect</button>
+                  <button class="tl-btn tl-btn-outline-teal tl-btn-xs" onclick="openSubscriptionRenewModal('${s.id}')">Renew</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Pagination UI
+      const pInfo = document.getElementById('subPaginationInfo');
+      if (pInfo) {
+        const end = Math.min(startIndex + subState.perPage, totalFiltered);
+        pInfo.innerText = totalFiltered === 0
+          ? 'Showing 0 subscriptions'
+          : `Showing ${startIndex + 1} to ${end} of ${totalFiltered} subscriptions`;
+      }
+
+      const pControls = document.getElementById('subPaginationControls');
+      if (pControls) {
+        let pagesHtml = '';
+        if (totalPages > 1) {
+          pagesHtml += `<button class="tl-btn tl-btn-outline tl-btn-xs" ${subState.currentPage === 1 ? 'disabled' : ''} onclick="changeSubPage(${subState.currentPage - 1})">&laquo; Prev</button>`;
+          for (let p = 1; p <= totalPages; p++) {
+            pagesHtml += `<button class="tl-btn ${p === subState.currentPage ? 'tl-btn-primary' : 'tl-btn-ghost'} tl-btn-xs" onclick="changeSubPage(${p})">${p}</button>`;
+          }
+          pagesHtml += `<button class="tl-btn tl-btn-outline tl-btn-xs" ${subState.currentPage === totalPages ? 'disabled' : ''} onclick="changeSubPage(${subState.currentPage + 1})">Next &raquo;</button>`;
+        }
+        pControls.innerHTML = pagesHtml;
+      }
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    function changeSubPage(page) {
+      subState.currentPage = page;
+      renderSubscriptionsTable();
+    }
+
+    function openSubscriptionDetailsModal(subId) {
+      subState.selectedSubId = subId;
+      const sub = TLSubscriptions.getSubscriptionById(subId);
+      if (!sub) return;
+
+      document.getElementById('dossierSubId').innerText = `#${sub.id}`;
+      document.getElementById('dossierSubPlanBadge').innerText = sub.planName || 'Plan';
+      const stEl = document.getElementById('dossierSubStatusBadge');
+      if (stEl) {
+        stEl.className = `tl-badge ${getSubscriptionBadgeClass(sub.status)}`;
+        stEl.innerText = (sub.status || 'ACTIVE').toUpperCase();
+      }
+      document.getElementById('dossierSubBillingCycle').innerText = sub.billingCycle || 'Monthly';
+      document.getElementById('dossierSubAmount').innerText = sub.amount === 0 ? 'Free' : `PKR ${Number(sub.amount).toLocaleString()}`;
+
+      const pro = sub.provider || {};
+      const elAv = document.getElementById('dossierSubProAvatar');
+      if (elAv) elAv.src = pro.avatar || 'assets/images/specialists/default-avatar.png';
+      document.getElementById('dossierSubProBizName').innerText = pro.businessName || sub.providerName;
+      document.getElementById('dossierSubProFullName').innerText = pro.fullName || sub.providerName;
+      document.getElementById('dossierSubProPhone').innerText = pro.phone || 'N/A';
+      document.getElementById('dossierSubProEmail').innerText = pro.email || 'N/A';
+
+      document.getElementById('dossierSubStartDate').innerText = sub.startDate || 'N/A';
+      document.getElementById('dossierSubExpDate').innerText = sub.expirationDate || sub.renewalDate || 'N/A';
+      document.getElementById('dossierSubPaymentMethod').innerText = sub.paymentMethod || 'Manual Grant';
+      document.getElementById('dossierSubAutoRenew').innerText = sub.autoRenew ? 'Enabled (Automatic)' : 'Manual Renewal';
+
+      // Remaining days
+      const daysRemEl = document.getElementById('dossierSubDaysRemaining');
+      if (daysRemEl) {
+        const exp = new Date(sub.expirationDate || sub.renewalDate || 0);
+        const diffDays = Math.ceil((exp.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+        if (diffDays > 0) {
+          daysRemEl.innerText = `${diffDays} Days Remaining`;
+          daysRemEl.className = 'tl-badge tl-badge-accepted';
+        } else {
+          daysRemEl.innerText = `Expired (${Math.abs(diffDays)}d ago)`;
+          daysRemEl.className = 'tl-badge tl-badge-cancelled';
+        }
+      }
+
+      // Features
+      const featList = document.getElementById('dossierSubFeaturesList');
+      if (featList) {
+        const feats = sub.plan?.features || ['Standard search placement', 'Direct client messaging'];
+        featList.innerHTML = feats.map(f => `<li>${escapeHtml(f)}</li>`).join('');
+      }
+
+      // Modal toggle
+      const modal = document.getElementById('subscriptionDetailsModal');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeSubscriptionDetailsModal() {
+      const modal = document.getElementById('subscriptionDetailsModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function handleDossierSubCancel() {
+      if (!subState.selectedSubId) return;
+      if (!confirm(`Are you sure you want to cancel Subscription #${subState.selectedSubId}?`)) return;
+
+      const adminId = currentAdminUser ? currentAdminUser.id : 'usr-admin-001';
+      const res = TLSubscriptions.adminUpdateSubscriptionStatus({
+        subId: subState.selectedSubId,
+        status: 'cancelled',
+        notes: 'Cancelled from Administrator Dossier modal.',
+        adminId
+      });
+
+      if (res.success) {
+        openSubscriptionDetailsModal(subState.selectedSubId);
+        renderSubscriptionsTable();
+        renderAuditTrailTable();
+        loadExecutiveKPIs();
+        alert('Subscription status marked as CANCELLED.');
+      } else {
+        alert(res.error || 'Failed to cancel subscription.');
+      }
+    }
+
+    function handleDossierSubRenew() {
+      if (!subState.selectedSubId) return;
+      closeSubscriptionDetailsModal();
+      openSubscriptionRenewModal(subState.selectedSubId);
+    }
+
+    function openSubscriptionRenewModal(subId) {
+      subState.selectedSubId = subId;
+      const sub = TLSubscriptions.getSubscriptionById(subId);
+      if (!sub) return;
+
+      document.getElementById('renewModalSubRef').innerText = `#${sub.id}`;
+      document.getElementById('renewModalPlanName').innerText = sub.planName || 'Plan';
+      document.getElementById('renewModalProName').innerText = sub.provider?.businessName || sub.providerName;
+      document.getElementById('renewModalCurrentExp').innerText = sub.expirationDate || sub.renewalDate || 'N/A';
+
+      const durInp = document.getElementById('renewDurationDays');
+      if (durInp) durInp.value = sub.plan?.durationDays || 30;
+
+      const errEl = document.getElementById('renewModalError');
+      if (errEl) errEl.style.display = 'none';
+
+      const modal = document.getElementById('subscriptionRenewModal');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeSubscriptionRenewModal() {
+      const modal = document.getElementById('subscriptionRenewModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function handleSubscriptionRenewSubmit(e) {
+      e.preventDefault();
+      if (!subState.selectedSubId) return;
+
+      const durationDays = parseInt(document.getElementById('renewDurationDays').value, 10);
+      const paymentMethod = document.getElementById('renewPaymentMethod').value;
+      const adminId = currentAdminUser ? currentAdminUser.id : 'usr-admin-001';
+
+      const res = TLSubscriptions.adminRenewSubscription({
+        subId: subState.selectedSubId,
+        durationDays,
+        paymentMethod,
+        adminId
+      });
+
+      if (!res.success) {
+        const errEl = document.getElementById('renewModalError');
+        if (errEl) {
+          errEl.innerText = res.error || 'Failed to renew subscription.';
+          errEl.style.display = 'block';
+        }
         return;
       }
 
-      tbody.innerHTML = subs.map(s => `
-        <tr>
-          <td><code>${s.id}</code></td>
-          <td>
-            <div style="font-weight:700; color:var(--tl-navy-900); font-size:0.82rem;">${s.providerName}</div>
-            <div style="font-size:0.68rem; color:#94A3B8;">${s.businessName || ''}</div>
-          </td>
-          <td><span class="tl-badge tl-badge-accepted">${s.planName}</span></td>
-          <td>${s.billingCycle}</td>
-          <td>${s.startDate}</td>
-          <td>${s.renewalDate}</td>
-          <td><span class="tl-badge tl-badge-${s.status === 'active' ? 'completed' : 'pending'}">${s.status.toUpperCase()}</span></td>
-          <td>
-            <button class="tl-btn tl-btn-outline tl-btn-xs" onclick="alert('Subscription #${s.id} for ${s.providerName} inspected.')">Inspect</button>
-          </td>
-        </tr>
-      `).join('');
+      closeSubscriptionRenewModal();
+      renderSubscriptionsTable();
+      renderAuditTrailTable();
+      loadExecutiveKPIs();
+      alert(`Subscription renewed until ${res.newExpirationDate}.`);
+    }
+
+    function openSubscriptionAssignModal() {
+      const errEl = document.getElementById('assignModalError');
+      if (errEl) errEl.style.display = 'none';
+
+      // Populate providers
+      const proSelect = document.getElementById('assignModalProviderSelect');
+      if (proSelect) {
+        const providers = (typeof TLAuth !== 'undefined') ? TLAuth.getProviders() : [];
+        proSelect.innerHTML = '<option value="">-- Choose Professional Specialist --</option>' +
+          providers.map(p => `<option value="${p.id}">${escapeHtml(p.businessName || p.fullName)} (${escapeHtml(p.categoryTitle || 'Pro')})</option>`).join('');
+      }
+
+      // Populate plans
+      const planSelect = document.getElementById('assignModalPlanSelect');
+      if (planSelect) {
+        const plans = (typeof TLSubscriptions !== 'undefined') ? TLSubscriptions.getPlans() : [];
+        planSelect.innerHTML = '<option value="">-- Choose Subscription Tier --</option>' +
+          plans.filter(p => p.is_active).map(p => `<option value="${p.id}" data-days="${p.durationDays || 30}">${escapeHtml(p.name)} - PKR ${Number(p.price).toLocaleString()}</option>`).join('');
+      }
+
+      document.getElementById('assignModalDurationDays').value = '30';
+
+      const modal = document.getElementById('subscriptionAssignModal');
+      if (modal) modal.classList.add('active');
+    }
+
+    function onAssignPlanSelectChange() {
+      const planSelect = document.getElementById('assignModalPlanSelect');
+      const selectedOpt = planSelect.options[planSelect.selectedIndex];
+      const days = selectedOpt?.getAttribute('data-days') || 30;
+      document.getElementById('assignModalDurationDays').value = days;
+    }
+
+    function closeSubscriptionAssignModal() {
+      const modal = document.getElementById('subscriptionAssignModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function handleSubscriptionAssignSubmit(e) {
+      e.preventDefault();
+      const providerId = document.getElementById('assignModalProviderSelect').value;
+      const planId = document.getElementById('assignModalPlanSelect').value;
+      const billingCycle = document.getElementById('assignModalBillingCycle').value;
+      const durationDays = parseInt(document.getElementById('assignModalDurationDays').value, 10);
+      const paymentMethod = document.getElementById('assignModalPaymentMethod').value;
+      const adminId = currentAdminUser ? currentAdminUser.id : 'usr-admin-001';
+
+      if (!providerId || !planId) {
+        alert('Please choose both a professional and a subscription plan.');
+        return;
+      }
+
+      const res = TLSubscriptions.adminAssignSubscription({
+        providerId,
+        planId,
+        billingCycle,
+        paymentMethod,
+        durationDays,
+        adminId
+      });
+
+      if (!res.success) {
+        const errEl = document.getElementById('assignModalError');
+        if (errEl) {
+          errEl.innerText = res.error || 'Failed to assign subscription.';
+          errEl.style.display = 'block';
+        }
+        return;
+      }
+
+      closeSubscriptionAssignModal();
+      renderSubscriptionsTable();
+      renderSubscriptionPlans();
+      renderAuditTrailTable();
+      loadExecutiveKPIs();
+      alert(`Assigned subscription #${res.subscription.id} successfully.`);
     }
 
     // ------------------------------------------------------------------------
-    // 12. Activity Logs & CSV
+    // 13. Admin Activity Logs & Audit Engine (FR-44, FR-48)
     // ------------------------------------------------------------------------
+    const auditState = {
+      currentPage: 1,
+      perPage: 10,
+      search: '',
+      entityFilter: 'all',
+      adminFilter: 'all',
+      timeFilter: 'all',
+      sortBy: 'newest',
+      selectedLogId: null
+    };
+
+    function onAuditSearchChange(val) {
+      auditState.search = (val || '').toLowerCase().trim();
+      auditState.currentPage = 1;
+      renderAuditTrailTable();
+    }
+
+    function onAuditEntityFilterChange() {
+      auditState.entityFilter = document.getElementById('auditEntityFilter')?.value || 'all';
+      auditState.currentPage = 1;
+      renderAuditTrailTable();
+    }
+
+    function onAuditAdminFilterChange() {
+      auditState.adminFilter = document.getElementById('auditAdminFilter')?.value || 'all';
+      auditState.currentPage = 1;
+      renderAuditTrailTable();
+    }
+
+    function onAuditTimeFilterChange() {
+      auditState.timeFilter = document.getElementById('auditTimeFilter')?.value || 'all';
+      auditState.currentPage = 1;
+      renderAuditTrailTable();
+    }
+
+    function onAuditSortChange(val) {
+      auditState.sortBy = val || 'newest';
+      renderAuditTrailTable();
+    }
+
+    function onAuditPerPageChange(val) {
+      auditState.perPage = parseInt(val, 10) || 10;
+      auditState.currentPage = 1;
+      renderAuditTrailTable();
+    }
+
+    function resetAuditFilters() {
+      auditState.search = '';
+      auditState.entityFilter = 'all';
+      auditState.adminFilter = 'all';
+      auditState.timeFilter = 'all';
+      auditState.sortBy = 'newest';
+      auditState.currentPage = 1;
+      auditState.perPage = 10;
+
+      const sInp = document.getElementById('auditSearchInput');
+      if (sInp) sInp.value = '';
+      const eFil = document.getElementById('auditEntityFilter');
+      if (eFil) eFil.value = 'all';
+      const aFil = document.getElementById('auditAdminFilter');
+      if (aFil) aFil.value = 'all';
+      const tFil = document.getElementById('auditTimeFilter');
+      if (tFil) tFil.value = 'all';
+      const sSel = document.getElementById('auditSortSelect');
+      if (sSel) sSel.value = 'newest';
+      const ppSel = document.getElementById('auditPerPageSelect');
+      if (ppSel) ppSel.value = '10';
+
+      renderAuditTrailTable();
+    }
+
+    function formatRelativeTime(isoString) {
+      if (!isoString) return '';
+      const past = new Date(isoString).getTime();
+      if (isNaN(past)) return '';
+      const diffSec = Math.floor((Date.now() - past) / 1000);
+      if (diffSec < 60) return 'Just now';
+      const diffMin = Math.floor(diffSec / 60);
+      if (diffMin < 60) return `${diffMin}m ago`;
+      const diffHrs = Math.floor(diffMin / 60);
+      if (diffHrs < 24) return `${diffHrs}h ago`;
+      const diffDays = Math.floor(diffHrs / 24);
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 30) return `${diffDays}d ago`;
+      return new Date(isoString).toLocaleDateString();
+    }
+
+    function getAuditActionBadgeStyle(actionType) {
+      const act = (actionType || '').toUpperCase();
+      if (act.includes('CREATE') || act.includes('APPROVE') || act.includes('VERIFIED')) {
+        return 'background: #064E3B; color: #34D399;';
+      }
+      if (act.includes('UPDATE') || act.includes('RENEW') || act.includes('ASSIGN')) {
+        return 'background: #1E3A8A; color: #93C5FD;';
+      }
+      if (act.includes('DELETE') || act.includes('REJECT') || act.includes('CANCEL') || act.includes('SUSPEND')) {
+        return 'background: #7F1D1D; color: #FCA5A5;';
+      }
+      return 'background: #0F172A; color: #E2E8F0;';
+    }
+
     function renderAuditTrailTable() {
-      let logs = TLCommunication.getAllAdminAuditLogs();
       const tbody = document.getElementById('auditTrailManagementTbody');
       if (!tbody) return;
 
-      const q = (document.getElementById('auditSearchInput')?.value || '').toLowerCase().trim();
-      if (q) logs = logs.filter(l => l.actionType.toLowerCase().includes(q) || l.details.toLowerCase().includes(q));
+      const allLogs = (typeof TLCommunication !== 'undefined') ? TLCommunication.getAllAdminAuditLogs() : [];
 
-      if (logs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#94A3B8; padding:24px;">No administrative logs recorded.</td></tr>';
-        return;
+      // Populate admin filter select
+      const adminFilterSelect = document.getElementById('auditAdminFilter');
+      if (adminFilterSelect && adminFilterSelect.options.length <= 1) {
+        const uniqueAdmins = [...new Set(allLogs.map(l => l.adminId || 'usr-admin-001'))];
+        uniqueAdmins.forEach(adm => {
+          const opt = document.createElement('option');
+          opt.value = adm;
+          opt.textContent = adm;
+          adminFilterSelect.appendChild(opt);
+        });
       }
 
-      tbody.innerHTML = logs.map(a => `
-        <tr>
-          <td><code>${a.id}</code></td>
-          <td><span class="tl-badge" style="background:var(--tl-navy-800); color:#FFF; font-size:0.7rem;">${a.actionType}</span></td>
-          <td><strong>${(a.targetType || 'ENTITY').toUpperCase()}</strong> (${a.targetId || '-'})</td>
-          <td style="max-width:320px; font-size:0.82rem; color:var(--tl-text-secondary);">${a.details}</td>
-          <td><span class="tl-badge" style="background:#F1F5F9; color:#011425;">${a.adminId || 'admin'}</span></td>
-          <td style="font-size:0.75rem; color:#94A3B8;">${new Date(a.timestamp).toLocaleString()}</td>
-        </tr>
-      `).join('');
+      // Update KPI telemetry
+      const totalCount = allLogs.length;
+      const now = Date.now();
+      const todayCount = allLogs.filter(l => {
+        const t = new Date(l.timestamp).getTime();
+        return !isNaN(t) && (now - t) <= 24 * 60 * 60 * 1000;
+      }).length;
+      const monetizationCount = allLogs.filter(l => {
+        const e = (l.entityType || l.targetType || '').toLowerCase();
+        return e === 'subscription_plan' || e === 'subscription';
+      }).length;
+      const moderationCount = allLogs.filter(l => {
+        const e = (l.entityType || l.targetType || '').toLowerCase();
+        return e === 'review' || e === 'portfolio' || e === 'dispute';
+      }).length;
+      const securityCount = allLogs.filter(l => {
+        const e = (l.entityType || l.targetType || '').toLowerCase();
+        const a = (l.actionType || '').toUpperCase();
+        return e === 'user' || e === 'provider' || a.includes('SUSPEND') || a.includes('VERIF');
+      }).length;
+
+      const elTotal = document.getElementById('auditStatTotal');
+      if (elTotal) elTotal.innerText = totalCount;
+      const elToday = document.getElementById('auditStatToday');
+      if (elToday) elToday.innerText = todayCount;
+      const elMonetization = document.getElementById('auditStatMonetization');
+      if (elMonetization) elMonetization.innerText = monetizationCount;
+      const elModeration = document.getElementById('auditStatModeration');
+      if (elModeration) elModeration.innerText = moderationCount;
+      const elSecurity = document.getElementById('auditStatSecurity');
+      if (elSecurity) elSecurity.innerText = securityCount;
+
+      const bNavLogs = document.getElementById('badgeNavLogs');
+      if (bNavLogs) bNavLogs.innerText = totalCount;
+
+      // Filter list
+      let list = (typeof TLCommunication !== 'undefined' && TLCommunication.filterAdminAuditLogs)
+        ? TLCommunication.filterAdminAuditLogs({
+            search: auditState.search,
+            entityType: auditState.entityFilter,
+            adminId: auditState.adminFilter,
+            timeRange: auditState.timeFilter
+          })
+        : allLogs;
+
+      // Sort
+      list.sort((a, b) => {
+        if (auditState.sortBy === 'newest') return new Date(b.timestamp || 0) - new Date(a.timestamp || 0);
+        if (auditState.sortBy === 'oldest') return new Date(a.timestamp || 0) - new Date(b.timestamp || 0);
+        return 0;
+      });
+
+      // Pagination
+      const totalFiltered = list.length;
+      const totalPages = Math.ceil(totalFiltered / auditState.perPage) || 1;
+      if (auditState.currentPage > totalPages) auditState.currentPage = totalPages;
+      const startIndex = (auditState.currentPage - 1) * auditState.perPage;
+      const paginatedItems = list.slice(startIndex, startIndex + auditState.perPage);
+
+      if (paginatedItems.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#94A3B8; padding:32px;">No administrative audit logs match your search and filter criteria.</td></tr>';
+      } else {
+        tbody.innerHTML = paginatedItems.map(a => {
+          const badgeStyle = getAuditActionBadgeStyle(a.actionType);
+          const entityType = (a.entityType || a.targetType || 'SYSTEM').toUpperCase();
+          const entityId = a.entityId || a.targetId || '-';
+          const relTime = formatRelativeTime(a.timestamp);
+          const dateStr = a.timestamp ? new Date(a.timestamp).toLocaleString() : 'N/A';
+          const adminName = a.adminName || 'System Administrator';
+
+          return `
+            <tr data-log-id="${a.id}">
+              <td>
+                <span class="tl-badge" style="font-family:monospace; font-weight:800; background:#F1F5F9; color:var(--tl-navy-900);">${a.id}</span>
+              </td>
+              <td>
+                <span class="tl-badge" style="${badgeStyle} font-size:0.72rem; font-weight:700;">${escapeHtml(a.actionType || 'ACTION')}</span>
+              </td>
+              <td>
+                <div style="font-weight:700; font-size:0.82rem; color:var(--tl-navy-900);">${entityType}</div>
+                <div style="font-family:monospace; font-size:0.72rem; color:#64748B;">${escapeHtml(entityId)}</div>
+              </td>
+              <td style="max-width:340px; font-size:0.82rem; color:var(--tl-text-secondary); line-height:1.5;">
+                ${escapeHtml(a.details || '')}
+              </td>
+              <td>
+                <div style="font-weight:700; font-size:0.82rem; color:var(--tl-navy-900);">${escapeHtml(adminName)}</div>
+                <div style="font-size:0.7rem; color:#64748B;">${escapeHtml(a.adminId || 'admin')}</div>
+              </td>
+              <td style="font-size:0.78rem; white-space:nowrap;">
+                <div style="color:var(--tl-navy-900); font-weight:600;">${relTime}</div>
+                <div style="font-size:0.7rem; color:#94A3B8;">${dateStr}</div>
+              </td>
+              <td>
+                <button class="tl-btn tl-btn-outline tl-btn-xs" onclick="openAuditDetailsModal('${a.id}')">Inspect</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Pagination UI
+      const pInfo = document.getElementById('auditPaginationInfo');
+      if (pInfo) {
+        const end = Math.min(startIndex + auditState.perPage, totalFiltered);
+        pInfo.innerText = totalFiltered === 0
+          ? 'Showing 0 audit logs'
+          : `Showing ${startIndex + 1} to ${end} of ${totalFiltered} audit logs`;
+      }
+
+      const pControls = document.getElementById('auditPaginationControls');
+      if (pControls) {
+        let pagesHtml = '';
+        if (totalPages > 1) {
+          pagesHtml += `<button class="tl-btn tl-btn-outline tl-btn-xs" ${auditState.currentPage === 1 ? 'disabled' : ''} onclick="changeAuditPage(${auditState.currentPage - 1})">&laquo; Prev</button>`;
+          for (let p = 1; p <= totalPages; p++) {
+            pagesHtml += `<button class="tl-btn ${p === auditState.currentPage ? 'tl-btn-primary' : 'tl-btn-ghost'} tl-btn-xs" onclick="changeAuditPage(${p})">${p}</button>`;
+          }
+          pagesHtml += `<button class="tl-btn tl-btn-outline tl-btn-xs" ${auditState.currentPage === totalPages ? 'disabled' : ''} onclick="changeAuditPage(${auditState.currentPage + 1})">Next &raquo;</button>`;
+        }
+        pControls.innerHTML = pagesHtml;
+      }
+
+      if (window.TLIcons) window.TLIcons.renderAll();
+    }
+
+    function changeAuditPage(page) {
+      auditState.currentPage = page;
+      renderAuditTrailTable();
+    }
+
+    function openAuditDetailsModal(logId) {
+      auditState.selectedLogId = logId;
+      const log = (typeof TLCommunication !== 'undefined' && TLCommunication.getAuditLogById)
+        ? TLCommunication.getAuditLogById(logId)
+        : ((TLCommunication.getAllAdminAuditLogs() || []).find(l => l.id === logId));
+      if (!log) return;
+
+      document.getElementById('dossierAuditId').innerText = `#${log.id}`;
+      const badgeEl = document.getElementById('dossierAuditActionBadge');
+      if (badgeEl) {
+        badgeEl.innerText = log.actionType || 'ACTION';
+        badgeEl.style.cssText = getAuditActionBadgeStyle(log.actionType) + ' font-size:0.75rem;';
+      }
+      document.getElementById('dossierAuditEntityType').innerText = (log.entityType || log.targetType || 'SYSTEM').toUpperCase();
+      document.getElementById('dossierAuditEntityId').innerText = `(${log.entityId || log.targetId || '-'})`;
+      document.getElementById('dossierAuditTimestamp').innerText = log.timestamp ? new Date(log.timestamp).toLocaleString() : 'N/A';
+      document.getElementById('dossierAuditDetails').innerText = log.details || 'N/A';
+      document.getElementById('dossierAuditAdminId').innerText = log.adminId || 'usr-admin-001';
+      document.getElementById('dossierAuditAdminName').innerText = log.adminName || 'System Administrator';
+
+      const jsonPre = document.getElementById('dossierAuditJson');
+      if (jsonPre) jsonPre.innerText = JSON.stringify(log, null, 2);
+
+      const modal = document.getElementById('auditDetailsModal');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeAuditDetailsModal() {
+      const modal = document.getElementById('auditDetailsModal');
+      if (modal) modal.classList.remove('active');
+    }
+
+    function copyAuditJson() {
+      const jsonPre = document.getElementById('dossierAuditJson');
+      if (jsonPre) {
+        navigator.clipboard.writeText(jsonPre.innerText).then(() => {
+          alert('Audit event JSON copied to clipboard.');
+        }).catch(() => {
+          alert('Could not copy JSON automatically.');
+        });
+      }
     }
 
     function exportAuditTrailCsv() {
-      const logs = TLCommunication.getAllAdminAuditLogs();
+      const logs = (typeof TLCommunication !== 'undefined') ? TLCommunication.getAllAdminAuditLogs() : [];
       if (!logs || logs.length === 0) {
         alert("No activity logs available for export.");
         return;
       }
-      const header = ["LogID", "ActionType", "TargetType", "TargetID", "Details", "AdminID", "Timestamp"];
+      const header = ["LogID", "ActionType", "EntityType", "EntityID", "Details", "AdminID", "AdminName", "Timestamp"];
       const rows = logs.map(l => [
         `"${l.id || ''}"`,
         `"${l.actionType || ''}"`,
-        `"${l.targetType || ''}"`,
-        `"${l.targetId || ''}"`,
+        `"${l.entityType || l.targetType || ''}"`,
+        `"${l.entityId || l.targetId || ''}"`,
         `"${(l.details || '').replace(/"/g, '""')}"`,
         `"${l.adminId || ''}"`,
+        `"${(l.adminName || '').replace(/"/g, '""')}"`,
         `"${l.timestamp || ''}"`
       ]);
       const csvContent = "data:text/csv;charset=utf-8," + [header.join(","), ...rows.map(e => e.join(","))].join("\n");
@@ -9717,6 +11226,21 @@
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
       link.setAttribute("download", `tradelinker_admin_logs_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function exportAuditTrailJson() {
+      const logs = (typeof TLCommunication !== 'undefined') ? TLCommunication.getAllAdminAuditLogs() : [];
+      if (!logs || logs.length === 0) {
+        alert("No activity logs available for export.");
+        return;
+      }
+      const jsonContent = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2));
+      const link = document.createElement("a");
+      link.setAttribute("href", jsonContent);
+      link.setAttribute("download", `tradelinker_admin_logs_${new Date().toISOString().slice(0, 10)}.json`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
