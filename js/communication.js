@@ -27,7 +27,44 @@ const TLCommunication = {
   // --------------------------------------------------------------------------
   init() {
     const rawCat = localStorage.getItem(this.STORAGE_KEYS.CATEGORIES);
-    if (!rawCat || rawCat === '[]') this.seedInitialCategories();
+    if (!rawCat || rawCat === '[]') {
+      this.seedInitialCategories();
+    } else {
+      // Normalize existing categories to make sure all 9 schema fields are always present
+      try {
+        const list = JSON.parse(rawCat);
+        let modified = false;
+        list.forEach((c, idx) => {
+          if (!c.name) { c.name = c.title || "Category"; modified = true; }
+          if (!c.title) { c.title = c.name; modified = true; }
+          if (!c.slug) { c.slug = c.id || c.name.toLowerCase().replace(/[^a-z0-9]/g, '-'); modified = true; }
+          if (!c.id) { c.id = c.slug; modified = true; }
+          if (c.display_order === undefined) { c.display_order = c.displayOrder || idx + 1; modified = true; }
+          if (c.displayOrder === undefined) { c.displayOrder = c.display_order; modified = true; }
+          if (c.is_active === undefined) { c.is_active = c.isActive !== undefined ? c.isActive : true; modified = true; }
+          if (c.isActive === undefined) { c.isActive = c.is_active; modified = true; }
+          if (!c.image) {
+            const defaultImages = {
+              construction: "https://images.unsplash.com/photo-1541888946425-d0fbb186156a?w=400&auto=format&fit=crop",
+              plumbing: "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=400&auto=format&fit=crop",
+              electrical: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&auto=format&fit=crop",
+              hvac: "https://images.unsplash.com/photo-1631545648834-58537b98bf95?w=400&auto=format&fit=crop",
+              solar: "https://images.unsplash.com/photo-1509391365360-2e959784a276?w=400&auto=format&fit=crop",
+              carpentry: "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=400&auto=format&fit=crop"
+            };
+            c.image = defaultImages[c.slug || c.id] || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&auto=format&fit=crop";
+            modified = true;
+          }
+          if (!c.created_at) { c.created_at = c.createdAt || new Date().toISOString(); modified = true; }
+          if (!c.createdAt) { c.createdAt = c.created_at; modified = true; }
+          if (!c.updated_at) { c.updated_at = c.updatedAt || new Date().toISOString(); modified = true; }
+          if (!c.updatedAt) { c.updatedAt = c.updated_at; modified = true; }
+        });
+        if (modified) {
+          localStorage.setItem(this.STORAGE_KEYS.CATEGORIES, JSON.stringify(list));
+        }
+      } catch (e) {}
+    }
 
     const rawDisp = localStorage.getItem(this.STORAGE_KEYS.DISPUTES);
     if (!rawDisp || rawDisp === '[]') this.seedInitialDisputes();
@@ -44,12 +81,108 @@ const TLCommunication = {
 
   seedInitialCategories() {
     const categories = [
-      { id: "construction", title: "Construction Services", description: "Structural masonry, renovations, and plastering", isActive: true, icon: "construction" },
-      { id: "plumbing", title: "Plumbing Services", description: "Pipework, water pumps, fixtures, and emergency drainage", isActive: true, icon: "plumbing" },
-      { id: "electrical", title: "Electrical Services", description: "Wiring, circuit diagnostics, DB panels, and automation", isActive: true, icon: "electrical" },
-      { id: "hvac", title: "AC and HVAC Services", description: "Inverter AC servicing, ducting, compressor repairs", isActive: true, icon: "hvac" },
-      { id: "solar", title: "Solar Energy Services", description: "Solar panel arrays, inverters, net metering, battery setups", isActive: true, icon: "solar" },
-      { id: "carpentry", title: "Wooden Door Making and Carpentry", description: "Solid wood doors, frames, cabinetry, polish, and repairs", isActive: true, icon: "carpentry" }
+      {
+        id: "construction",
+        name: "Construction Services",
+        title: "Construction Services",
+        slug: "construction",
+        description: "Civil engineers, grey structure masonry, structural renovations, and site supervision.",
+        image: "https://images.unsplash.com/photo-1541888946425-d0fbb186156a?w=400&auto=format&fit=crop",
+        icon: "construction",
+        display_order: 1,
+        displayOrder: 1,
+        is_active: true,
+        isActive: true,
+        created_at: "2026-08-01T09:00:00.000Z",
+        createdAt: "2026-08-01T09:00:00.000Z",
+        updated_at: "2026-10-25T14:00:00.000Z",
+        updatedAt: "2026-10-25T14:00:00.000Z"
+      },
+      {
+        id: "plumbing",
+        name: "Plumbing Services",
+        title: "Plumbing Services",
+        slug: "plumbing",
+        description: "Pipe installation, acoustic leak detection, water tank fittings, and drainage unblocking.",
+        image: "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=400&auto=format&fit=crop",
+        icon: "plumbing",
+        display_order: 2,
+        displayOrder: 2,
+        is_active: true,
+        isActive: true,
+        created_at: "2026-08-02T10:00:00.000Z",
+        createdAt: "2026-08-02T10:00:00.000Z",
+        updated_at: "2026-10-25T14:00:00.000Z",
+        updatedAt: "2026-10-25T14:00:00.000Z"
+      },
+      {
+        id: "electrical",
+        name: "Electrical Services",
+        title: "Electrical Services",
+        slug: "electrical",
+        description: "Home electrical installation, distribution board (DB) upgrades, and short circuit repair.",
+        image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=400&auto=format&fit=crop",
+        icon: "electrical",
+        display_order: 3,
+        displayOrder: 3,
+        is_active: true,
+        isActive: true,
+        created_at: "2026-08-03T11:00:00.000Z",
+        createdAt: "2026-08-03T11:00:00.000Z",
+        updated_at: "2026-10-25T14:00:00.000Z",
+        updatedAt: "2026-10-25T14:00:00.000Z"
+      },
+      {
+        id: "hvac",
+        name: "AC and HVAC Services",
+        title: "AC and HVAC Services",
+        slug: "hvac",
+        description: "DC inverter AC servicing, coil chemical jet cleaning, gas charging, and chiller maintenance.",
+        image: "https://images.unsplash.com/photo-1631545648834-58537b98bf95?w=400&auto=format&fit=crop",
+        icon: "hvac",
+        display_order: 4,
+        displayOrder: 4,
+        is_active: true,
+        isActive: true,
+        created_at: "2026-08-04T12:00:00.000Z",
+        createdAt: "2026-08-04T12:00:00.000Z",
+        updated_at: "2026-10-25T14:00:00.000Z",
+        updatedAt: "2026-10-25T14:00:00.000Z"
+      },
+      {
+        id: "solar",
+        name: "Solar Energy Services",
+        title: "Solar Energy Services",
+        slug: "solar",
+        description: "Turnkey on-grid and hybrid solar installations, NEPRA net-metering, and battery backups.",
+        image: "https://images.unsplash.com/photo-1509391365360-2e959784a276?w=400&auto=format&fit=crop",
+        icon: "solar",
+        display_order: 5,
+        displayOrder: 5,
+        is_active: true,
+        isActive: true,
+        created_at: "2026-08-05T13:00:00.000Z",
+        createdAt: "2026-08-05T13:00:00.000Z",
+        updated_at: "2026-10-25T14:00:00.000Z",
+        updatedAt: "2026-10-25T14:00:00.000Z"
+      },
+      {
+        id: "carpentry",
+        name: "Wooden Door Making and Carpentry",
+        title: "Wooden Door Making and Carpentry",
+        slug: "carpentry",
+        description: "Custom solid wood door crafting, architectural frames, precision lock fitting, and cabinetry.",
+        image: "https://images.unsplash.com/photo-1538688525198-9b88f6f53126?w=400&auto=format&fit=crop",
+        icon: "carpentry",
+        display_order: 6,
+        displayOrder: 6,
+        is_active: true,
+        isActive: true,
+        created_at: "2026-08-06T14:00:00.000Z",
+        createdAt: "2026-08-06T14:00:00.000Z",
+        updated_at: "2026-10-25T14:00:00.000Z",
+        updatedAt: "2026-10-25T14:00:00.000Z"
+      }
     ];
     localStorage.setItem(this.STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
   },
@@ -140,22 +273,101 @@ const TLCommunication = {
         id: "aud-001",
         actionType: "PROVIDER_VERIFIED",
         targetType: "provider",
+        entityType: "provider",
         targetId: "prov-profile-001",
+        entityId: "prov-profile-001",
         details: "Administrator verified PEC license and CNIC identity for Engr. Rashid Khan.",
-        adminId: "usr-adm-001",
+        adminId: "usr-admin-001",
+        adminName: "System Administrator",
         timestamp: "2026-10-25T10:00:00.000Z"
       },
       {
         id: "aud-002",
         actionType: "DISPUTE_RESOLVED",
         targetType: "dispute",
+        entityType: "dispute",
         targetId: "DISP-101",
+        entityId: "DISP-101",
         details: "Dispute DISP-101 investigated and marked resolved with mutual schedule agreement.",
-        adminId: "usr-adm-001",
+        adminId: "usr-admin-001",
+        adminName: "System Administrator",
         timestamp: "2026-10-26T18:30:00.000Z"
+      },
+      {
+        id: "aud-003",
+        actionType: "CATEGORY_CREATED",
+        targetType: "category",
+        entityType: "category",
+        targetId: "cat-006",
+        entityId: "cat-006",
+        details: "Administrator created category 'Wooden Door Making & Carpentry' with display order 6.",
+        adminId: "usr-admin-001",
+        adminName: "System Administrator",
+        timestamp: "2026-10-27T09:15:00.000Z"
+      },
+      {
+        id: "aud-004",
+        actionType: "USER_STATUS_UPDATED",
+        targetType: "user",
+        entityType: "user",
+        targetId: "usr-cust-002",
+        entityId: "usr-cust-002",
+        details: "Administrator activated user account for Ayesha Malik (Customer).",
+        adminId: "usr-admin-001",
+        adminName: "System Administrator",
+        timestamp: "2026-10-28T14:20:00.000Z"
+      },
+      {
+        id: "aud-005",
+        actionType: "BOOKING_STATUS_UPDATED",
+        targetType: "booking",
+        entityType: "booking",
+        targetId: "bk-9001",
+        entityId: "bk-9001",
+        details: "Administrator approved Booking #bk-9001 and transitioned state to [ACCEPTED].",
+        adminId: "usr-admin-001",
+        adminName: "System Administrator",
+        timestamp: "2026-10-29T11:45:00.000Z"
+      },
+      {
+        id: "aud-006",
+        actionType: "REVIEW_APPROVED",
+        targetType: "review",
+        entityType: "review",
+        targetId: "rev-88410",
+        entityId: "rev-88410",
+        details: "Administrator verified and approved customer review #rev-88410 for Engr. Rashid Khan.",
+        adminId: "usr-admin-001",
+        adminName: "System Administrator",
+        timestamp: "2026-10-30T16:10:00.000Z"
+      },
+      {
+        id: "aud-007",
+        actionType: "PLAN_CREATED",
+        targetType: "subscription_plan",
+        entityType: "subscription_plan",
+        targetId: "plan-pro",
+        entityId: "plan-pro",
+        details: "Administrator published subscription tier [TradeLinker Pro] (PKR 3,500 / 30 Days).",
+        adminId: "usr-admin-001",
+        adminName: "System Administrator",
+        timestamp: "2026-10-31T08:30:00.000Z"
+      },
+      {
+        id: "aud-008",
+        actionType: "SUBSCRIPTION_RENEWED",
+        targetType: "subscription",
+        entityType: "subscription",
+        targetId: "SUB-801",
+        entityId: "SUB-801",
+        details: "Administrator renewed subscription #SUB-801 for Engr. Rashid Khan for 30 days.",
+        adminId: "usr-admin-001",
+        adminName: "System Administrator",
+        timestamp: "2026-11-01T10:00:00.000Z"
       }
     ];
     localStorage.setItem(this.STORAGE_KEYS.ADMIN_AUDIT, JSON.stringify(logs));
+    localStorage.setItem("admin_audit_logs", JSON.stringify(logs));
   },
 
   // --------------------------------------------------------------------------
@@ -392,63 +604,133 @@ const TLCommunication = {
   getAllCategories() {
     this.init();
     try {
-      return JSON.parse(localStorage.getItem(this.STORAGE_KEYS.CATEGORIES)) || [];
-    } catch (e) { return []; }
+      const raw = localStorage.getItem(this.STORAGE_KEYS.CATEGORIES);
+      const list = JSON.parse(raw) || [];
+      return list.map((c, idx) => ({
+        id: c.id || c.slug,
+        name: c.name || c.title || "Category",
+        title: c.title || c.name || "Category", // alias
+        slug: c.slug || c.id || "",
+        description: c.description || "",
+        image: c.image || "",
+        icon: c.icon || "tools",
+        display_order: Number.isInteger(c.display_order) ? c.display_order : (Number.isInteger(c.displayOrder) ? c.displayOrder : idx + 1),
+        displayOrder: Number.isInteger(c.display_order) ? c.display_order : (Number.isInteger(c.displayOrder) ? c.displayOrder : idx + 1),
+        is_active: c.is_active !== undefined ? Boolean(c.is_active) : (c.isActive !== undefined ? Boolean(c.isActive) : true),
+        isActive: c.isActive !== undefined ? Boolean(c.isActive) : (c.is_active !== undefined ? Boolean(c.is_active) : true),
+        created_at: c.created_at || c.createdAt || new Date().toISOString(),
+        createdAt: c.createdAt || c.created_at || new Date().toISOString(),
+        updated_at: c.updated_at || c.updatedAt || new Date().toISOString(),
+        updatedAt: c.updatedAt || c.updated_at || new Date().toISOString()
+      }));
+    } catch (e) {
+      return [];
+    }
   },
 
   getCategoryById(id) {
+    if (!id) return null;
     const list = this.getAllCategories();
-    return list.find(c => c.id === id) || null;
+    const query = id.trim().toLowerCase();
+    return list.find(c => (c.id && c.id.toLowerCase() === query) || (c.slug && c.slug.toLowerCase() === query)) || null;
   },
 
   getCategoryUsage(categoryId) {
     const services = typeof TLServices !== "undefined" ? TLServices.getAllServices() : [];
     const bookings = typeof TLBookings !== "undefined" ? TLBookings.getAllBookings() : [];
     const providers = typeof TLAuth !== "undefined" ? TLAuth.getProviders() : [];
+    const cat = this.getCategoryById(categoryId);
+    const catTitle = cat ? (cat.name || cat.title || "").toLowerCase() : "";
+    const catSlug = cat ? (cat.slug || cat.id || "").toLowerCase() : (categoryId || "").toLowerCase();
 
-    const serviceCount = services.filter(s => s.categoryId === categoryId || s.category === categoryId).length;
-    const bookingCount = bookings.filter(b => b.categoryId === categoryId || b.category === categoryId).length;
-    const providerCount = providers.filter(p => p.categoryId === categoryId || p.categoryTitle === categoryId).length;
+    const matchedServices = services.filter(s => 
+      (s.categoryId && s.categoryId.toLowerCase() === catSlug) ||
+      (s.category && s.category.toLowerCase() === catSlug) ||
+      (s.categoryTitle && s.categoryTitle.toLowerCase() === catTitle)
+    );
 
-    return { serviceCount, bookingCount, providerCount, totalReferences: serviceCount + bookingCount };
+    const matchedBookings = bookings.filter(b => 
+      (b.categoryId && b.categoryId.toLowerCase() === catSlug) ||
+      (b.category && b.category.toLowerCase() === catSlug) ||
+      (b.categoryTitle && b.categoryTitle.toLowerCase() === catTitle)
+    );
+
+    const matchedProviders = providers.filter(p => 
+      (p.categoryId && p.categoryId.toLowerCase() === catSlug) ||
+      (p.categoryTitle && p.categoryTitle.toLowerCase() === catTitle)
+    );
+
+    return {
+      serviceCount: matchedServices.length,
+      bookingCount: matchedBookings.length,
+      providerCount: matchedProviders.length,
+      totalReferences: matchedServices.length + matchedBookings.length,
+      services: matchedServices,
+      bookings: matchedBookings
+    };
   },
 
-  addCategory({ id, title, description, icon = "tools", isActive = true, popularServices = [], adminId = "admin" }) {
+  addCategory({ id, name, title, slug, description, image, icon = "tools", display_order, displayOrder, is_active, isActive = true, popularServices = [], adminId = "admin" }) {
     this.init();
-    if (!title || title.trim().length < 3) {
-      return { success: false, error: "Category title must be at least 3 characters long." };
+    const categoryName = (name || title || "").trim();
+    if (!categoryName || categoryName.length < 3) {
+      return { success: false, error: "Category name must be at least 3 characters long." };
     }
 
-    const slug = (id && id.trim().length > 0)
-      ? id.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-')
-      : title.trim().toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+    // Slug generation & validation
+    let categorySlug = (slug || id || "").trim().toLowerCase();
+    if (!categorySlug) {
+      categorySlug = categoryName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    } else {
+      categorySlug = categorySlug.replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    }
 
-    if (!slug || slug.length < 2) {
-      return { success: false, error: "Invalid category slug generated." };
+    if (!categorySlug || categorySlug.length < 2) {
+      return { success: false, error: "Invalid category slug generated. Please enter a valid slug (alphanumeric and hyphens only)." };
     }
 
     const categories = this.getAllCategories();
 
-    if (categories.some(c => c.id === slug)) {
-      return { success: false, error: `A category with slug '${slug}' already exists. Please choose a unique name or slug.` };
-    }
-    if (categories.some(c => c.title.toLowerCase() === title.trim().toLowerCase())) {
-      return { success: false, error: `A category named '${title.trim()}' already exists.` };
+    // Check duplicate name
+    if (categories.some(c => (c.name || c.title || "").toLowerCase() === categoryName.toLowerCase())) {
+      return { success: false, error: `A category named '${categoryName}' already exists. Category names must be unique.` };
     }
 
+    // Check duplicate slug
+    if (categories.some(c => (c.slug || c.id || "").toLowerCase() === categorySlug.toLowerCase())) {
+      return { success: false, error: `A category with slug '${categorySlug}' already exists. Category slugs must be unique.` };
+    }
+
+    const activeStatus = is_active !== undefined ? Boolean(is_active) : Boolean(isActive);
+    const orderNum = parseInt(display_order || displayOrder || (categories.length + 1), 10) || (categories.length + 1);
+
+    const nowIso = new Date().toISOString();
     const newCategory = {
-      id: slug,
-      title: title.trim(),
+      id: categorySlug,
+      name: categoryName,
+      title: categoryName,
+      slug: categorySlug,
       description: (description && description.trim()) || "Professional trade and technical service solutions across Pakistan.",
+      image: image || "",
       icon: icon || "tools",
-      isActive: Boolean(isActive),
+      display_order: orderNum,
+      displayOrder: orderNum,
+      is_active: activeStatus,
+      isActive: activeStatus,
       popularServices: Array.isArray(popularServices) ? popularServices : (popularServices ? popularServices.split(',').map(s => s.trim()).filter(Boolean) : []),
-      createdAt: new Date().toISOString()
+      created_at: nowIso,
+      createdAt: nowIso,
+      updated_at: nowIso,
+      updatedAt: nowIso
     };
 
     categories.push(newCategory);
+    // Sort by display order
+    categories.sort((a, b) => a.display_order - b.display_order);
+
     localStorage.setItem(this.STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
 
+    // Keep TLData in sync if present
     if (typeof window !== "undefined" && window.TLData && Array.isArray(window.TLData.categories)) {
       if (!window.TLData.categories.some(c => c.id === newCategory.id)) {
         window.TLData.categories.push({
@@ -465,61 +747,57 @@ const TLCommunication = {
     this.logAdminAction({
       actionType: "CATEGORY_CREATED",
       targetType: "category",
-      targetId: newCategory.id,
-      details: `New service category '${newCategory.title}' (${newCategory.id}) created with status ${newCategory.isActive ? 'ACTIVE' : 'INACTIVE'}.`,
+      targetId: newCategory.slug,
+      details: `New service category '${newCategory.name}' (slug: ${newCategory.slug}, order: ${newCategory.display_order}) created with status ${newCategory.is_active ? 'ACTIVE' : 'INACTIVE'}.`,
       adminId
     });
 
     return { success: true, category: newCategory };
   },
 
-  updateCategory(categoryId, { title, description, icon, isActive, newSlug, popularServices, adminId = "admin" }) {
+  updateCategory(categoryId, { name, title, slug, newSlug, description, image, icon, display_order, displayOrder, is_active, isActive, popularServices, adminId = "admin" }) {
     this.init();
     const categories = this.getAllCategories();
-    const idx = categories.findIndex(c => c.id === categoryId);
+    const idx = categories.findIndex(c => (c.id === categoryId || c.slug === categoryId));
     if (idx === -1) return { success: false, error: "Category not found." };
 
     const oldCat = categories[idx];
+    const categoryName = (name !== undefined ? name : title);
 
-    if (title && title.trim().toLowerCase() !== oldCat.title.toLowerCase()) {
-      if (categories.some((c, i) => i !== idx && c.title.toLowerCase() === title.trim().toLowerCase())) {
-        return { success: false, error: `Another category is already named '${title.trim()}'.` };
+    if (categoryName && categoryName.trim().toLowerCase() !== (oldCat.name || oldCat.title || "").toLowerCase()) {
+      const cleanName = categoryName.trim();
+      if (cleanName.length < 3) {
+        return { success: false, error: "Category name must be at least 3 characters long." };
       }
-      oldCat.title = title.trim();
+      if (categories.some((c, i) => i !== idx && (c.name || c.title || "").toLowerCase() === cleanName.toLowerCase())) {
+        return { success: false, error: `Another category is already named '${cleanName}'. Category names must be unique.` };
+      }
+      oldCat.name = cleanName;
+      oldCat.title = cleanName;
     }
 
-    if (description !== undefined) {
-      oldCat.description = description.trim();
-    }
-
-    if (icon) {
-      oldCat.icon = icon.trim();
-    }
-
-    if (isActive !== undefined) {
-      oldCat.isActive = Boolean(isActive);
-    }
-
-    if (popularServices !== undefined) {
-      oldCat.popularServices = Array.isArray(popularServices) 
-        ? popularServices 
-        : popularServices.split(',').map(s => s.trim()).filter(Boolean);
-    }
-
-    if (newSlug && newSlug.trim() !== categoryId) {
-      const cleanSlug = newSlug.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-');
-      if (categories.some((c, i) => i !== idx && c.id === cleanSlug)) {
+    const proposedSlug = (slug || newSlug);
+    if (proposedSlug && proposedSlug.trim().toLowerCase() !== (oldCat.slug || oldCat.id || "").toLowerCase()) {
+      const cleanSlug = proposedSlug.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+      if (cleanSlug.length < 2) {
+        return { success: false, error: "Invalid category slug." };
+      }
+      if (categories.some((c, i) => i !== idx && (c.slug || c.id || "").toLowerCase() === cleanSlug)) {
         return { success: false, error: `Slug '${cleanSlug}' is already in use by another category.` };
       }
+
+      const prevSlug = oldCat.slug || oldCat.id;
+      oldCat.slug = cleanSlug;
       oldCat.id = cleanSlug;
 
+      // Update references in TLServices
       if (typeof TLServices !== "undefined") {
         const services = TLServices.getAllServices();
         let changed = false;
         services.forEach(s => {
-          if (s.categoryId === categoryId) {
+          if (s.categoryId === prevSlug) {
             s.categoryId = cleanSlug;
-            s.categoryTitle = oldCat.title;
+            s.categoryTitle = oldCat.name;
             changed = true;
           }
         });
@@ -529,15 +807,54 @@ const TLCommunication = {
       }
     }
 
-    oldCat.updatedAt = new Date().toISOString();
+    if (description !== undefined) {
+      oldCat.description = description.trim();
+    }
+
+    if (image !== undefined) {
+      oldCat.image = image.trim();
+    }
+
+    if (icon !== undefined) {
+      oldCat.icon = icon.trim();
+    }
+
+    if (display_order !== undefined || displayOrder !== undefined) {
+      const ord = parseInt(display_order !== undefined ? display_order : displayOrder, 10);
+      if (!isNaN(ord) && ord >= 0) {
+        oldCat.display_order = ord;
+        oldCat.displayOrder = ord;
+      }
+    }
+
+    if (is_active !== undefined) {
+      oldCat.is_active = Boolean(is_active);
+      oldCat.isActive = Boolean(is_active);
+    } else if (isActive !== undefined) {
+      oldCat.is_active = Boolean(isActive);
+      oldCat.isActive = Boolean(isActive);
+    }
+
+    if (popularServices !== undefined) {
+      oldCat.popularServices = Array.isArray(popularServices) 
+        ? popularServices 
+        : popularServices.split(',').map(s => s.trim()).filter(Boolean);
+    }
+
+    oldCat.updated_at = new Date().toISOString();
+    oldCat.updatedAt = oldCat.updated_at;
+
     categories[idx] = oldCat;
+    // Sort by display order
+    categories.sort((a, b) => a.display_order - b.display_order);
+
     localStorage.setItem(this.STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
 
     this.logAdminAction({
       actionType: "CATEGORY_UPDATED",
       targetType: "category",
-      targetId: oldCat.id,
-      details: `Category '${oldCat.title}' was updated. Status: ${oldCat.isActive ? 'ACTIVE' : 'INACTIVE'}.`,
+      targetId: oldCat.slug || oldCat.id,
+      details: `Category '${oldCat.name}' was updated. Status: ${oldCat.is_active ? 'ACTIVE' : 'INACTIVE'}, Display Order: ${oldCat.display_order}.`,
       adminId
     });
 
@@ -547,8 +864,8 @@ const TLCommunication = {
   deleteCategory(categoryId, { force = false, adminId = "admin" } = {}) {
     this.init();
     const categories = this.getAllCategories();
-    const idx = categories.findIndex(c => c.id === categoryId);
-    if (idx === -1) return { success: false, error: "Category not found." };
+    const idx = categories.findIndex(c => (c.id === categoryId || c.slug === categoryId));
+    if (idx === -1) return { success: false, error: "Category not found in database." };
 
     const cat = categories[idx];
     const usage = this.getCategoryUsage(categoryId);
@@ -560,7 +877,7 @@ const TLCommunication = {
         serviceCount: usage.serviceCount,
         bookingCount: usage.bookingCount,
         providerCount: usage.providerCount,
-        error: `Category '${cat.title}' is actively referenced by ${usage.serviceCount} service(s) and ${usage.bookingCount} booking(s). Deactivate the category instead to avoid breaking existing customer and provider records.`
+        error: `Category '${cat.name || cat.title}' cannot be deleted because it is actively being used by ${usage.serviceCount} service listing(s) and ${usage.bookingCount} booking request(s). Deactivate this category instead to prevent breaking customer and professional records.`
       };
     }
 
@@ -568,7 +885,7 @@ const TLCommunication = {
     localStorage.setItem(this.STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
 
     if (typeof window !== "undefined" && window.TLData && Array.isArray(window.TLData.categories)) {
-      const dIdx = window.TLData.categories.findIndex(c => c.id === categoryId);
+      const dIdx = window.TLData.categories.findIndex(c => c.id === categoryId || c.id === cat.slug);
       if (dIdx !== -1) window.TLData.categories.splice(dIdx, 1);
     }
 
@@ -576,31 +893,36 @@ const TLCommunication = {
       actionType: "CATEGORY_DELETED",
       targetType: "category",
       targetId: categoryId,
-      details: `Category '${cat.title}' (${categoryId}) was deleted by administrator.`,
+      details: `Category '${cat.name || cat.title}' (${categoryId}) was deleted permanently by administrator.`,
       adminId
     });
 
-    return { success: true, deletedId: categoryId, title: cat.title };
+    return { success: true, deletedId: categoryId, name: cat.name || cat.title };
   },
 
   toggleCategoryStatus(categoryId, adminId = "admin") {
     this.init();
     const categories = this.getAllCategories();
-    const idx = categories.findIndex(c => c.id === categoryId);
+    const idx = categories.findIndex(c => (c.id === categoryId || c.slug === categoryId));
     if (idx === -1) return { success: false, error: "Category not found." };
 
-    categories[idx].isActive = !categories[idx].isActive;
+    const newStatus = !(categories[idx].is_active !== undefined ? categories[idx].is_active : categories[idx].isActive);
+    categories[idx].is_active = newStatus;
+    categories[idx].isActive = newStatus;
+    categories[idx].updated_at = new Date().toISOString();
+    categories[idx].updatedAt = categories[idx].updated_at;
+
     localStorage.setItem(this.STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
 
     this.logAdminAction({
-      actionType: categories[idx].isActive ? "CATEGORY_ACTIVATED" : "CATEGORY_DEACTIVATED",
+      actionType: newStatus ? "CATEGORY_ACTIVATED" : "CATEGORY_DEACTIVATED",
       targetType: "category",
       targetId: categoryId,
-      details: `Category '${categories[idx].title}' status changed to: ${categories[idx].isActive ? 'ACTIVE' : 'INACTIVE'}.`,
+      details: `Category '${categories[idx].name || categories[idx].title}' status set to: ${newStatus ? 'ACTIVE' : 'INACTIVE'}.`,
       adminId
     });
 
-    return { success: true, category: categories[idx] };
+    return { success: true, is_active: newStatus, category: categories[idx] };
   },
 
   // --------------------------------------------------------------------------
@@ -615,12 +937,12 @@ const TLCommunication = {
 
     const provider = providers[idx];
 
-    if (action === "approve") {
+    if (action === "approve" || action === "verified") {
       provider.verificationStatus = "verified";
-    } else if (action === "reject") {
+    } else if (action === "reject" || action === "rejected") {
       provider.verificationStatus = "rejected";
-    } else if (action === "request_info") {
-      provider.verificationStatus = "info_requested";
+    } else if (action === "request_info" || action === "pending" || action === "info_requested") {
+      provider.verificationStatus = "pending";
     } else {
       return { success: false, error: `Invalid verification action: ${action}` };
     }
@@ -663,32 +985,114 @@ const TLCommunication = {
   // --------------------------------------------------------------------------
   // 7. Administrator Audit Logging (FR-44, FR-48)
   // --------------------------------------------------------------------------
-  logAdminAction({ actionType, targetType, targetId, details, adminId = "admin" }) {
+  logAdminAction({
+    actionType,
+    targetType,
+    targetId,
+    entityType,
+    entityId,
+    details,
+    adminId = "usr-admin-001",
+    adminName
+  }) {
     let logs = [];
     try {
-      logs = JSON.parse(localStorage.getItem(this.STORAGE_KEYS.ADMIN_AUDIT)) || [];
-    } catch (e) { logs = []; }
+      const raw = localStorage.getItem(this.STORAGE_KEYS.ADMIN_AUDIT) || localStorage.getItem("admin_audit_logs");
+      logs = raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      logs = [];
+    }
+
+    const finalEntityType = (entityType || targetType || "system").toLowerCase();
+    const finalEntityId = entityId || targetId || "-";
+
+    let resolvedName = adminName;
+    if (!resolvedName && typeof TLAuth !== "undefined" && TLAuth.getUsers) {
+      const u = (TLAuth.getUsers() || []).find(x => x.id === adminId);
+      resolvedName = u ? (u.fullName || u.name) : "System Administrator";
+    }
+    if (!resolvedName) resolvedName = "System Administrator";
 
     const entry = {
       id: "aud-" + Math.floor(1000 + Math.random() * 9000),
-      actionType,
-      targetType,
-      targetId,
-      details,
-      adminId,
+      actionType: actionType || "ADMIN_ACTION",
+      targetType: finalEntityType,
+      entityType: finalEntityType,
+      targetId: finalEntityId,
+      entityId: finalEntityId,
+      details: details || "Administrative action executed.",
+      adminId: adminId || "usr-admin-001",
+      adminName: resolvedName,
       timestamp: new Date().toISOString()
     };
 
     logs.unshift(entry);
     localStorage.setItem(this.STORAGE_KEYS.ADMIN_AUDIT, JSON.stringify(logs));
+    localStorage.setItem("admin_audit_logs", JSON.stringify(logs));
     return entry;
   },
 
   getAllAdminAuditLogs() {
     this.init();
     try {
-      return JSON.parse(localStorage.getItem(this.STORAGE_KEYS.ADMIN_AUDIT)) || [];
-    } catch (e) { return []; }
+      const raw = localStorage.getItem(this.STORAGE_KEYS.ADMIN_AUDIT) || localStorage.getItem("admin_audit_logs");
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  getAuditLogById(logId) {
+    if (!logId) return null;
+    return this.getAllAdminAuditLogs().find(l => l.id === logId) || null;
+  },
+
+  getAdminAuditTrail() {
+    return this.getAllAdminAuditLogs();
+  },
+
+  filterAdminAuditLogs({ search = "", entityType = "all", actionType = "all", adminId = "all", timeRange = "all" }) {
+    let list = this.getAllAdminAuditLogs();
+    const q = (search || "").toLowerCase().trim();
+
+    if (q) {
+      list = list.filter(l =>
+        (l.id || "").toLowerCase().includes(q) ||
+        (l.actionType || "").toLowerCase().includes(q) ||
+        (l.entityType || l.targetType || "").toLowerCase().includes(q) ||
+        (l.entityId || l.targetId || "").toLowerCase().includes(q) ||
+        (l.details || "").toLowerCase().includes(q) ||
+        (l.adminName || "").toLowerCase().includes(q) ||
+        (l.adminId || "").toLowerCase().includes(q)
+      );
+    }
+
+    if (entityType && entityType !== "all") {
+      list = list.filter(l => (l.entityType || l.targetType || "").toLowerCase() === entityType.toLowerCase());
+    }
+
+    if (actionType && actionType !== "all") {
+      list = list.filter(l => (l.actionType || "").toUpperCase() === actionType.toUpperCase());
+    }
+
+    if (adminId && adminId !== "all") {
+      list = list.filter(l => l.adminId === adminId);
+    }
+
+    if (timeRange && timeRange !== "all") {
+      const now = Date.now();
+      list = list.filter(l => {
+        const t = new Date(l.timestamp).getTime();
+        if (isNaN(t)) return true;
+        const diffHours = (now - t) / (1000 * 60 * 60);
+        if (timeRange === "today") return diffHours <= 24;
+        if (timeRange === "7days") return diffHours <= 24 * 7;
+        if (timeRange === "30days") return diffHours <= 24 * 30;
+        return true;
+      });
+    }
+
+    return list;
   },
 
   // --------------------------------------------------------------------------
