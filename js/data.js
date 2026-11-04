@@ -191,6 +191,26 @@ const TLData = {
 
   // Helper: Query categories
   getCategories() {
+    try {
+      const raw = localStorage.getItem("tl_db_categories");
+      if (raw) {
+        const stored = JSON.parse(raw);
+        if (Array.isArray(stored) && stored.length > 0) {
+          return stored.map(c => ({
+            id: c.slug || c.id,
+            slug: c.slug || c.id,
+            title: c.name || c.title || "Category",
+            name: c.name || c.title || "Category",
+            tagline: c.description || c.tagline || "",
+            description: c.description || c.tagline || "",
+            icon: c.icon || "tools",
+            activeCount: c.activeCount || 0,
+            is_active: c.is_active !== undefined ? c.is_active : (c.isActive !== undefined ? c.isActive : true),
+            popularServices: Array.isArray(c.popularServices) ? c.popularServices : []
+          }));
+        }
+      }
+    } catch (e) {}
     return this.categories;
   },
 

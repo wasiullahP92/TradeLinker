@@ -844,7 +844,28 @@
     // ------------------------------------------------------------------------
     // Service Modal Handlers (Create / Edit / Delete)
     // ------------------------------------------------------------------------
+    function populateProviderCategorySelect(selectedCategory = '') {
+      const srvCat = document.getElementById('srvCategory');
+      if (!srvCat) return;
+      let categories = [];
+      if (typeof TLCommunication !== 'undefined' && TLCommunication.getAllCategories) {
+        categories = TLCommunication.getAllCategories();
+      } else {
+        try {
+          categories = JSON.parse(localStorage.getItem("tl_db_categories")) || [];
+        } catch(e) {}
+      }
+      if (categories && categories.length > 0) {
+        const activeCategories = categories.filter(c => c.is_active !== false && c.isActive !== false);
+        srvCat.innerHTML = activeCategories.map(c => `
+          <option value="${c.slug || c.id}">${c.name || c.title}</option>
+        `).join('');
+      }
+      if (selectedCategory) srvCat.value = selectedCategory;
+    }
+
     function openCreateServiceModal() {
+      populateProviderCategorySelect();
       document.getElementById('serviceForm').reset();
       document.getElementById('serviceEditId').value = '';
       document.getElementById('serviceModalTitle').innerText = 'Create Service Listing';
@@ -858,6 +879,7 @@
       const s = services.find(x => x.id === serviceId);
       if (!s) return;
 
+      populateProviderCategorySelect(s.categoryId);
       document.getElementById('serviceEditId').value = s.id;
       document.getElementById('srvTitle').value = s.title;
       document.getElementById('srvCategory').value = s.categoryId;

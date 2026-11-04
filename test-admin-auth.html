@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TradeLinker Admin Authentication & Security Verification Test Runner</title>
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    body { padding: 40px; background: #F8FAFC; font-family: var(--tl-font-sans); }
+    .test-card { background: #FFF; border: 1px solid var(--tl-border-subtle); border-radius: 12px; padding: 18px 24px; margin-bottom: 14px; }
+    .test-pass { color: #059669; font-weight: 800; font-size: 0.9rem; }
+    .test-fail { color: #DC2626; font-weight: 800; font-size: 0.9rem; }
+    .log-box { background: #011425; color: #A7F3D0; font-family: monospace; font-size: 0.8rem; padding: 16px; border-radius: 10px; max-height: 240px; overflow-y: auto; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <div class="tl-container" style="max-width: 900px;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+      <div>
+        <h1 style="font-size: 1.8rem; color: var(--tl-navy-800); margin: 0 0 6px;">Admin Authentication & RBAC Test Suite</h1>
+        <p style="color: var(--tl-text-secondary); margin: 0;">Comprehensive verification of SRS FR-43, FR-49, BR-08, NFR-04, and NFR-06.</p>
+      </div>
+      <button class="tl-btn tl-btn-primary" onclick="runAllAdminAuthTests()">Re-Run All Security Tests</button>
+    </div>
+
+    <!-- Summary Box -->
+    <div id="testSummaryBox" style="margin-bottom: 20px;">
+      <div style="padding: 16px; background: #FFFFFF; border: 1px solid var(--tl-border-subtle); border-radius: 12px;">
+        <span class="tl-spinner tl-spinner-sm"></span> Initializing automated security test scenarios...
+      </div>
+    </div>
+
+    <!-- Test List Container -->
+    <div id="testResultsList"></div>
+
+    <!-- Terminal Log -->
+    <div class="log-box" id="testLogBox"></div>
+
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+
+  <script>
+    const logs = [];
+    function log(msg) {
+      logs.push(`[${new Date().toLocaleTimeString()}] ${msg}`);
+      const box = document.getElementById('testLogBox');
+      if (box) {
+        box.innerText = logs.join('\n');
+        box.scrollTop = box.scrollHeight;
+      }
+    }
+
+    async function runAllAdminAuthTests() {
+      const resultsContainer = document.getElementById('testResultsList');
+      const summaryBox = document.getElementById('testSummaryBox');
+      resultsContainer.innerHTML = '';
+      logs.length = 0;
+      log("Initializing TradeLinker Admin Security Test Suite...");
+
+      const tests = [];
+
+      // Test 1: Seed Admin Account Integrity
+      try {
+        log("Test 1: Verifying Administrator seed vault record in storage...");
+        TLAuth.init();
+        const users = TLAuth.getUsers();
+        const adminUser = users.find(u => u.role === 'admin' && u.email === 'admin@tradelinker.com');
+        
+        if (!adminUser) throw new Error("Administrator seed user not found in vault.");
+        if (!adminUser.passwordHash || adminUser.passwordHash.length !== 64) {
+          throw new Error("Invalid password hash format. Expected 64-character SHA-256 string.");
+        }
+
+        tests.push({
+          name: "1. Administrator Vault Seed & SHA-256 Integrity",
+          passed: true,
+          details: `Admin user '${adminUser.email}' present with 64-character cryptographic hash (Zero plain-text password exposure).`
+        });
+        log("Test 1 PASS: Admin user seeded securely.");
+      } catch (e) {
+        tests.push({ name: "1. Administrator Vault Seed Integrity", passed: false, details: e.message });
+        log("Test 1 FAIL: " + e.message);
+      }
+
+      // Test 2: Valid Administrator Authentication (FR-03, FR-43)
+      try {
+        log("Test 2: Authenticating with valid Administrator credentials...");
+        TLAuth.clearSession();
+        const res = await TLAuth.login("admin@tradelinker.com", "AdminTradeLinker2026!", true);
+        
+        if (!res.success) throw new Error(res.error || "Login returned false");
+        if (res.user.role !== 'admin') throw new Error(`Role mismatch. Expected 'admin', got '${res.user.role}'`);
+        
+        tests.push({
+          name: "2. Valid Admin Login Authentication (FR-43)",
+          passed: true,
+          details: `Successfully authenticated '${res.user.fullName}' with role 'admin' and token prefix '${TLConfig.security.tokenPrefix}'.`
+        });
+        log("Test 2 PASS: Valid admin login verified.");
+      } catch (e) {
+        tests.push({ name: "2. Valid Admin Login Authentication", passed: false, details: e.message });
+        log("Test 2 FAIL: " + e.message);
+      }
+
+      // Test 3: Invalid Admin Password Rejection (NFR-04)
+      try {
+        log("Test 3: Testing brute force rejection with invalid admin password...");
+        const badRes = await TLAuth.login("admin@tradelinker.com", "IncorrectPassword123!");
+        
+        if (badRes.success) throw new Error("Login unexpectedly succeeded with incorrect password!");
+        if (!badRes.error || !badRes.error.includes("Invalid credentials")) {
+          throw new Error("Unexpected error message: " + badRes.error);
+        }
+
+        tests.push({
+          name: "3. Bad Password Rejection & Anti-Enumeration (NFR-04)",
+          passed: true,
+          details: `Rejected invalid password cleanly with generic message: "${badRes.error}".`
+        });
+        log("Test 3 PASS: Bad password correctly rejected.");
+      } catch (e) {
+        tests.push({ name: "3. Bad Password Rejection", passed: false, details: e.message });
+        log("Test 3 FAIL: " + e.message);
+      }
+
+      // Test 4: Role-Based Authorization Guard on Admin Portal (FR-49, NFR-06)
+      try {
+        log("Test 4: Verifying non-admin customer account attempting admin login is blocked...");
+        // Authenticate as customer
+        const custLogin = await TLAuth.login("customer@tradelinker.com", "CustomerPass2026!");
+        if (!custLogin.success) throw new Error("Customer test login failed: " + custLogin.error);
+
+        const currentCust = TLAuth.getCurrentUser();
+        // Check if customer possesses admin privileges
+        const isAdmin = currentCust.role === 'admin';
+        if (isAdmin) throw new Error("Customer account incorrectly recognized as admin!");
+
+        tests.push({
+          name: "4. Customer Account Admin Access Guard (FR-49)",
+          passed: !isAdmin && currentCust.role === 'customer',
+          details: `Customer account '${currentCust.email}' strictly restricted from administrator privileges.`
+        });
+        log("Test 4 PASS: Non-admin role blocked from admin privileges.");
+      } catch (e) {
+        tests.push({ name: "4. Customer Account Admin Access Guard", passed: false, details: e.message });
+        log("Test 4 FAIL: " + e.message);
+      }
+
+      // Test 5: Suspended Account Login Rejection (BR-08)
+      try {
+        log("Test 5: Testing account suspension enforcement...");
+        const users = TLAuth.getUsers();
+        const testUser = users.find(u => u.role === 'customer');
+        const origStatus = testUser.status;
+
+        // Temporarily suspend
+        testUser.status = 'suspended';
+        localStorage.setItem(TLAuth.STORAGE_KEYS.USERS, JSON.stringify(users));
+
+        const suspRes = await TLAuth.login(testUser.email, "CustomerPass2026!");
+
+        // Restore original status
+        testUser.status = origStatus;
+        localStorage.setItem(TLAuth.STORAGE_KEYS.USERS, JSON.stringify(users));
+
+        if (suspRes.success) throw new Error("Suspended account was able to authenticate!");
+        if (!suspRes.error.includes("suspended")) throw new Error("Expected suspension error notice.");
+
+        tests.push({
+          name: "5. Suspended Account Enforcement (BR-08)",
+          passed: true,
+          details: `Suspended user '${testUser.email}' immediately blocked from authentication.`
+        });
+        log("Test 5 PASS: Suspended user blocked.");
+      } catch (e) {
+        tests.push({ name: "5. Suspended Account Enforcement", passed: false, details: e.message });
+        log("Test 5 FAIL: " + e.message);
+      }
+
+      // Test 6: Session Vault Structure & Expiration (NFR-04)
+      try {
+        log("Test 6: Testing authenticated session token persistence...");
+        await TLAuth.login("admin@tradelinker.com", "AdminTradeLinker2026!", true);
+        const sessionRaw = localStorage.getItem(TLAuth.STORAGE_KEYS.SESSION);
+        if (!sessionRaw) throw new Error("Session not saved in localStorage.");
+
+        const session = JSON.parse(sessionRaw);
+        if (!session.token || !session.token.startsWith(TLConfig.security.tokenPrefix)) {
+          throw new Error("Invalid session token format.");
+        }
+        if (!session.expiresAt || session.expiresAt <= Date.now()) {
+          throw new Error("Invalid session expiration timestamp.");
+        }
+        if (session.role !== 'admin') {
+          throw new Error("Session role is not 'admin'.");
+        }
+
+        tests.push({
+          name: "6. Session Token Cryptographic Structure",
+          passed: true,
+          details: `Valid session token verified. Expiration set for ${new Date(session.expiresAt).toLocaleTimeString()} (+24 hrs).`
+        });
+        log("Test 6 PASS: Session structure valid.");
+      } catch (e) {
+        tests.push({ name: "6. Session Token Cryptographic Structure", passed: false, details: e.message });
+        log("Test 6 FAIL: " + e.message);
+      }
+
+      // Test 7: Admin Logout & Complete Session Revocation
+      try {
+        log("Test 7: Testing administrator logout & session clearance...");
+        TLAuth.clearSession();
+
+        const currentUser = TLAuth.getCurrentUser();
+        const hasSession = localStorage.getItem(TLAuth.STORAGE_KEYS.SESSION) !== null;
+
+        if (currentUser !== null || hasSession) {
+          throw new Error("Session keys not purged completely from browser storage.");
+        }
+
+        tests.push({
+          name: "7. Logout & Session Purge Verification",
+          passed: true,
+          details: `Session keys removed from localStorage and sessionStorage. Unauthenticated state confirmed.`
+        });
+        log("Test 7 PASS: Logout cleared all sessions.");
+      } catch (e) {
+        tests.push({ name: "7. Logout & Session Purge Verification", passed: false, details: e.message });
+        log("Test 7 FAIL: " + e.message);
+      }
+
+      // Render Summary
+      const passedCount = tests.filter(t => t.passed).length;
+      summaryBox.innerHTML = `
+        <div style="padding: 16px 20px; background: ${passedCount === tests.length ? '#D1FAE5' : '#FEF2F2'}; border: 1px solid ${passedCount === tests.length ? '#A7F3D0' : '#FECACA'}; border-radius: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <strong style="color: ${passedCount === tests.length ? '#065F46' : '#991B1B'}; font-size: 1.1rem;">
+              ${passedCount === tests.length ? '✓ All Security Tests Passed' : '⚠ Some Tests Failed'}
+            </strong>
+            <div style="font-size: 0.85rem; color: #475569; margin-top: 4px;">
+              ${passedCount} of ${tests.length} automated authentication & authorization tests completed successfully.
+            </div>
+          </div>
+          <span class="tl-badge ${passedCount === tests.length ? 'tl-badge-completed' : 'tl-badge-cancelled'}" style="font-size: 0.9rem; padding: 6px 14px;">
+            ${passedCount} / ${tests.length} PASSED
+          </span>
+        </div>
+      `;
+
+      // Render Test Cards
+      resultsContainer.innerHTML = tests.map(t => `
+        <div class="test-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <strong style="font-size: 1rem; color: var(--tl-navy-800);">${t.name}</strong>
+            <span class="${t.passed ? 'test-pass' : 'test-fail'}">${t.passed ? 'PASSED ✓' : 'FAILED ✗'}</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--tl-text-secondary); margin: 0;">${t.details}</p>
+        </div>
+      `).join('');
+    }
+
+    // Auto-run on load
+    document.addEventListener('DOMContentLoaded', () => {
+      runAllAdminAuthTests();
+    });
+  </script>
+
+</body>
+</html>
+

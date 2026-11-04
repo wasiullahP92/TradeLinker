@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>TradeLinker Service Management Verification Suite</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 24px;
+      background: #0F172A;
+      color: #F8FAFC;
+      margin: 0;
+    }
+
+    h1 {
+      color: #01AD8F;
+      margin-top: 0;
+      font-size: 1.5rem;
+    }
+
+    .summary-bar {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .summary-pass {
+      background: #064E3B;
+      color: #34D399;
+      border: 1px solid #059669;
+    }
+
+    .summary-fail {
+      background: #7F1D1D;
+      color: #F87171;
+      border: 1px solid #DC2626;
+    }
+
+    .test-box {
+      background: #1E293B;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border-left: 4px solid #64748B;
+      font-size: 0.9rem;
+    }
+
+    .test-box.pass {
+      border-left-color: #10B981;
+    }
+
+    .test-box.fail {
+      border-left-color: #EF4444;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+      margin-right: 8px;
+    }
+
+    .badge.pass {
+      background: #064E3B;
+      color: #34D399;
+    }
+
+    .badge.fail {
+      background: #7F1D1D;
+      color: #F87171;
+    }
+
+    .details {
+      font-size: 0.8rem;
+      color: #94A3B8;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>TradeLinker Service Listings Catalog &amp; Management Verification Suite</h1>
+  <div id="resultsUI">Running automated test assertions...</div>
+
+  <!-- Direct In-DOM Container with Service Management UI Elements -->
+  <div id="testDomWrapper" style="display:none;">
+    <div id="serviceStatTotal">0</div>
+    <div id="serviceStatAvailable">0</div>
+    <div id="serviceStatPaused">0</div>
+    <div id="serviceStatFixed">0</div>
+    <div id="serviceStatQuote">0</div>
+    <div id="badgeNavListings">0</div>
+
+    <input type="text" id="listingSearchInput">
+    <select id="listingCategoryFilter">
+      <option value="all">All Categories</option>
+    </select>
+    <select id="listingStatusFilter">
+      <option value="all">All Statuses</option>
+      <option value="available">Available (Active)</option>
+      <option value="paused">Paused (Offline)</option>
+    </select>
+    <select id="listingPricingFilter">
+      <option value="all">All Pricing</option>
+      <option value="fixed">Fixed Price</option>
+      <option value="hourly">Hourly Rate</option>
+      <option value="upon_request">Upon Request</option>
+    </select>
+    <select id="listingSortSelect">
+      <option value="newest">Newest</option>
+      <option value="oldest">Oldest</option>
+      <option value="title_asc">Title</option>
+      <option value="price_low_high">Price Low-High</option>
+      <option value="price_high_low">Price High-Low</option>
+    </select>
+    <select id="listingPerPageSelect">
+      <option value="5" selected>5</option>
+      <option value="10">10</option>
+      <option value="20">20</option>
+    </select>
+
+    <table>
+      <tbody id="listingsManagementTbody"></tbody>
+    </table>
+
+    <div id="listingPaginationInfo"></div>
+    <div id="listingPaginationControls"></div>
+
+    <!-- Modals -->
+    <div id="serviceDetailsModal" class="tl-modal-backdrop">
+      <div id="dossierServiceTitle"></div>
+      <div id="dossierServiceCategoryBadge"></div>
+      <div id="dossierServiceStatusBadge"></div>
+      <div id="dossierServiceId"></div>
+      <div id="dossierServiceCreated"></div>
+      <div id="dossierServicePricingType"></div>
+      <div id="dossierServicePriceDisplay"></div>
+      <div id="dossierServiceBookingsCount"></div>
+      <div id="dossierServiceDescription"></div>
+      <img id="dossierServiceProAvatar" src="">
+      <div id="dossierServiceProBizName"></div>
+      <div id="dossierServiceProLegalName"></div>
+      <div id="dossierServiceProCity"></div>
+      <div id="dossierServiceProPhone"></div>
+      <div id="dossierServiceProRatingPill"></div>
+      <div id="dossierServiceProIdTag"></div>
+      <div id="dossierServiceBookingsList"></div>
+      <button id="dossierServiceOpenProBtn"></button>
+      <button id="dossierServiceToggleBtn"></button>
+      <button id="dossierServiceEditBtn"></button>
+      <button id="dossierServiceDeleteBtn"></button>
+    </div>
+
+    <div id="serviceEditModal" class="tl-modal-backdrop">
+      <div id="modalServiceEditError" style="display:none;"></div>
+      <form id="serviceEditForm">
+        <input type="hidden" id="modalServiceEditId">
+        <input type="text" id="modalServiceEditTitle">
+        <select id="modalServiceEditCategory"></select>
+        <select id="modalServiceEditProvider"></select>
+        <select id="modalServiceEditPricingType">
+          <option value="fixed">Fixed</option>
+          <option value="hourly">Hourly</option>
+          <option value="upon_request">Upon Request</option>
+        </select>
+        <div id="modalServiceEditPriceGroup">
+          <input type="number" id="modalServiceEditPriceAmount">
+        </div>
+        <div id="modalServiceEditUnitGroup">
+          <input type="text" id="modalServiceEditPriceUnit">
+        </div>
+        <select id="modalServiceEditAvailable">
+          <option value="true">true</option>
+          <option value="false">false</option>
+        </select>
+        <textarea id="modalServiceEditDescription"></textarea>
+      </form>
+    </div>
+
+    <div id="serviceCreateModal" class="tl-modal-backdrop">
+      <div id="modalServiceCreateError" style="display:none;"></div>
+      <form id="serviceCreateForm">
+        <input type="text" id="modalServiceCreateTitle">
+        <select id="modalServiceCreateCategory"></select>
+        <select id="modalServiceCreateProvider"></select>
+        <select id="modalServiceCreatePricingType">
+          <option value="fixed">Fixed</option>
+          <option value="hourly">Hourly</option>
+          <option value="upon_request">Upon Request</option>
+        </select>
+        <div id="modalServiceCreatePriceGroup">
+          <input type="number" id="modalServiceCreatePriceAmount">
+        </div>
+        <div id="modalServiceCreateUnitGroup">
+          <input type="text" id="modalServiceCreatePriceUnit">
+        </div>
+        <select id="modalServiceCreateAvailable">
+          <option value="true">true</option>
+          <option value="false">false</option>
+        </select>
+        <textarea id="modalServiceCreateDescription"></textarea>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+
+  <script>
+    let currentAdminUser = { id: "usr-admin-001", fullName: "System Administrator", role: "admin" };
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    const listingState = {
+      currentPage: 1,
+      perPage: 5,
+      search: '',
+      categoryFilter: 'all',
+      statusFilter: 'all',
+      pricingFilter: 'all',
+      sortBy: 'newest',
+      selectedServiceId: null
+    };
+
+    function populateListingCategoriesDropdown() {
+      let categories = [];
+      if (typeof TLCommunication !== 'undefined' && TLCommunication.getAllCategories) {
+        categories = TLCommunication.getAllCategories();
+      } else {
+        try {
+          categories = JSON.parse(localStorage.getItem('tl_db_categories')) || [];
+        } catch (e) { }
+      }
+
+      const catFilter = document.getElementById('listingCategoryFilter');
+      if (catFilter) {
+        const currentVal = listingState.categoryFilter;
+        let html = '<option value="all">All Categories</option>';
+        categories.forEach(c => {
+          const val = c.slug || c.id;
+          const label = c.name || c.title;
+          html += `<option value="${escapeHtml(val)}" ${currentVal === val ? 'selected' : ''}>${escapeHtml(label)}</option>`;
+        });
+        catFilter.innerHTML = html;
+      }
+
+      const editCat = document.getElementById('modalServiceEditCategory');
+      if (editCat) {
+        let html = '';
+        categories.forEach(c => {
+          const val = c.slug || c.id;
+          const label = c.name || c.title;
+          html += `<option value="${escapeHtml(val)}">${escapeHtml(label)}</option>`;
+        });
+        editCat.innerHTML = html;
+      }
+
+      const createCat = document.getElementById('modalServiceCreateCategory');
+      if (createCat) {
+        let html = '';
+        categories.forEach(c => {
+          const val = c.slug || c.id;
+          const label = c.name || c.title;
+          html += `<option value="${escapeHtml(val)}">${escapeHtml(label)}</option>`;
+        });
+        createCat.innerHTML = html;
+      }
+
+      let providers = [];
+      if (typeof TLAuth !== 'undefined' && TLAuth.getProviders) {
+        providers = TLAuth.getProviders();
+      }
+      const editPro = document.getElementById('modalServiceEditProvider');
+      if (editPro) {
+        editPro.innerHTML = providers.map(p => `
+          <option value="${escapeHtml(p.id)}">${escapeHtml(p.businessName || p.name || p.id)} (${p.city || 'Islamabad'})</option>
+        `).join('');
+      }
+      const createPro = document.getElementById('modalServiceCreateProvider');
+      if (createPro) {
+        createPro.innerHTML = providers.map(p => `
+          <option value="${escapeHtml(p.id)}">${escapeHtml(p.businessName || p.name || p.id)} (${p.city || 'Islamabad'})</option>
+        `).join('');
+      }
+    }
+
+    function onListingSearchChange(val) {
+      listingState.search = (val || '').toLowerCase().trim();
+      listingState.currentPage = 1;
+      renderListingsTable();
+    }
+
+    function onListingCategoryFilterChange() {
+      listingState.categoryFilter = document.getElementById('listingCategoryFilter')?.value || 'all';
+      listingState.currentPage = 1;
+      renderListingsTable();
+    }
+
+    function onListingStatusFilterChange() {
+      listingState.statusFilter = document.getElementById('listingStatusFilter')?.value || 'all';
+      listingState.currentPage = 1;
+      renderListingsTable();
+    }
+
+    function onListingPricingFilterChange() {
+      listingState.pricingFilter = document.getElementById('listingPricingFilter')?.value || 'all';
+      listingState.currentPage = 1;
+      renderListingsTable();
+    }
+
+    function onListingSortChange(val) {
+      listingState.sortBy = val || 'newest';
+      renderListingsTable();
+    }
+
+    function onListingPerPageChange(val) {
+      listingState.perPage = parseInt(val, 10) || 5;
+      listingState.currentPage = 1;
+      renderListingsTable();
+    }
+
+    function resetListingFilters() {
+      listingState.currentPage = 1;
+      listingState.search = '';
+      listingState.categoryFilter = 'all';
+      listingState.statusFilter = 'all';
+      listingState.pricingFilter = 'all';
+      listingState.sortBy = 'newest';
+
+      const sInp = document.getElementById('listingSearchInput');
+      if (sInp) sInp.value = '';
+      const cFil = document.getElementById('listingCategoryFilter');
+      if (cFil) cFil.value = 'all';
+      const stFil = document.getElementById('listingStatusFilter');
+      if (stFil) stFil.value = 'all';
+      const prFil = document.getElementById('listingPricingFilter');
+      if (prFil) prFil.value = 'all';
+      const sortSel = document.getElementById('listingSortSelect');
+      if (sortSel) sortSel.value = 'newest';
+      const ppSel = document.getElementById('listingPerPageSelect');
+      if (ppSel) ppSel.value = '5';
+      listingState.perPage = 5;
+
+      renderListingsTable();
+    }
+
+    function changeListingPage(page) {
+      listingState.currentPage = page;
+      renderListingsTable();
+    }
+
+    function renderListingsTable() {
+      populateListingCategoriesDropdown();
+
+      const allListings = (typeof TLServices !== 'undefined' && TLServices.getAllServicesJoined)
+        ? TLServices.getAllServicesJoined()
+        : [];
+
+      const totalCount = allListings.length;
+      const availableCount = allListings.filter(s => s.isAvailable !== false).length;
+      const pausedCount = totalCount - availableCount;
+      const fixedCount = allListings.filter(s => s.pricingType === 'fixed').length;
+      const quoteCount = allListings.filter(s => s.pricingType === 'upon_request').length;
+
+      const elTotal = document.getElementById('serviceStatTotal');
+      if (elTotal) elTotal.innerText = totalCount;
+      const elAvail = document.getElementById('serviceStatAvailable');
+      if (elAvail) elAvail.innerText = availableCount;
+      const elPaused = document.getElementById('serviceStatPaused');
+      if (elPaused) elPaused.innerText = pausedCount;
+      const elFixed = document.getElementById('serviceStatFixed');
+      if (elFixed) elFixed.innerText = fixedCount;
+      const elQuote = document.getElementById('serviceStatQuote');
+      if (elQuote) elQuote.innerText = quoteCount;
+
+      const badgeNav = document.getElementById('badgeNavListings');
+      if (badgeNav) badgeNav.innerText = totalCount;
+
+      let list = allListings.filter(s => {
+        if (listingState.search) {
+          const q = listingState.search;
+          const matchTitle = (s.title || '').toLowerCase().includes(q);
+          const matchDesc = (s.description || '').toLowerCase().includes(q);
+          const matchPro = (s.providerName || '').toLowerCase().includes(q) || (s.providerLegalName || '').toLowerCase().includes(q);
+          const matchCat = (s.categoryTitle || s.categoryId || '').toLowerCase().includes(q);
+          const matchId = (s.id || '').toLowerCase().includes(q);
+          if (!matchTitle && !matchDesc && !matchPro && !matchCat && !matchId) return false;
+        }
+
+        if (listingState.categoryFilter !== 'all') {
+          const cF = listingState.categoryFilter.toLowerCase();
+          const sCatId = (s.categoryId || '').toLowerCase();
+          const sCatTitle = (s.categoryTitle || '').toLowerCase();
+          if (sCatId !== cF && !sCatTitle.includes(cF)) return false;
+        }
+
+        if (listingState.statusFilter !== 'all') {
+          const isAvail = s.isAvailable !== false;
+          if (listingState.statusFilter === 'available' && !isAvail) return false;
+          if (listingState.statusFilter === 'paused' && isAvail) return false;
+        }
+
+        if (listingState.pricingFilter !== 'all') {
+          if (s.pricingType !== listingState.pricingFilter) return false;
+        }
+
+        return true;
+      });
+
+      list.sort((a, b) => {
+        if (listingState.sortBy === 'newest') return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        if (listingState.sortBy === 'oldest') return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+        if (listingState.sortBy === 'title_asc') return (a.title || '').localeCompare(b.title || '');
+        if (listingState.sortBy === 'price_low_high') {
+          const pA = a.priceAmount !== null && a.priceAmount !== undefined ? a.priceAmount : 999999;
+          const pB = b.priceAmount !== null && b.priceAmount !== undefined ? b.priceAmount : 999999;
+          return pA - pB;
+        }
+        if (listingState.sortBy === 'price_high_low') {
+          const pA = a.priceAmount !== null && a.priceAmount !== undefined ? a.priceAmount : -1;
+          const pB = b.priceAmount !== null && b.priceAmount !== undefined ? b.priceAmount : -1;
+          return pB - pA;
+        }
+        return 0;
+      });
+
+      const totalFiltered = list.length;
+      const totalPages = Math.ceil(totalFiltered / listingState.perPage) || 1;
+      if (listingState.currentPage > totalPages) listingState.currentPage = totalPages;
+      if (listingState.currentPage < 1) listingState.currentPage = 1;
+
+      const startIndex = (listingState.currentPage - 1) * listingState.perPage;
+      const paginatedItems = list.slice(startIndex, startIndex + listingState.perPage);
+
+      const tbody = document.getElementById('listingsManagementTbody');
+      if (tbody) {
+        if (paginatedItems.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7">No service listings found</td></tr>`;
+        } else {
+          tbody.innerHTML = paginatedItems.map(s => {
+            const isAvail = s.isAvailable !== false;
+            return `
+              <tr data-service-id="${s.id}">
+                <td class="col-title">${escapeHtml(s.title)}</td>
+                <td class="col-pro">${escapeHtml(s.providerName)}</td>
+                <td class="col-cat">${escapeHtml(s.categoryTitle || s.categoryId)}</td>
+                <td class="col-price">${s.pricingType === 'upon_request' ? 'Upon Request' : 'PKR ' + s.priceAmount}</td>
+                <td class="col-bookings">${s.totalBookingsCount} (${s.activeBookingsCount} active)</td>
+                <td class="col-status">${isAvail ? 'AVAILABLE' : 'PAUSED'}</td>
+                <td class="col-actions">
+                  <button onclick="openServiceDetailsModal('${s.id}')">Details</button>
+                  <button onclick="openEditServiceModal('${s.id}')">Edit</button>
+                  <button onclick="handleToggleServiceStatus('${s.id}')">Toggle</button>
+                  <button onclick="handleDeleteService('${s.id}')">Delete</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+
+      const pInfo = document.getElementById('listingPaginationInfo');
+      if (pInfo) {
+        if (totalFiltered === 0) {
+          pInfo.innerText = "Showing 0 services";
+        } else {
+          const end = Math.min(startIndex + listingState.perPage, totalFiltered);
+          pInfo.innerText = `Showing ${startIndex + 1} to ${end} of ${totalFiltered} service listings`;
+        }
+      }
+
+      const pControls = document.getElementById('listingPaginationControls');
+      if (pControls) {
+        if (totalPages <= 1) {
+          pControls.innerHTML = '';
+        } else {
+          let btns = [];
+          for (let i = 1; i <= totalPages; i++) {
+            btns.push(`<button class="${i === listingState.currentPage ? 'active' : ''}">${i}</button>`);
+          }
+          pControls.innerHTML = btns.join('');
+        }
+      }
+    }
+
+    function openServiceDetailsModal(serviceId) {
+      listingState.selectedServiceId = serviceId;
+      const dossier = TLServices.getServiceFullDossier(serviceId);
+      if (!dossier || !dossier.service) return;
+
+      const { service: s, bookings } = dossier;
+      document.getElementById('dossierServiceTitle').innerText = s.title;
+      document.getElementById('dossierServiceId').innerText = s.id;
+      document.getElementById('dossierServiceCategoryBadge').innerText = s.categoryTitle;
+      document.getElementById('dossierServiceStatusBadge').innerText = s.isAvailable ? 'AVAILABLE' : 'PAUSED';
+      document.getElementById('dossierServicePricingType').innerText = s.pricingType;
+      document.getElementById('dossierServicePriceDisplay').innerText = s.pricingType === 'upon_request' ? 'Upon Request' : `PKR ${Number(s.priceAmount || 0).toLocaleString()}`;
+      document.getElementById('dossierServiceDescription').innerText = s.description;
+      document.getElementById('dossierServiceProBizName').innerText = s.providerName;
+      document.getElementById('dossierServiceProLegalName').innerText = s.providerLegalName;
+      document.getElementById('dossierServiceProCity').innerText = s.providerCity;
+      document.getElementById('dossierServiceProPhone').innerText = s.providerPhone;
+      document.getElementById('dossierServiceBookingsCount').innerText = `${bookings.length} Total`;
+
+      document.getElementById('serviceDetailsModal').classList.add('active');
+    }
+
+    function closeServiceDetailsModal() {
+      document.getElementById('serviceDetailsModal').classList.remove('active');
+    }
+
+    function openEditServiceModal(serviceId) {
+      listingState.selectedServiceId = serviceId;
+      populateListingCategoriesDropdown();
+      const services = TLServices.getAllServicesJoined();
+      const s = services.find(x => x.id === serviceId);
+      if (!s) return;
+
+      document.getElementById('modalServiceEditId').value = s.id;
+      document.getElementById('modalServiceEditTitle').value = s.title;
+      document.getElementById('modalServiceEditCategory').value = s.categoryId;
+      document.getElementById('modalServiceEditProvider').value = s.providerId;
+      document.getElementById('modalServiceEditPricingType').value = s.pricingType;
+      document.getElementById('modalServiceEditPriceAmount').value = s.priceAmount || '';
+      document.getElementById('modalServiceEditPriceUnit').value = s.priceUnit || 'job';
+      document.getElementById('modalServiceEditAvailable').value = s.isAvailable ? 'true' : 'false';
+      document.getElementById('modalServiceEditDescription').value = s.description;
+
+      document.getElementById('serviceEditModal').classList.add('active');
+    }
+
+    function closeEditServiceModal() {
+      document.getElementById('serviceEditModal').classList.remove('active');
+    }
+
+    function handleAdminServiceEditSubmit(event) {
+      if (event) event.preventDefault();
+      const serviceId = document.getElementById('modalServiceEditId').value;
+      const title = document.getElementById('modalServiceEditTitle').value.trim();
+      const categoryId = document.getElementById('modalServiceEditCategory').value;
+      const providerId = document.getElementById('modalServiceEditProvider').value;
+      const pricingType = document.getElementById('modalServiceEditPricingType').value;
+      const priceAmount = document.getElementById('modalServiceEditPriceAmount').value;
+      const priceUnit = document.getElementById('modalServiceEditPriceUnit').value;
+      const isAvailable = document.getElementById('modalServiceEditAvailable').value === 'true';
+      const description = document.getElementById('modalServiceEditDescription').value.trim();
+
+      const res = TLServices.adminUpdateService(serviceId, {
+        title,
+        categoryId,
+        providerId,
+        pricingType,
+        priceAmount,
+        priceUnit,
+        isAvailable,
+        description
+      }, "usr-admin-001");
+
+      closeEditServiceModal();
+      renderListingsTable();
+      return res;
+    }
+
+    function openCreateServiceModal() {
+      populateListingCategoriesDropdown();
+      document.getElementById('serviceCreateForm').reset();
+      document.getElementById('serviceCreateModal').classList.add('active');
+    }
+
+    function closeCreateServiceModal() {
+      document.getElementById('serviceCreateModal').classList.remove('active');
+    }
+
+    function handleAdminServiceCreateSubmit(event) {
+      if (event) event.preventDefault();
+      const title = document.getElementById('modalServiceCreateTitle').value.trim();
+      const categoryId = document.getElementById('modalServiceCreateCategory').value;
+      const providerId = document.getElementById('modalServiceCreateProvider').value;
+      const pricingType = document.getElementById('modalServiceCreatePricingType').value;
+      const priceAmount = document.getElementById('modalServiceCreatePriceAmount').value;
+      const priceUnit = document.getElementById('modalServiceCreatePriceUnit').value;
+      const isAvailable = document.getElementById('modalServiceCreateAvailable').value === 'true';
+      const description = document.getElementById('modalServiceCreateDescription').value.trim();
+
+      const res = TLServices.adminCreateService({
+        title,
+        categoryId,
+        providerId,
+        pricingType,
+        priceAmount,
+        priceUnit,
+        isAvailable,
+        description
+      }, "usr-admin-001");
+
+      closeCreateServiceModal();
+      renderListingsTable();
+      return res;
+    }
+
+    function handleToggleServiceStatus(serviceId) {
+      const res = TLServices.adminToggleServiceAvailability(serviceId, "usr-admin-001");
+      renderListingsTable();
+      return res;
+    }
+
+    function handleDeleteService(serviceId) {
+      const res = TLServices.adminDeleteService(serviceId, "usr-admin-001");
+      renderListingsTable();
+      return res;
+    }
+
+    function refreshAdminData() {
+      renderListingsTable();
+    }
+
+    // ------------------------------------------------------------------------
+    // Test Assertions Runner
+    // ------------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', async () => {
+      const results = [];
+
+      function assert(name, condition, details = "") {
+        results.push({ name, pass: Boolean(condition), details });
+      }
+
+      try {
+        TLAuth.init();
+        TLServices.init();
+        TLBookings.init();
+        TLCommunication.init();
+
+        // TEST 1: Joined Service Listings Integrity
+        const joined = TLServices.getAllServicesJoined();
+        assert("getAllServicesJoined() loads listings", joined.length >= 7, `Found ${joined.length} joined services`);
+
+        const firstSrv = joined[0];
+        assert("Service has linked provider business and legal name", Boolean(firstSrv.providerName && firstSrv.providerLegalName), `Provider=${firstSrv.providerName}, Legal=${firstSrv.providerLegalName}`);
+        assert("Service has dynamic category title", Boolean(firstSrv.categoryTitle), `Category=${firstSrv.categoryTitle}`);
+        assert("Service computes live booking telemetry", typeof firstSrv.totalBookingsCount === 'number', `Bookings=${firstSrv.totalBookingsCount} (Active=${firstSrv.activeBookingsCount})`);
+
+        // TEST 2: Initial Table Rendering & Summary KPIs
+        renderListingsTable();
+        const statTotal = parseInt(document.getElementById('serviceStatTotal').innerText, 10);
+        const statAvail = parseInt(document.getElementById('serviceStatAvailable').innerText, 10);
+        const statPaused = parseInt(document.getElementById('serviceStatPaused').innerText, 10);
+        const statFixed = parseInt(document.getElementById('serviceStatFixed').innerText, 10);
+        const statQuote = parseInt(document.getElementById('serviceStatQuote').innerText, 10);
+
+        assert("Top Stat Total matches listings count", statTotal === joined.length, `Total=${statTotal}`);
+        assert("Available listings counter matches active items", statAvail > 0, `Available=${statAvail}`);
+        assert("Fixed pricing counter matches database", statFixed >= 4, `Fixed=${statFixed}`);
+        assert("Quote / Upon Request counter matches database", statQuote >= 2, `Quote=${statQuote}`);
+        assert("Sidebar badgeNavListings updated", parseInt(document.getElementById('badgeNavListings').innerText, 10) === statTotal, `Badge=${document.getElementById('badgeNavListings').innerText}`);
+
+        // TEST 3: Dynamic Category Integration
+        // Provision a brand new category in Category Management
+        const newCatRes = TLCommunication.addCategory({
+          name: "CCTV & Security Systems",
+          slug: "cctv-security",
+          description: "Smart CCTV installation, IP cameras, DVR configuration, and burglar alarms.",
+          icon: "shield",
+          adminId: "usr-admin-001"
+        });
+        assert("New category created successfully in database", newCatRes.success === true, `Created slug=${newCatRes.category?.slug}`);
+
+        // Check if category is immediately available in dropdowns
+        populateListingCategoriesDropdown();
+        const catFilterOptions = Array.from(document.getElementById('listingCategoryFilter').options).map(o => o.value);
+        assert("Newly created category is available in filter dropdown", catFilterOptions.includes("cctv-security"), "Found 'cctv-security' in listingCategoryFilter");
+
+        const modalCategoryOptions = Array.from(document.getElementById('modalServiceCreateCategory').options).map(o => o.value);
+        assert("Newly created category is available in create service modal", modalCategoryOptions.includes("cctv-security"), "Found 'cctv-security' in modalServiceCreateCategory");
+
+        // Verify getCategoryTitle dynamically resolves this new category
+        const resolvedTitle = TLServices.getCategoryTitle("cctv-security");
+        assert("getCategoryTitle dynamically resolves new category name", resolvedTitle === "CCTV & Security Systems", `Resolved=${resolvedTitle}`);
+
+        // TEST 4: Search Filtering
+        onListingSearchChange("Electrical Inspection");
+        let renderedRows = document.querySelectorAll('#listingsManagementTbody tr');
+        assert("Search by service title works", renderedRows.length >= 1, `Found ${renderedRows.length} matching 'Electrical Inspection'`);
+
+        onListingSearchChange("Thermal wall leak");
+        renderedRows = document.querySelectorAll('#listingsManagementTbody tr');
+        assert("Search by description keyword works", renderedRows.length >= 1, `Found ${renderedRows.length} matching 'Thermal wall leak'`);
+
+        onListingSearchChange("NonExistentServiceTitle999");
+        assert("Search non-existent shows empty state", document.getElementById('listingsManagementTbody').innerText.includes("No service listings found"), "Empty state rendered cleanly");
+
+        resetListingFilters();
+        assert("Reset filters restores table", document.querySelectorAll('#listingsManagementTbody tr').length === 5, "Restored 5 items per page");
+
+        // TEST 5: Category & Status Filtering
+        document.getElementById('listingCategoryFilter').value = 'plumbing';
+        onListingCategoryFilterChange();
+        const plumbRows = document.querySelectorAll('#listingsManagementTbody tr');
+        assert("Category filter (plumbing) works", plumbRows.length >= 1, `Plumbing services count=${plumbRows.length}`);
+
+        resetListingFilters();
+
+        document.getElementById('listingStatusFilter').value = 'available';
+        onListingStatusFilterChange();
+        const availRows = document.querySelectorAll('#listingsManagementTbody tr');
+        assert("Status filter (available) works", availRows.length > 0 && availRows.length <= statAvail, `Available rows=${availRows.length}`);
+
+        resetListingFilters();
+
+        // TEST 6: Pricing Model Filtering
+        document.getElementById('listingPricingFilter').value = 'upon_request';
+        onListingPricingFilterChange();
+        const quoteRows = document.querySelectorAll('#listingsManagementTbody tr');
+        assert("Pricing filter (upon_request) works", quoteRows.length >= 2, `Quote rows count=${quoteRows.length}`);
+
+        resetListingFilters();
+
+        // TEST 7: Service Details Modal Inspection
+        openServiceDetailsModal("srv-001");
+        assert("Service details modal is activated", document.getElementById('serviceDetailsModal').classList.contains('active'), "Modal active class present");
+        assert("Details displays service title", document.getElementById('dossierServiceTitle').innerText.includes("Electrical Inspection"), `Title=${document.getElementById('dossierServiceTitle').innerText}`);
+        assert("Details displays pricing pill", document.getElementById('dossierServicePriceDisplay').innerText.includes("1,500"), `Price=${document.getElementById('dossierServicePriceDisplay').innerText}`);
+        assert("Details displays full description", document.getElementById('dossierServiceDescription').innerText.length > 20, "Full description rendered");
+        assert("Details displays associated provider info", document.getElementById('dossierServiceProBizName').innerText.length > 0, `Provider=${document.getElementById('dossierServiceProBizName').innerText}`);
+        assert("Details displays linked bookings count", document.getElementById('dossierServiceBookingsCount').innerText.includes("Total"), `Bookings=${document.getElementById('dossierServiceBookingsCount').innerText}`);
+
+        closeServiceDetailsModal();
+        assert("Service details modal closes cleanly", !document.getElementById('serviceDetailsModal').classList.contains('active'), "Modal active class removed");
+
+        // TEST 8: Toggle Service Availability / Status
+        const initialStatus = TLServices.getAllServices().find(s => s.id === "srv-002").isAvailable;
+        const toggleRes = handleToggleServiceStatus("srv-002");
+        assert("handleToggleServiceStatus succeeds", toggleRes.success === true, "Status toggled");
+        const toggledService = TLServices.getAllServices().find(s => s.id === "srv-002");
+        assert("isAvailable status inverted in database", toggledService.isAvailable === !initialStatus, `New status=${toggledService.isAvailable}`);
+
+        // Restore status
+        handleToggleServiceStatus("srv-002");
+        assert("Status restored to initial availability", TLServices.getAllServices().find(s => s.id === "srv-002").isAvailable === initialStatus, "Restored availability");
+
+        // TEST 9: Admin Edit Service Listing
+        openEditServiceModal("srv-003");
+        assert("Edit modal opens", document.getElementById('serviceEditModal').classList.contains('active'), "Edit modal active");
+        document.getElementById('modalServiceEditTitle').value = "Thermal Leak Detection & Ultrasonic Pipe Fusion";
+        document.getElementById('modalServiceEditPriceAmount').value = 2800;
+        document.getElementById('modalServiceEditDescription').value = "Comprehensive thermal imaging inspection, ultrasonic pipe leak testing, and PPRC fusion.";
+        const editRes = handleAdminServiceEditSubmit();
+        assert("adminUpdateService succeeds", editRes.success === true, "Service updated in database");
+
+        const updatedSrv = TLServices.getAllServices().find(s => s.id === "srv-003");
+        assert("Title updated in database", updatedSrv.title === "Thermal Leak Detection & Ultrasonic Pipe Fusion", `Title=${updatedSrv.title}`);
+        assert("Price amount updated in database", updatedSrv.priceAmount === 2800, `Price=${updatedSrv.priceAmount}`);
+
+        // Verify audit log recorded
+        const auditLogs = TLCommunication.getAllAdminAuditLogs();
+        const editAudit = auditLogs.find(l => l.targetId === "srv-003" && l.actionType === "SERVICE_UPDATED");
+        assert("Audit trail logged SERVICE_UPDATED", Boolean(editAudit), `Logged: ${editAudit?.details || 'Found'}`);
+
+        // TEST 10: Create New Service Listing with New Category
+        openCreateServiceModal();
+        assert("Create modal opens", document.getElementById('serviceCreateModal').classList.contains('active'), "Create modal active");
+        document.getElementById('modalServiceCreateTitle').value = "Smart 8-Channel 4K CCTV Installation & DVR Setup";
+        document.getElementById('modalServiceCreateCategory').value = "cctv-security"; // The newly added category!
+        document.getElementById('modalServiceCreateProvider').value = "prov-profile-001";
+        document.getElementById('modalServiceCreatePricingType').value = "fixed";
+        document.getElementById('modalServiceCreatePriceAmount').value = 4500;
+        document.getElementById('modalServiceCreateDescription').value = "Full 8-camera PoE security network installation, night vision calibration, and mobile live-view setup.";
+        const createRes = handleAdminServiceCreateSubmit();
+        assert("adminCreateService succeeds", createRes.success === true, `Created srvId=${createRes.service?.id}`);
+
+        const newlyCreated = TLServices.getAllServices().find(s => s.id === createRes.service.id);
+        assert("New service persisted in database", Boolean(newlyCreated), "Found in tl_db_services");
+        assert("New service has correct dynamic category title", newlyCreated.categoryTitle === "CCTV & Security Systems", `CategoryTitle=${newlyCreated.categoryTitle}`);
+
+        // TEST 11: Referential Integrity on Deletion (BR-07)
+        // Service 'srv-001' has active booking 'TL-BK-9182' (status 'pending')
+        const blockedDelete = handleDeleteService("srv-001");
+        assert("Deletion of service with active bookings is blocked", blockedDelete.success === false, `Blocked message: ${blockedDelete.error}`);
+        assert("Blocked service remains safely in database", TLServices.getAllServices().some(s => s.id === "srv-001"), "Service srv-001 preserved");
+
+        // Deleting newly created service (which has 0 bookings) must succeed safely
+        const safeDelete = handleDeleteService(createRes.service.id);
+        assert("Deletion of safe service succeeds", safeDelete.success === true, "Service deleted");
+        assert("Deleted service is removed from database", !TLServices.getAllServices().some(s => s.id === createRes.service.id), "Service removed from tl_db_services");
+
+        // Verify audit log recorded for deletion
+        const delAudit = TLCommunication.getAllAdminAuditLogs().find(l => l.targetId === createRes.service.id && l.actionType === "SERVICE_DELETED");
+        assert("Audit trail logged SERVICE_DELETED", Boolean(delAudit), `Logged: ${delAudit?.details || 'Found'}`);
+
+        // TEST 12: Pagination Controls
+        onListingPerPageChange(2);
+        assert("Pagination perPage 2 sets multiple pages", document.getElementById('listingPaginationControls').children.length >= 3, `Page buttons count=${document.getElementById('listingPaginationControls').children.length}`);
+        changeListingPage(2);
+        assert("Page 2 info updated correctly", document.getElementById('listingPaginationInfo').innerText.includes("Showing 3 to 4"), `Label=${document.getElementById('listingPaginationInfo').innerText}`);
+
+      } catch (err) {
+        assert("Unexpected runtime exception", false, err.message + "\n" + err.stack);
+      }
+
+      // Render Results Summary
+      const passedCount = results.filter(r => r.pass).length;
+      const totalCount = results.length;
+      const allPassed = passedCount === totalCount;
+
+      let html = `<div class="summary-bar ${allPassed ? 'summary-pass' : 'summary-fail'}">`;
+      html += allPassed
+        ? `✅ ALL ${totalCount} ASSERTIONS PASSED (100% Comprehensive Coverage)`
+        : `❌ ${totalCount - passedCount} OF ${totalCount} ASSERTIONS FAILED`;
+      html += `</div>`;
+
+      results.forEach(r => {
+        html += `
+          <div class="test-box ${r.pass ? 'pass' : 'fail'}">
+            <span class="badge ${r.pass ? 'pass' : 'fail'}">${r.pass ? 'PASS' : 'FAIL'}</span>
+            <strong>${escapeHtml(r.name)}</strong>
+            ${r.details ? `<div class="details">${escapeHtml(r.details)}</div>` : ''}
+          </div>
+        `;
+      });
+
+      document.getElementById('resultsUI').innerHTML = html;
+    });
+  </script>
+</body>
+
+</html>

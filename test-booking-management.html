@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>TradeLinker Booking Management Verification Suite</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 24px;
+      background: #0F172A;
+      color: #F8FAFC;
+      margin: 0;
+    }
+
+    h1 {
+      color: #01AD8F;
+      margin-top: 0;
+      font-size: 1.5rem;
+    }
+
+    .summary-bar {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .summary-pass {
+      background: #064E3B;
+      color: #34D399;
+      border: 1px solid #059669;
+    }
+
+    .summary-fail {
+      background: #7F1D1D;
+      color: #F87171;
+      border: 1px solid #DC2626;
+    }
+
+    .test-box {
+      background: #1E293B;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border-left: 4px solid #64748B;
+      font-size: 0.9rem;
+    }
+
+    .test-box.pass {
+      border-left-color: #10B981;
+    }
+
+    .test-box.fail {
+      border-left-color: #EF4444;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+      margin-right: 8px;
+    }
+
+    .badge.pass {
+      background: #064E3B;
+      color: #34D399;
+    }
+
+    .badge.fail {
+      background: #7F1D1D;
+      color: #F87171;
+    }
+
+    .details {
+      font-size: 0.8rem;
+      color: #94A3B8;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>TradeLinker Booking Requests &amp; Lifecycle Supervision Verification Suite</h1>
+  <div id="resultsUI">Running automated test assertions...</div>
+
+  <!-- Direct In-DOM Container with Booking Management UI Elements -->
+  <div id="testDomWrapper" style="display:none;">
+    <!-- Stat Strip -->
+    <div id="bookingStatTotal">0</div>
+    <div id="bookingStatPending">0</div>
+    <div id="bookingStatAccepted">0</div>
+    <div id="bookingStatInProgress">0</div>
+    <div id="bookingStatCompleted">0</div>
+    <div id="bookingStatCancelled">0</div>
+    <div id="badgeNavBookings">0</div>
+
+    <!-- Filter Bar -->
+    <input type="text" id="bookingSearchInput">
+    <select id="bookingStatusFilter">
+      <option value="all">All Statuses</option>
+      <option value="pending">Pending</option>
+      <option value="accepted">Accepted</option>
+      <option value="in_progress">In Progress</option>
+      <option value="completed">Completed</option>
+      <option value="cancelled">Cancelled</option>
+      <option value="rejected">Rejected</option>
+    </select>
+    <select id="bookingCategoryFilter">
+      <option value="all">All Categories</option>
+    </select>
+    <select id="bookingSortSelect">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="scheduled_date_asc">Appointment (Earliest)</option>
+      <option value="scheduled_date_desc">Appointment (Latest)</option>
+      <option value="status">Status Grouping</option>
+    </select>
+    <select id="bookingPerPageSelect">
+      <option value="5" selected>5</option>
+      <option value="10">10</option>
+      <option value="20">20</option>
+    </select>
+
+    <!-- Table -->
+    <table>
+      <tbody id="bookingsManagementTbody"></tbody>
+    </table>
+
+    <div id="bookingPaginationInfo"></div>
+    <div id="bookingPaginationControls"></div>
+
+    <!-- Booking Details Modal -->
+    <div id="bookingDetailsModal" class="tl-modal-backdrop">
+      <div id="dossierBookingId"></div>
+      <div id="dossierBookingCategoryBadge"></div>
+      <div id="dossierBookingStatusBadge"></div>
+      <div id="dossierBookingServiceTitle"></div>
+      <div id="dossierBookingCreatedAt"></div>
+      <div id="dossierBookingUpdatedAt"></div>
+      
+      <!-- Customer Card -->
+      <img id="dossierBookingCustomerAvatar" src="">
+      <div id="dossierBookingCustomerName"></div>
+      <div id="dossierBookingCustomerId"></div>
+      <div id="dossierBookingCustomerEmail"></div>
+      <div id="dossierBookingCustomerPhone"></div>
+      <div id="dossierBookingCustomerCity"></div>
+      <div id="dossierBookingCustomerStatusBadge"></div>
+
+      <!-- Pro Card -->
+      <img id="dossierBookingProAvatar" src="">
+      <div id="dossierBookingProBizName"></div>
+      <div id="dossierBookingProLegalName"></div>
+      <div id="dossierBookingProRatingPill"></div>
+      <div id="dossierBookingProPhone"></div>
+      <div id="dossierBookingProVerifyBadge"></div>
+      <button id="dossierBookingOpenProBtn"></button>
+
+      <!-- Particulars -->
+      <div id="dossierBookingScheduledDate"></div>
+      <div id="dossierBookingTimeSlot"></div>
+      <div id="dossierBookingPriceQuote"></div>
+      <div id="dossierBookingAddress"></div>
+      <div id="dossierBookingProblemDesc"></div>
+
+      <!-- Cancellation Box -->
+      <div id="dossierBookingCancellationBox">
+        <div id="dossierBookingCancellationReason"></div>
+      </div>
+
+      <!-- Review Box -->
+      <div id="dossierBookingReviewBox">
+        <div id="dossierBookingReviewRatingStars"></div>
+        <div id="dossierBookingReviewText"></div>
+        <div id="dossierBookingReviewMeta"></div>
+      </div>
+
+      <!-- Timeline -->
+      <div id="dossierBookingTimeline"></div>
+
+      <!-- Admin Controls -->
+      <select id="dossierAdminTargetStatus">
+        <option value="pending">pending</option>
+        <option value="accepted">accepted</option>
+        <option value="in_progress">in_progress</option>
+        <option value="completed">completed</option>
+        <option value="cancelled">cancelled</option>
+        <option value="rejected">rejected</option>
+      </select>
+      <input type="text" id="dossierAdminReasonNote">
+    </div>
+
+    <!-- Quick Status Modal -->
+    <div id="bookingStatusModal" class="tl-modal-backdrop">
+      <div id="quickBookingError"></div>
+      <div id="quickBookingRef"></div>
+      <div id="quickBookingCurrentBadge"></div>
+      <div id="quickBookingCustomerName"></div>
+      <div id="quickBookingServiceTitle"></div>
+      <select id="quickBookingTargetSelect">
+        <option value="pending">pending</option>
+        <option value="accepted">accepted</option>
+        <option value="in_progress">in_progress</option>
+        <option value="completed">completed</option>
+        <option value="cancelled">cancelled</option>
+        <option value="rejected">rejected</option>
+      </select>
+      <textarea id="quickBookingReasonInput"></textarea>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+
+  <script>
+    let currentAdminUser = { id: "usr-admin-001", fullName: "System Administrator", role: "admin" };
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // Mirror dashboard booking state & functions
+    const bookingState = {
+      currentPage: 1,
+      perPage: 5,
+      search: '',
+      statusFilter: 'all',
+      categoryFilter: 'all',
+      sortBy: 'newest',
+      selectedBookingId: null
+    };
+
+    function getBookingStatusBadgeClass(status) {
+      if (status === 'in_progress') return 'tl-badge-inprogress';
+      if (status === 'completed') return 'tl-badge-completed';
+      if (status === 'accepted') return 'tl-badge-accepted';
+      if (status === 'cancelled') return 'tl-badge-cancelled';
+      if (status === 'rejected') return 'tl-badge-rejected';
+      return 'tl-badge-pending';
+    }
+
+    function getBookingStatusLabel(status) {
+      switch (status) {
+        case 'pending': return 'Pending Confirmation';
+        case 'accepted': return 'Accepted / Confirmed';
+        case 'in_progress': return 'In Progress';
+        case 'completed': return 'Completed';
+        case 'cancelled': return 'Cancelled';
+        case 'rejected': return 'Rejected';
+        default: return (status || 'Pending').toUpperCase();
+      }
+    }
+
+    function populateBookingCategoriesDropdown() {
+      const select = document.getElementById('bookingCategoryFilter');
+      if (!select) return;
+
+      const currentVal = bookingState.categoryFilter || select.value || 'all';
+
+      let cats = [];
+      if (typeof TLCommunication !== 'undefined' && TLCommunication.getAllCategories) {
+        cats = TLCommunication.getAllCategories();
+      } else {
+        try {
+          cats = JSON.parse(localStorage.getItem('tl_db_categories')) || [];
+        } catch (e) { cats = []; }
+      }
+
+      select.innerHTML = '<option value="all">All Categories</option>' +
+        cats.map(c => `<option value="${escapeHtml(c.slug || c.id || c.name)}" ${currentVal === (c.slug || c.id || c.name) ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('');
+    }
+
+    function onBookingSearchChange(val) {
+      bookingState.search = (val || '').toLowerCase().trim();
+      bookingState.currentPage = 1;
+      renderBookingsTable();
+    }
+
+    function onBookingStatusFilterChange() {
+      bookingState.statusFilter = document.getElementById('bookingStatusFilter')?.value || 'all';
+      bookingState.currentPage = 1;
+      renderBookingsTable();
+    }
+
+    function onBookingCategoryFilterChange() {
+      bookingState.categoryFilter = document.getElementById('bookingCategoryFilter')?.value || 'all';
+      bookingState.currentPage = 1;
+      renderBookingsTable();
+    }
+
+    function onBookingSortChange(val) {
+      bookingState.sortBy = val || 'newest';
+      renderBookingsTable();
+    }
+
+    function onBookingPerPageChange(val) {
+      bookingState.perPage = parseInt(val, 10) || 5;
+      bookingState.currentPage = 1;
+      renderBookingsTable();
+    }
+
+    function resetBookingFilters() {
+      bookingState.currentPage = 1;
+      bookingState.search = '';
+      bookingState.statusFilter = 'all';
+      bookingState.categoryFilter = 'all';
+      bookingState.sortBy = 'newest';
+      bookingState.perPage = 5;
+
+      const sInp = document.getElementById('bookingSearchInput');
+      if (sInp) sInp.value = '';
+      const stFil = document.getElementById('bookingStatusFilter');
+      if (stFil) stFil.value = 'all';
+      const cFil = document.getElementById('bookingCategoryFilter');
+      if (cFil) cFil.value = 'all';
+      const sSel = document.getElementById('bookingSortSelect');
+      if (sSel) sSel.value = 'newest';
+      const ppSel = document.getElementById('bookingPerPageSelect');
+      if (ppSel) ppSel.value = '5';
+
+      renderBookingsTable();
+    }
+
+    function changeBookingPage(page) {
+      bookingState.currentPage = page;
+      renderBookingsTable();
+    }
+
+    function renderBookingsTable() {
+      populateBookingCategoriesDropdown();
+
+      const allBookings = (typeof TLBookings !== 'undefined' && TLBookings.getAllBookingsJoined)
+        ? TLBookings.getAllBookingsJoined()
+        : ((typeof TLBookings !== 'undefined' && TLBookings.getAllBookings) ? TLBookings.getAllBookings() : []);
+
+      // Update KPI Counter Strip
+      const totalCount = allBookings.length;
+      const pendingCount = allBookings.filter(b => b.status === 'pending').length;
+      const acceptedCount = allBookings.filter(b => b.status === 'accepted').length;
+      const inProgressCount = allBookings.filter(b => b.status === 'in_progress').length;
+      const completedCount = allBookings.filter(b => b.status === 'completed').length;
+      const cancelledCount = allBookings.filter(b => b.status === 'cancelled' || b.status === 'rejected').length;
+
+      const elTotal = document.getElementById('bookingStatTotal');
+      if (elTotal) elTotal.innerText = totalCount;
+      const elPending = document.getElementById('bookingStatPending');
+      if (elPending) elPending.innerText = pendingCount;
+      const elAccepted = document.getElementById('bookingStatAccepted');
+      if (elAccepted) elAccepted.innerText = acceptedCount;
+      const elInProgress = document.getElementById('bookingStatInProgress');
+      if (elInProgress) elInProgress.innerText = inProgressCount;
+      const elCompleted = document.getElementById('bookingStatCompleted');
+      if (elCompleted) elCompleted.innerText = completedCount;
+      const elCancelled = document.getElementById('bookingStatCancelled');
+      if (elCancelled) elCancelled.innerText = cancelledCount;
+
+      const badgeNav = document.getElementById('badgeNavBookings');
+      if (badgeNav) badgeNav.innerText = totalCount;
+
+      // Filtering
+      let list = allBookings.filter(b => {
+        if (bookingState.search) {
+          const q = bookingState.search;
+          const matchId = (b.id || '').toLowerCase().includes(q);
+          const matchCust = (b.customerName || (b.customer && b.customer.fullName) || '').toLowerCase().includes(q);
+          const matchCustEmail = (b.customer && b.customer.email || '').toLowerCase().includes(q);
+          const matchCustPhone = (b.customerPhone || (b.customer && b.customer.phone) || '').toLowerCase().includes(q);
+          const matchProBiz = (b.providerBusinessName || (b.provider && b.provider.businessName) || '').toLowerCase().includes(q);
+          const matchProLegal = (b.providerName || (b.provider && b.provider.fullName) || '').toLowerCase().includes(q);
+          const matchSrv = (b.serviceTitle || (b.service && b.service.title) || '').toLowerCase().includes(q);
+          const matchDesc = (b.problemDescription || '').toLowerCase().includes(q);
+          const matchCity = (b.city || (b.customer && b.customer.city) || '').toLowerCase().includes(q);
+          const matchAddr = (b.serviceAddress || '').toLowerCase().includes(q);
+
+          if (!matchId && !matchCust && !matchCustEmail && !matchCustPhone && !matchProBiz && !matchProLegal && !matchSrv && !matchDesc && !matchCity && !matchAddr) {
+            return false;
+          }
+        }
+
+        if (bookingState.statusFilter !== 'all') {
+          if (b.status !== bookingState.statusFilter) return false;
+        }
+
+        if (bookingState.categoryFilter !== 'all') {
+          const cF = bookingState.categoryFilter.toLowerCase();
+          const catTitle = (b.categoryTitle || (b.service && b.service.categoryTitle) || '').toLowerCase();
+          if (!catTitle.includes(cF)) return false;
+        }
+
+        return true;
+      });
+
+      // Sorting
+      list.sort((a, b) => {
+        if (bookingState.sortBy === 'newest') {
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        }
+        if (bookingState.sortBy === 'oldest') {
+          return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+        }
+        if (bookingState.sortBy === 'scheduled_date_asc') {
+          return new Date(a.scheduledDate || 0) - new Date(b.scheduledDate || 0);
+        }
+        if (bookingState.sortBy === 'scheduled_date_desc') {
+          return new Date(b.scheduledDate || 0) - new Date(a.scheduledDate || 0);
+        }
+        if (bookingState.sortBy === 'status') {
+          const priority = { pending: 1, accepted: 2, in_progress: 3, completed: 4, cancelled: 5, rejected: 6 };
+          return (priority[a.status] || 99) - (priority[b.status] || 99);
+        }
+        return 0;
+      });
+
+      // Pagination
+      const totalFiltered = list.length;
+      const totalPages = Math.ceil(totalFiltered / bookingState.perPage) || 1;
+      if (bookingState.currentPage > totalPages) bookingState.currentPage = totalPages;
+      if (bookingState.currentPage < 1) bookingState.currentPage = 1;
+
+      const startIndex = (bookingState.currentPage - 1) * bookingState.perPage;
+      const paginatedItems = list.slice(startIndex, startIndex + bookingState.perPage);
+
+      const tbody = document.getElementById('bookingsManagementTbody');
+      if (tbody) {
+        if (paginatedItems.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align:center; padding: 2.5rem; color:#94A3B8;">
+                <div style="font-size:1rem; font-weight:700; color:var(--tl-navy-800); margin-bottom:4px;">No booking requests found</div>
+              </td>
+            </tr>
+          `;
+        } else {
+          tbody.innerHTML = paginatedItems.map(b => {
+            const statusClass = getBookingStatusBadgeClass(b.status);
+            const statusLabel = getBookingStatusLabel(b.status);
+            const custName = b.customerName || (b.customer && b.customer.fullName) || 'Customer';
+            const proBiz = b.providerBusinessName || (b.provider && b.provider.businessName) || 'Trade Specialist';
+
+            return `
+              <tr data-booking-id="${b.id}">
+                <td><strong class="b-id">#${escapeHtml(b.id)}</strong></td>
+                <td><strong class="b-cust">${escapeHtml(custName)}</strong></td>
+                <td><strong class="b-pro">${escapeHtml(proBiz)}</strong></td>
+                <td><span class="b-srv">${escapeHtml(b.serviceTitle || 'Consultation')}</span></td>
+                <td><span class="b-date">${escapeHtml(b.scheduledDate || 'Flexible')}</span></td>
+                <td><span class="tl-badge ${statusClass}">${escapeHtml(statusLabel)}</span></td>
+                <td>
+                  <button onclick="openBookingDetailsModal('${b.id}')">Details</button>
+                  <button onclick="openQuickBookingStatusModal('${b.id}')">Status</button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      }
+
+      // Pagination Controls
+      const pInfo = document.getElementById('bookingPaginationInfo');
+      if (pInfo) {
+        if (totalFiltered === 0) {
+          pInfo.innerText = "Showing 0 bookings";
+        } else {
+          const end = Math.min(startIndex + bookingState.perPage, totalFiltered);
+          pInfo.innerText = `Showing ${startIndex + 1} to ${end} of ${totalFiltered} bookings`;
+        }
+      }
+    }
+
+    function openBookingDetailsModal(bookingId) {
+      if (!bookingId) return;
+      bookingState.selectedBookingId = bookingId;
+
+      const dossier = (typeof TLBookings !== 'undefined' && TLBookings.getBookingFullDossier)
+        ? TLBookings.getBookingFullDossier(bookingId)
+        : null;
+
+      if (!dossier || !dossier.booking) return;
+      const b = dossier.booking;
+
+      document.getElementById('dossierBookingId').innerText = `#${b.id}`;
+      document.getElementById('dossierBookingServiceTitle').innerText = b.serviceTitle || 'Service Consultation';
+      document.getElementById('dossierBookingCategoryBadge').innerText = b.categoryTitle || 'Trade Services';
+      
+      const stBadge = document.getElementById('dossierBookingStatusBadge');
+      stBadge.className = 'tl-badge ' + getBookingStatusBadgeClass(b.status);
+      stBadge.innerText = getBookingStatusLabel(b.status);
+
+      document.getElementById('dossierBookingCreatedAt').innerText = b.createdAt;
+      document.getElementById('dossierBookingUpdatedAt').innerText = b.updatedAt;
+
+      // Customer Card
+      const cust = b.customer || {};
+      document.getElementById('dossierBookingCustomerAvatar').src = cust.avatar || '';
+      document.getElementById('dossierBookingCustomerName').innerText = cust.fullName || b.customerName || 'Customer';
+      document.getElementById('dossierBookingCustomerId').innerText = `ID: ${b.customerId}`;
+      document.getElementById('dossierBookingCustomerEmail').innerText = cust.email || '';
+      document.getElementById('dossierBookingCustomerPhone').innerText = cust.phone || b.customerPhone || '';
+      document.getElementById('dossierBookingCustomerCity').innerText = cust.city || b.city || '';
+      document.getElementById('dossierBookingCustomerStatusBadge').innerText = cust.status || 'active';
+
+      // Pro Card
+      const pro = b.provider || {};
+      document.getElementById('dossierBookingProAvatar').src = pro.avatar || '';
+      document.getElementById('dossierBookingProBizName').innerText = pro.businessName || b.providerBusinessName || '';
+      document.getElementById('dossierBookingProLegalName').innerText = pro.fullName || b.providerName || '';
+      document.getElementById('dossierBookingProRatingPill').innerText = `★ ${(pro.rating !== undefined ? pro.rating : 5.0).toFixed(1)}`;
+      document.getElementById('dossierBookingProPhone').innerText = pro.phone || '';
+      document.getElementById('dossierBookingProVerifyBadge').innerText = pro.verificationStatus || 'verified';
+
+      // Particulars
+      document.getElementById('dossierBookingScheduledDate').innerText = b.scheduledDate || 'Flexible';
+      document.getElementById('dossierBookingTimeSlot').innerText = b.scheduledTimeSlot || '';
+      document.getElementById('dossierBookingPriceQuote').innerText = (b.service && b.service.priceAmount) ? `PKR ${b.service.priceAmount}` : 'Upon Request';
+      document.getElementById('dossierBookingAddress').innerText = b.serviceAddress || '';
+      document.getElementById('dossierBookingProblemDesc').innerText = b.problemDescription || '';
+
+      // Cancellation
+      const cancelBox = document.getElementById('dossierBookingCancellationBox');
+      const cancelReason = document.getElementById('dossierBookingCancellationReason');
+      if (b.status === 'cancelled' || b.status === 'rejected') {
+        cancelReason.innerText = b.cancellationReason || '';
+        cancelBox.style.display = 'block';
+      } else {
+        cancelBox.style.display = 'none';
+      }
+
+      // Review
+      const reviewBox = document.getElementById('dossierBookingReviewBox');
+      const reviewStars = document.getElementById('dossierBookingReviewRatingStars');
+      const reviewText = document.getElementById('dossierBookingReviewText');
+      const reviewMeta = document.getElementById('dossierBookingReviewMeta');
+      if (b.review) {
+        reviewStars.innerText = `★ ${(b.review.rating || 5).toFixed(1)}`;
+        reviewText.innerText = b.review.comment || '';
+        reviewMeta.innerText = `Submitted on ${b.review.createdAt}`;
+        reviewBox.style.display = 'block';
+      } else {
+        reviewBox.style.display = 'none';
+      }
+
+      // Timeline
+      const timelineContainer = document.getElementById('dossierBookingTimeline');
+      const history = b.statusHistory || [];
+      timelineContainer.innerHTML = history.map(h => `
+        <div class="timeline-step">
+          <span class="step-role">${h.changedByRole}</span>
+          <span class="step-from">${h.fromStatus || 'none'}</span>
+          <span class="step-to">${h.toStatus}</span>
+          <span class="step-note">${h.note}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('bookingDetailsModal').classList.add('active');
+    }
+
+    function closeBookingDetailsModal() {
+      document.getElementById('bookingDetailsModal').classList.remove('active');
+    }
+
+    function handleDossierAdminStatusUpdate() {
+      if (!bookingState.selectedBookingId) return;
+      const targetStatus = document.getElementById('dossierAdminTargetStatus')?.value;
+      const reasonNote = document.getElementById('dossierAdminReasonNote')?.value;
+      const adminId = currentAdminUser ? currentAdminUser.id : 'admin';
+      return TLBookings.adminUpdateBookingStatus({
+        bookingId: bookingState.selectedBookingId,
+        targetStatus,
+        reasonNote,
+        adminId
+      });
+    }
+
+    function openQuickBookingStatusModal(bookingId) {
+      if (!bookingId) return;
+      bookingState.selectedBookingId = bookingId;
+      const dossier = TLBookings.getBookingFullDossier(bookingId);
+      if (!dossier || !dossier.booking) return;
+      const b = dossier.booking;
+
+      document.getElementById('quickBookingRef').innerText = `#${b.id}`;
+      document.getElementById('quickBookingCurrentBadge').innerText = b.status;
+      document.getElementById('quickBookingCustomerName').innerText = b.customerName;
+      document.getElementById('quickBookingServiceTitle').innerText = b.serviceTitle;
+      document.getElementById('quickBookingTargetSelect').value = b.status;
+      document.getElementById('quickBookingReasonInput').value = '';
+      document.getElementById('bookingStatusModal').classList.add('active');
+    }
+
+    function closeQuickBookingStatusModal() {
+      document.getElementById('bookingStatusModal').classList.remove('active');
+    }
+
+    // ------------------------------------------------------------------------
+    // Test Assertion Runner
+    // ------------------------------------------------------------------------
+    const testResults = [];
+    function assert(name, condition, details = "") {
+      testResults.push({ name, passed: !!condition, details });
+    }
+
+    function runAllTests() {
+      // 1. Data Federation & Schema Integrity Tests
+      const joinedBookings = TLBookings.getAllBookingsJoined();
+      assert("TF-01: Cross-entity joined bookings return non-empty array", Array.isArray(joinedBookings) && joinedBookings.length >= 7, `Returned ${joinedBookings.length} joined booking records`);
+
+      const sample = joinedBookings[0];
+      assert("TF-02: Joined booking contains customer dossier object", sample && sample.customer && sample.customer.fullName && sample.customer.email !== undefined, `Customer: ${sample.customer?.fullName}`);
+      assert("TF-03: Joined booking contains specialist / provider dossier object", sample && sample.provider && sample.provider.businessName && sample.provider.rating !== undefined, `Provider: ${sample.provider?.businessName}`);
+      assert("TF-04: Joined booking contains service listing information", sample && sample.service && sample.service.title && sample.service.priceType !== undefined, `Service: ${sample.service?.title}`);
+      assert("TF-05: Joined booking contains immutable statusHistory array", sample && Array.isArray(sample.statusHistory) && sample.statusHistory.length > 0, `History events: ${sample.statusHistory?.length}`);
+
+      // Check review join on completed booking (TL-BK-5190)
+      const reviewedBooking = joinedBookings.find(b => b.id === "TL-BK-5190");
+      assert("TF-06: Completed reviewed booking (TL-BK-5190) resolves customer review", reviewedBooking && reviewedBooking.review && reviewedBooking.review.rating === 5, `Review comment: ${reviewedBooking?.review?.comment?.slice(0, 40)}...`);
+
+      // Check cancellation reason on cancelled booking (TL-BK-1940)
+      const cancelledBooking = joinedBookings.find(b => b.id === "TL-BK-1940");
+      assert("TF-07: Cancelled booking (TL-BK-1940) has cancellationReason preserved", cancelledBooking && cancelledBooking.status === "cancelled" && typeof cancelledBooking.cancellationReason === "string", `Reason: ${cancelledBooking?.cancellationReason}`);
+
+      // Check rejected booking (TL-BK-1120)
+      const rejectedBooking = joinedBookings.find(b => b.id === "TL-BK-1120");
+      assert("TF-08: Rejected booking (TL-BK-1120) has rejected status and reason", rejectedBooking && rejectedBooking.status === "rejected" && typeof rejectedBooking.cancellationReason === "string", `Status: ${rejectedBooking?.status}`);
+
+      // 2. Table Rendering & Executive KPI Strip
+      renderBookingsTable();
+
+      const elTotal = document.getElementById('bookingStatTotal');
+      const elPending = document.getElementById('bookingStatPending');
+      const elAccepted = document.getElementById('bookingStatAccepted');
+      const elInProgress = document.getElementById('bookingStatInProgress');
+      const elCompleted = document.getElementById('bookingStatCompleted');
+      const elCancelled = document.getElementById('bookingStatCancelled');
+      const elBadgeNav = document.getElementById('badgeNavBookings');
+
+      assert("TF-09: Top Stat Total Bookings correctly rendered", elTotal && parseInt(elTotal.innerText) === joinedBookings.length, `Total: ${elTotal?.innerText}`);
+      assert("TF-10: Top Stat Pending Requests correctly rendered", elPending && parseInt(elPending.innerText) === joinedBookings.filter(b => b.status === 'pending').length, `Pending: ${elPending?.innerText}`);
+      assert("TF-11: Top Stat Accepted Bookings correctly rendered", elAccepted && parseInt(elAccepted.innerText) === joinedBookings.filter(b => b.status === 'accepted').length, `Accepted: ${elAccepted?.innerText}`);
+      assert("TF-12: Top Stat In Progress Bookings correctly rendered", elInProgress && parseInt(elInProgress.innerText) === joinedBookings.filter(b => b.status === 'in_progress').length, `In Progress: ${elInProgress?.innerText}`);
+      assert("TF-13: Top Stat Completed Bookings correctly rendered", elCompleted && parseInt(elCompleted.innerText) === joinedBookings.filter(b => b.status === 'completed').length, `Completed: ${elCompleted?.innerText}`);
+      assert("TF-14: Top Stat Cancelled / Rejected correctly rendered", elCancelled && parseInt(elCancelled.innerText) === joinedBookings.filter(b => b.status === 'cancelled' || b.status === 'rejected').length, `Cancelled: ${elCancelled?.innerText}`);
+      assert("TF-15: Sidebar Nav Badge matches total bookings", elBadgeNav && parseInt(elBadgeNav.innerText) === joinedBookings.length, `Nav Badge: ${elBadgeNav?.innerText}`);
+
+      const rowsInitial = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-16: Table renders first page items (perPage=5)", rowsInitial.length === 5, `Rendered rows: ${rowsInitial.length}`);
+
+      // 3. Search Functionality Tests
+      // Search by Ref ID
+      onBookingSearchChange("8841");
+      const rowsSearchId = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-17: Search by Booking Reference ('8841') returns matching record", rowsSearchId.length === 1 && rowsSearchId[0].textContent.includes("TL-BK-8841"), `Found ${rowsSearchId.length} records`);
+
+      // Search by Customer Name
+      onBookingSearchChange("Hamad");
+      const rowsSearchCust = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-18: Search by Customer Name ('Hamad') finds customer bookings", rowsSearchCust.length >= 2, `Found ${rowsSearchCust.length} records`);
+
+      // Search by Specialist / Business Name
+      onBookingSearchChange("Rashid");
+      const rowsSearchPro = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-19: Search by Specialist ('Rashid') finds engineer bookings", rowsSearchPro.length >= 2, `Found ${rowsSearchPro.length} records`);
+
+      // Search by Problem Description Keyword
+      onBookingSearchChange("breaker");
+      const rowsSearchProblem = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-20: Search by Problem Description keyword ('breaker') returns match", rowsSearchProblem.length >= 1, `Found ${rowsSearchProblem.length} records`);
+
+      // Search by City
+      onBookingSearchChange("Karachi");
+      const rowsSearchCity = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-21: Search by City ('Karachi') returns matching bookings", rowsSearchCity.length >= 1, `Found ${rowsSearchCity.length} records`);
+
+      // Reset Search
+      resetBookingFilters();
+      const rowsReset = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-22: Filter reset restores standard pagination count", rowsReset.length === 5, `Restored to ${rowsReset.length} rows`);
+
+      // 4. Status Filtering (All 6 Lifecycle States)
+      document.getElementById('bookingStatusFilter').value = 'pending';
+      onBookingStatusFilterChange();
+      const rowsPending = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-23: Status filter 'pending' displays only pending bookings", rowsPending.length >= 1 && Array.from(rowsPending).every(r => r.textContent.includes("Pending Confirmation")), `Pending rows: ${rowsPending.length}`);
+
+      document.getElementById('bookingStatusFilter').value = 'accepted';
+      onBookingStatusFilterChange();
+      const rowsAccepted = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-24: Status filter 'accepted' displays only accepted bookings", rowsAccepted.length >= 1 && Array.from(rowsAccepted).every(r => r.textContent.includes("Accepted")), `Accepted rows: ${rowsAccepted.length}`);
+
+      document.getElementById('bookingStatusFilter').value = 'in_progress';
+      onBookingStatusFilterChange();
+      const rowsInProgress = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-25: Status filter 'in_progress' displays only in-progress execution jobs", rowsInProgress.length >= 1 && Array.from(rowsInProgress).every(r => r.textContent.includes("In Progress")), `In Progress rows: ${rowsInProgress.length}`);
+
+      document.getElementById('bookingStatusFilter').value = 'completed';
+      onBookingStatusFilterChange();
+      const rowsCompleted = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-26: Status filter 'completed' displays only completed services", rowsCompleted.length >= 1 && Array.from(rowsCompleted).every(r => r.textContent.includes("Completed")), `Completed rows: ${rowsCompleted.length}`);
+
+      document.getElementById('bookingStatusFilter').value = 'cancelled';
+      onBookingStatusFilterChange();
+      const rowsCancelled = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-27: Status filter 'cancelled' displays only cancelled bookings", rowsCancelled.length >= 1 && Array.from(rowsCancelled).every(r => r.textContent.includes("Cancelled")), `Cancelled rows: ${rowsCancelled.length}`);
+
+      document.getElementById('bookingStatusFilter').value = 'rejected';
+      onBookingStatusFilterChange();
+      const rowsRejected = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-28: Status filter 'rejected' displays only rejected bookings", rowsRejected.length >= 1 && Array.from(rowsRejected).every(r => r.textContent.includes("Rejected")), `Rejected rows: ${rowsRejected.length}`);
+
+      // Reset
+      resetBookingFilters();
+
+      // 5. Category Filtering
+      const catSelect = document.getElementById('bookingCategoryFilter');
+      assert("TF-29: Category filter dropdown is populated with database categories", catSelect && catSelect.options.length > 2, `Category options: ${catSelect?.options?.length}`);
+
+      // 6. Sorting Tests
+      onBookingSortChange('oldest');
+      const rowsOldest = document.querySelectorAll('#bookingsManagementTbody tr');
+      const firstOldestRef = rowsOldest[0]?.querySelector('.b-id')?.textContent;
+      assert("TF-30: Sort by oldest first reorders dataset chronologically", !!firstOldestRef, `First oldest ref: ${firstOldestRef}`);
+
+      onBookingSortChange('status');
+      const rowsStatusSort = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-31: Sort by status priority succeeds", rowsStatusSort.length === 5, `Status sorted rows: ${rowsStatusSort.length}`);
+
+      resetBookingFilters();
+
+      // 7. Pagination Controls
+      onBookingPerPageChange(10);
+      const rows10 = document.querySelectorAll('#bookingsManagementTbody tr');
+      assert("TF-32: Per Page select (10) expands table rows", rows10.length >= 7, `Expanded rows: ${rows10.length}`);
+
+      onBookingPerPageChange(5);
+      changeBookingPage(2);
+      const pInfo = document.getElementById('bookingPaginationInfo');
+      assert("TF-33: Page 2 navigation updates pagination label", pInfo && pInfo.innerText.includes("Showing 6 to"), `Pagination info: ${pInfo?.innerText}`);
+      resetBookingFilters();
+
+      // 8. Full Booking Details Modal Tests
+      openBookingDetailsModal("TL-BK-8841");
+      const dModal = document.getElementById('bookingDetailsModal');
+      assert("TF-34: Booking details modal opens with active class", dModal && dModal.classList.contains('active'), "Details modal is active");
+
+      const dId = document.getElementById('dossierBookingId')?.innerText;
+      const dTitle = document.getElementById('dossierBookingServiceTitle')?.innerText;
+      const dCustName = document.getElementById('dossierBookingCustomerName')?.innerText;
+      const dProBiz = document.getElementById('dossierBookingProBizName')?.innerText;
+      const dTimelineSteps = document.querySelectorAll('#dossierBookingTimeline .timeline-step');
+
+      assert("TF-35: Details modal displays correct booking ref (#TL-BK-8841)", dId === "#TL-BK-8841", `Dossier ID: ${dId}`);
+      assert("TF-36: Details modal displays correct service title", dTitle && dTitle.includes("Electrical"), `Title: ${dTitle}`);
+      assert("TF-37: Details modal displays customer full name", dCustName === "Hamad Ullah", `Customer: ${dCustName}`);
+      assert("TF-38: Details modal displays specialist business name", dProBiz === "Khan Electrical & Automation", `Provider: ${dProBiz}`);
+      assert("TF-39: Details modal renders lifecycle status timeline audit log", dTimelineSteps.length >= 1, `Timeline entries: ${dTimelineSteps.length}`);
+
+      closeBookingDetailsModal();
+      assert("TF-40: Booking details modal closes properly", !dModal.classList.contains('active'), "Details modal closed");
+
+      // Test Completed Booking with Verified Review
+      openBookingDetailsModal("TL-BK-5190");
+      const reviewBox = document.getElementById('dossierBookingReviewBox');
+      const reviewText = document.getElementById('dossierBookingReviewText')?.innerText;
+      assert("TF-41: Completed reviewed booking displays review feedback box", reviewBox && reviewBox.style.display === 'block' && reviewText.length > 10, `Review: ${reviewText}`);
+      closeBookingDetailsModal();
+
+      // Test Cancelled Booking with Reason
+      openBookingDetailsModal("TL-BK-1940");
+      const cancelBox = document.getElementById('dossierBookingCancellationBox');
+      const cancelReason = document.getElementById('dossierBookingCancellationReason')?.innerText;
+      assert("TF-42: Cancelled booking displays cancellation reason box", cancelBox && cancelBox.style.display === 'block' && cancelReason.length > 5, `Cancellation: ${cancelReason}`);
+      closeBookingDetailsModal();
+
+      // 9. Quick Status Modal Tests
+      openQuickBookingStatusModal("TL-BK-8841");
+      const qModal = document.getElementById('bookingStatusModal');
+      const qRef = document.getElementById('quickBookingRef')?.innerText;
+      assert("TF-43: Quick status modal opens for #TL-BK-8841", qModal && qModal.classList.contains('active') && qRef === "#TL-BK-8841", `Quick ref: ${qRef}`);
+      closeQuickBookingStatusModal();
+      assert("TF-44: Quick status modal closes properly", !qModal.classList.contains('active'), "Quick modal closed");
+
+      // 10. Administrator Status Transition & Audit Logging
+      openBookingDetailsModal("TL-BK-8841");
+      document.getElementById('dossierAdminTargetStatus').value = "accepted";
+      document.getElementById('dossierAdminReasonNote').value = "Approved by senior operations officer via customer phone confirmation.";
+      const updateRes = handleDossierAdminStatusUpdate();
+
+      assert("TF-45: Administrator status update operation succeeds", updateRes && updateRes.success, "Transition returned success");
+
+      // Verify updated record in database
+      const updatedBooking = TLBookings.getBookingById("TL-BK-8841");
+      assert("TF-46: Booking status in database updated to 'accepted'", updatedBooking && updatedBooking.status === "accepted", `Updated status: ${updatedBooking?.status}`);
+
+      // Verify statusHistory audit log
+      const lastAudit = updatedBooking.statusHistory[updatedBooking.statusHistory.length - 1];
+      assert("TF-47: Immutable audit log entry records admin role and note", lastAudit && lastAudit.changedByRole === "admin" && lastAudit.toStatus === "accepted" && lastAudit.note.includes("Approved by senior"), `Audit: ${lastAudit?.note}`);
+
+      // Verify admin audit log
+      const rawAudit = localStorage.getItem("tl_db_admin_audit");
+      const auditLogs = rawAudit ? JSON.parse(rawAudit) : [];
+      const bookingAuditEntry = auditLogs.find(a => a.targetId === "TL-BK-8841");
+      assert("TF-48: Administrative audit entry recorded in tl_db_admin_audit", !!bookingAuditEntry && bookingAuditEntry.actionType === "BOOKING_STATUS_UPDATED", `Audit entry: ${bookingAuditEntry?.details}`);
+
+      // Verify in-app notifications dispatched
+      const rawNotifs = localStorage.getItem("tl_db_notifications");
+      const notifs = rawNotifs ? JSON.parse(rawNotifs) : [];
+      const bookingNotif = notifs.find(n => n.bookingId === "TL-BK-8841");
+      assert("TF-49: In-app lifecycle notification dispatched to customer/provider", !!bookingNotif && bookingNotif.title.includes("Accepted"), `Notification title: ${bookingNotif?.title}`);
+
+      closeBookingDetailsModal();
+
+      // Render Results UI
+      renderResults();
+    }
+
+    function renderResults() {
+      const container = document.getElementById('resultsUI');
+      const passCount = testResults.filter(t => t.passed).length;
+      const failCount = testResults.length - passCount;
+      const allPassed = failCount === 0;
+
+      let html = `
+        <div class="summary-bar ${allPassed ? 'summary-pass' : 'summary-fail'}">
+          ${allPassed ? '&#x2714; ALL TEST ASSERTIONS PASSED (100%)' : `&#x2718; ${failCount} ASSERTION(S) FAILED`}
+          &mdash; ${passCount} / ${testResults.length} Passed
+        </div>
+      `;
+
+      testResults.forEach((t, i) => {
+        html += `
+          <div class="test-box ${t.passed ? 'pass' : 'fail'}">
+            <span class="badge ${t.passed ? 'pass' : 'fail'}">${t.passed ? 'PASS' : 'FAIL'}</span>
+            <strong>[${i + 1}] ${escapeHtml(t.name)}</strong>
+            ${t.details ? `<div class="details">${escapeHtml(t.details)}</div>` : ''}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    document.addEventListener('DOMContentLoaded', runAllTests);
+  </script>
+</body>
+
+</html>

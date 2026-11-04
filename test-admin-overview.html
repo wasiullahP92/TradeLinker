@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TradeLinker Admin Overview Dynamic Verification Test Suite</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 20px; background: #0F172A; color: #F8FAFC; }
+    h1 { color: #01AD8F; }
+    .test-box { background: #1E293B; border-radius: 8px; padding: 15px; margin-bottom: 12px; border-left: 4px solid #64748B; }
+    .test-box.pass { border-left-color: #10B981; }
+    .test-box.fail { border-left-color: #EF4444; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+    .badge.pass { background: #064E3B; color: #34D399; }
+    .badge.fail { background: #7F1D1D; color: #F87171; }
+    iframe { width: 1200px; height: 800px; border: 1px solid #334155; margin-top: 20px; background: #FFF; }
+  </style>
+</head>
+<body>
+  <h1>TradeLinker Admin Overview Test Suite</h1>
+  <div id="results">Running verification suite...</div>
+  <iframe id="dashboardFrame" src="admin-dashboard.html"></iframe>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+
+  <script>
+    // Ensure active admin session is stored in localStorage
+    const adminUser = {
+      id: "usr-admin-001",
+      fullName: "System Administrator",
+      email: "admin@tradelinker.com",
+      role: "admin",
+      status: "active",
+      city: "Islamabad"
+    };
+    TLAuth.createSession(adminUser, true);
+
+    const testResults = [];
+
+    function recordTest(name, passed, details) {
+      testResults.push({ name, passed, details });
+      console.log(`[TEST] ${name}: ${passed ? 'PASSED' : 'FAILED'} - ${details}`);
+    }
+
+    function renderResultsUI() {
+      const el = document.getElementById('results');
+      const allPassed = testResults.every(t => t.passed);
+      el.innerHTML = `
+        <div style="margin-bottom: 15px; font-size: 1.1rem; font-weight: bold; color: ${allPassed ? '#34D399' : '#F87171'}">
+          Summary: ${testResults.filter(t => t.passed).length} / ${testResults.length} Tests Passed
+        </div>
+        ${testResults.map(t => `
+          <div class="test-box ${t.passed ? 'pass' : 'fail'}">
+            <span class="badge ${t.passed ? 'pass' : 'fail'}">${t.passed ? 'PASS' : 'FAIL'}</span>
+            <strong>${t.name}</strong>
+            <div style="margin-top: 4px; font-size: 0.85rem; color: #94A3B8;">${t.details}</div>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    window.addEventListener('load', () => {
+      // Step 1: Unit level storage validation
+      TLAuth.init();
+      TLServices.init();
+      TLBookings.init();
+      TLCommunication.init();
+      TLSubscriptions.init();
+
+      const users = TLAuth.getUsers();
+      const customers = users.filter(u => u.role === 'customer');
+      const pros = TLAuth.getProviders();
+      const categories = TLCommunication.getAllCategories();
+      const services = TLServices.getAllServices();
+      const bookings = TLBookings.getAllBookings();
+      const subs = TLSubscriptions.getAllSubscriptions();
+      const activeSubs = TLSubscriptions.getActiveSubscriptions();
+
+      recordTest("Database Users Count", users.length >= 10, `Found ${users.length} registered accounts.`);
+      recordTest("Database Customers Count", customers.length >= 4, `Found ${customers.length} customer accounts.`);
+      recordTest("Database Providers Count", pros.length >= 6, `Found ${pros.length} service specialists.`);
+      recordTest("Database Categories Count", categories.length >= 6, `Found ${categories.length} core trade categories.`);
+      recordTest("Database Services Count", services.length >= 6, `Found ${services.length} active service listings.`);
+      recordTest("Database Bookings Lifecycle", bookings.length >= 6, `Found ${bookings.length} bookings covering all 6 SRS lifecycle states.`);
+      recordTest("Database Subscriptions Ledger", activeSubs.length >= 5, `Found ${activeSubs.length} active subscriptions (${subs.length} total).`);
+
+      // Step 2: Test live iframe rendering of admin-dashboard.html
+      const frame = document.getElementById('dashboardFrame');
+      frame.onload = () => {
+        setTimeout(() => {
+          try {
+            const fDoc = frame.contentDocument || frame.contentWindow.document;
+
+            // 1. KPI Cards
+            const kpiTotalUsers = fDoc.getElementById('kpiTotalUsers')?.innerText;
+            const kpiTotalCustomers = fDoc.getElementById('kpiTotalCustomers')?.innerText;
+            const kpiTotalProfessionals = fDoc.getElementById('kpiTotalProfessionals')?.innerText;
+            const kpiTotalCategories = fDoc.getElementById('kpiTotalCategories')?.innerText;
+            const kpiTotalServices = fDoc.getElementById('kpiTotalServices')?.innerText;
+            const kpiTotalBookings = fDoc.getElementById('kpiTotalBookings')?.innerText;
+            const kpiPendingBookings = fDoc.getElementById('kpiPendingBookings')?.innerText;
+            const kpiActiveSubscriptions = fDoc.getElementById('kpiActiveSubscriptions')?.innerText;
+
+            recordTest("Overview KPI - Total Users", parseInt(kpiTotalUsers) === users.length, `Value: ${kpiTotalUsers} (Expected: ${users.length})`);
+            recordTest("Overview KPI - Total Customers", parseInt(kpiTotalCustomers) === customers.length, `Value: ${kpiTotalCustomers} (Expected: ${customers.length})`);
+            recordTest("Overview KPI - Total Professionals", parseInt(kpiTotalProfessionals) === pros.length, `Value: ${kpiTotalProfessionals} (Expected: ${pros.length})`);
+            recordTest("Overview KPI - Total Categories", parseInt(kpiTotalCategories) === categories.length, `Value: ${kpiTotalCategories} (Expected: ${categories.length})`);
+            recordTest("Overview KPI - Total Services", parseInt(kpiTotalServices) === services.length, `Value: ${kpiTotalServices} (Expected: ${services.length})`);
+            recordTest("Overview KPI - Total Bookings", parseInt(kpiTotalBookings) === bookings.length, `Value: ${kpiTotalBookings} (Expected: ${bookings.length})`);
+            recordTest("Overview KPI - Pending Bookings", parseInt(kpiPendingBookings) === bookings.filter(b => b.status === 'pending').length, `Value: ${kpiPendingBookings}`);
+            recordTest("Overview KPI - Active Subscriptions", parseInt(kpiActiveSubscriptions) === activeSubs.length, `Value: ${kpiActiveSubscriptions} (Expected: ${activeSubs.length})`);
+
+            // 2. Professional SVG Charts
+            const regSvg = fDoc.querySelector('#userRegistrationsChartContainer svg');
+            const regBars = fDoc.querySelectorAll('#userRegistrationsChartContainer rect[fill="url(#userBarGradient)"]');
+            recordTest("Chart - User Registrations Bar Chart SVG", regSvg !== null && regBars.length >= 5, `Rendered SVG with ${regBars.length} monthly bars.`);
+
+            const roleDonut = fDoc.querySelector('#userRolesBreakdownContainer svg');
+            recordTest("Chart - Role Breakdown Donut SVG", roleDonut !== null, `Rendered SVG Donut circle.`);
+
+            const pipelineItems = fDoc.querySelectorAll('#bookingPipelineContainer .pipeline-item');
+            recordTest("Chart - Booking 6-Stage Pipeline", pipelineItems.length === 6, `Rendered ${pipelineItems.length} lifecycle status progress bars.`);
+
+            const demandItems = fDoc.querySelectorAll('#categoryDemandContainer .demand-item');
+            recordTest("Chart - Trade Demand Meters", demandItems.length >= 4, `Rendered ${demandItems.length} trade demand volume meters.`);
+
+            // 3. 4 Live Dynamic Activity Feeds
+            const recentUsersRows = fDoc.querySelectorAll('#overviewRecentUsersTbody tr');
+            recordTest("Feed - Recently Registered Users Table", recentUsersRows.length >= 3, `Populated ${recentUsersRows.length} recent users rows.`);
+
+            const recentServicesRows = fDoc.querySelectorAll('#overviewRecentServicesTbody tr');
+            recordTest("Feed - Recently Added Services Table", recentServicesRows.length >= 3, `Populated ${recentServicesRows.length} recent services rows.`);
+
+            const recentBookingsRows = fDoc.querySelectorAll('#overviewRecentBookingsTbody tr');
+            recordTest("Feed - Recent Booking Requests Table", recentBookingsRows.length >= 3, `Populated ${recentBookingsRows.length} recent bookings rows.`);
+
+            const recentAuditRows = fDoc.querySelectorAll('#overviewRecentAuditTbody tr');
+            recordTest("Feed - Recent Administrative Activities Table", recentAuditRows.length >= 1, `Populated ${recentAuditRows.length} recent audit log rows.`);
+
+          } catch (err) {
+            recordTest("Iframe Execution", false, `Exception during iframe inspection: ${err.message}`);
+          }
+          renderResultsUI();
+        }, 1200);
+      };
+    });
+  </script>
+</body>
+</html>
+

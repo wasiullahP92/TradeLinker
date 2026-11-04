@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>TradeLinker Reviews, Ratings &amp; Portfolio Verification Suite</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 24px;
+      background: #0F172A;
+      color: #F8FAFC;
+      margin: 0;
+    }
+
+    h1 {
+      color: #01AD8F;
+      margin-top: 0;
+      font-size: 1.5rem;
+    }
+
+    .summary-bar {
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .summary-pass {
+      background: #064E3B;
+      color: #34D399;
+      border: 1px solid #059669;
+    }
+
+    .summary-fail {
+      background: #7F1D1D;
+      color: #F87171;
+      border: 1px solid #DC2626;
+    }
+
+    .test-box {
+      background: #1E293B;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      border-left: 4px solid #64748B;
+      font-size: 0.9rem;
+    }
+
+    .test-box.pass {
+      border-left-color: #10B981;
+    }
+
+    .test-box.fail {
+      border-left-color: #EF4444;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+      margin-right: 8px;
+    }
+
+    .badge.pass {
+      background: #064E3B;
+      color: #34D399;
+    }
+
+    .badge.fail {
+      background: #7F1D1D;
+      color: #F87171;
+    }
+
+    .details {
+      font-size: 0.8rem;
+      color: #94A3B8;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>TradeLinker Reviews, Ratings &amp; Portfolio Management Verification Suite</h1>
+  <div id="resultsUI">Running automated test assertions...</div>
+
+  <!-- In-DOM Container with Reviews & Portfolio Management Elements -->
+  <div id="testDomWrapper" style="display:none;">
+    <!-- Reviews Stat Strip -->
+    <div id="reviewStatTotal">0</div>
+    <div id="reviewStatApproved">0</div>
+    <div id="reviewStatPending">0</div>
+    <div id="reviewStatRejected">0</div>
+    <div id="reviewStatAvgRating">0</div>
+    <div id="reviewStat5Stars">0</div>
+    <div id="badgeNavReviews">0</div>
+
+    <!-- Reviews Filters -->
+    <input type="text" id="reviewSearchInput">
+    <select id="reviewModerationFilter">
+      <option value="all">All Moderation</option>
+      <option value="approved">Approved</option>
+      <option value="pending">Pending</option>
+      <option value="rejected">Rejected</option>
+    </select>
+    <select id="reviewRatingFilter">
+      <option value="all">All Star Ratings</option>
+      <option value="5">5 Stars</option>
+      <option value="4">4 Stars</option>
+      <option value="3">3 Stars</option>
+      <option value="low">1-2 Stars</option>
+    </select>
+    <select id="reviewSortSelect">
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="rating_high_low">Rating High-Low</option>
+      <option value="rating_low_high">Rating Low-High</option>
+      <option value="moderation_status">Status Grouping</option>
+    </select>
+    <select id="reviewPerPageSelect">
+      <option value="5" selected>5</option>
+      <option value="10">10</option>
+      <option value="20">20</option>
+    </select>
+
+    <!-- Reviews Table -->
+    <table>
+      <tbody id="reviewsManagementTbody"></tbody>
+    </table>
+    <div id="reviewPaginationInfo"></div>
+    <div id="reviewPaginationControls"></div>
+
+    <!-- Review Details Modal -->
+    <div id="reviewDetailsModal" class="tl-modal-backdrop">
+      <div id="dossierReviewId"></div>
+      <div id="dossierReviewBookingRef"></div>
+      <div id="dossierReviewServiceTitle"></div>
+      <div id="dossierReviewRatingBadge"></div>
+      <div id="dossierReviewModerationBadge"></div>
+      <div id="dossierReviewCreatedAt"></div>
+      <img id="dossierReviewCustomerAvatar" src="">
+      <div id="dossierReviewCustomerName"></div>
+      <div id="dossierReviewCustomerContact"></div>
+      <img id="dossierReviewProAvatar" src="">
+      <div id="dossierReviewProBizName"></div>
+      <div id="dossierReviewProLegalName"></div>
+      <div id="dossierReviewStarsGraphic"></div>
+      <div id="dossierReviewCommentText"></div>
+      <div id="dossierReviewModerationTrailBox">
+        <div id="dossierReviewModerationNote"></div>
+        <div id="dossierReviewModeratedMeta"></div>
+      </div>
+      <input type="text" id="dossierReviewModerationInput">
+    </div>
+
+    <!-- Review Moderation Modal -->
+    <div id="reviewModerationModal" class="tl-modal-backdrop">
+      <div id="quickReviewModTitle"></div>
+      <div id="quickReviewModRef"></div>
+      <div id="quickReviewModTargetBadge"></div>
+      <div id="quickReviewModCustomer"></div>
+      <div id="quickReviewModExcerpt"></div>
+      <textarea id="quickReviewModReasonInput"></textarea>
+      <button id="quickReviewModSubmitBtn"></button>
+      <div id="quickReviewModError"></div>
+    </div>
+
+    <!-- Portfolio Stat Strip -->
+    <div id="portfolioStatTotal">0</div>
+    <div id="portfolioStatApproved">0</div>
+    <div id="portfolioStatPending">0</div>
+    <div id="portfolioStatRejected">0</div>
+    <div id="portfolioStatFeatured">0</div>
+    <div id="badgeNavPortfolio">0</div>
+
+    <!-- Portfolio Controls -->
+    <button id="portfolioViewGridBtn"></button>
+    <button id="portfolioViewTableBtn"></button>
+    <input type="text" id="portfolioSearchInput">
+    <select id="portfolioStatusFilter">
+      <option value="all">All Moderation</option>
+      <option value="approved">Approved</option>
+      <option value="pending">Pending</option>
+      <option value="rejected">Rejected</option>
+    </select>
+    <select id="portfolioCategoryFilter">
+      <option value="all">All Categories</option>
+    </select>
+    <select id="portfolioSortSelect">
+      <option value="display_order">Display Order</option>
+      <option value="newest">Newest First</option>
+      <option value="oldest">Oldest First</option>
+      <option value="title_asc">Title A-Z</option>
+    </select>
+    <select id="portfolioPerPageSelect">
+      <option value="6" selected>6</option>
+      <option value="12">12</option>
+      <option value="24">24</option>
+    </select>
+
+    <!-- Portfolio Containers -->
+    <div id="portfolioGridContainer"></div>
+    <div id="portfolioTableWrap" style="display:none;">
+      <table>
+        <tbody id="portfolioManagementTbody"></tbody>
+      </table>
+    </div>
+    <div id="portfolioPaginationInfo"></div>
+    <div id="portfolioPaginationControls"></div>
+
+    <!-- Portfolio Details Modal -->
+    <div id="portfolioDetailsModal" class="tl-modal-backdrop">
+      <div id="dossierPortfolioId"></div>
+      <div id="dossierPortfolioTitle"></div>
+      <div id="dossierPortfolioCategoryBadge"></div>
+      <div id="dossierPortfolioOrderBadge"></div>
+      <div id="dossierPortfolioStatusBadge"></div>
+      <div id="dossierPortfolioCreatedAt"></div>
+      <img id="dossierPortfolioImage" src="">
+      <div id="dossierPortfolioCaption"></div>
+      <img id="dossierPortfolioProAvatar" src="">
+      <div id="dossierPortfolioProBizName"></div>
+      <div id="dossierPortfolioProLegalName"></div>
+      <button id="dossierPortfolioOpenProBtn"></button>
+      <div id="dossierPortfolioModerationTrailBox">
+        <div id="dossierPortfolioModerationNote"></div>
+      </div>
+    </div>
+
+    <!-- Portfolio Edit Modal -->
+    <div id="portfolioEditModal" class="tl-modal-backdrop">
+      <input type="text" id="modalPortfolioEditTitle">
+      <textarea id="modalPortfolioEditCaption"></textarea>
+      <input type="number" id="modalPortfolioEditOrder">
+      <select id="modalPortfolioEditFeatured">
+        <option value="false">false</option>
+        <option value="true">true</option>
+      </select>
+      <div id="portfolioEditError"></div>
+    </div>
+
+    <!-- Portfolio Quick Moderation Modal -->
+    <div id="portfolioModerationModal" class="tl-modal-backdrop">
+      <div id="quickPortfolioModTitle"></div>
+      <div id="quickPortfolioModRef"></div>
+      <div id="quickPortfolioModTargetBadge"></div>
+      <div id="quickPortfolioModProjectTitle"></div>
+      <div id="quickPortfolioModProName"></div>
+      <textarea id="quickPortfolioModReasonInput"></textarea>
+      <button id="quickPortfolioModSubmitBtn"></button>
+      <div id="quickPortfolioModError"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+
+  <script>
+    let currentAdminUser = { id: "usr-admin-001", fullName: "System Administrator", role: "admin" };
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // Mirror dashboard functions for isolated testing
+    // ------------------------------------------------------------------------
+    // Review State & Logic
+    // ------------------------------------------------------------------------
+    const reviewState = {
+      currentPage: 1,
+      perPage: 5,
+      search: '',
+      moderationFilter: 'all',
+      ratingFilter: 'all',
+      sortBy: 'newest',
+      selectedReviewId: null,
+      quickTargetAction: null
+    };
+
+    function getReviewModerationBadgeClass(status) {
+      if (status === 'approved') return 'tl-badge-completed';
+      if (status === 'pending') return 'tl-badge-pending';
+      if (status === 'rejected') return 'tl-badge-cancelled';
+      return 'tl-badge-completed';
+    }
+
+    function getReviewModerationLabel(status) {
+      if (status === 'approved') return 'APPROVED';
+      if (status === 'pending') return 'PENDING';
+      if (status === 'rejected') return 'REJECTED';
+      return (status || 'APPROVED').toUpperCase();
+    }
+
+    function onReviewSearchChange(val) {
+      reviewState.search = (val || '').toLowerCase().trim();
+      reviewState.currentPage = 1;
+      renderReviewsTable();
+    }
+
+    function onReviewModerationFilterChange() {
+      reviewState.moderationFilter = document.getElementById('reviewModerationFilter')?.value || 'all';
+      reviewState.currentPage = 1;
+      renderReviewsTable();
+    }
+
+    function onReviewRatingFilterChange() {
+      reviewState.ratingFilter = document.getElementById('reviewRatingFilter')?.value || 'all';
+      reviewState.currentPage = 1;
+      renderReviewsTable();
+    }
+
+    function onReviewSortChange(val) {
+      reviewState.sortBy = val || 'newest';
+      renderReviewsTable();
+    }
+
+    function onReviewPerPageChange(val) {
+      reviewState.perPage = parseInt(val, 10) || 5;
+      reviewState.currentPage = 1;
+      renderReviewsTable();
+    }
+
+    function resetReviewFilters() {
+      reviewState.currentPage = 1;
+      reviewState.search = '';
+      reviewState.moderationFilter = 'all';
+      reviewState.ratingFilter = 'all';
+      reviewState.sortBy = 'newest';
+      reviewState.perPage = 5;
+
+      const sInp = document.getElementById('reviewSearchInput');
+      if (sInp) sInp.value = '';
+      const mFil = document.getElementById('reviewModerationFilter');
+      if (mFil) mFil.value = 'all';
+      const rFil = document.getElementById('reviewRatingFilter');
+      if (rFil) rFil.value = 'all';
+      const sSel = document.getElementById('reviewSortSelect');
+      if (sSel) sSel.value = 'newest';
+      const ppSel = document.getElementById('reviewPerPageSelect');
+      if (ppSel) ppSel.value = '5';
+
+      renderReviewsTable();
+    }
+
+    function changeReviewPage(page) {
+      reviewState.currentPage = page;
+      renderReviewsTable();
+    }
+
+    function renderReviewsTable() {
+      const allReviews = (typeof TLBookings !== 'undefined' && TLBookings.getAllReviewsJoined)
+        ? TLBookings.getAllReviewsJoined()
+        : [];
+
+      const totalCount = allReviews.length;
+      const approvedCount = allReviews.filter(r => r.moderation_status === 'approved').length;
+      const pendingCount = allReviews.filter(r => r.moderation_status === 'pending').length;
+      const rejectedCount = allReviews.filter(r => r.moderation_status === 'rejected').length;
+
+      const approvedReviews = allReviews.filter(r => r.moderation_status === 'approved');
+      let avgRating = 5.0;
+      if (approvedReviews.length > 0) {
+        const sumStars = approvedReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0);
+        avgRating = (sumStars / approvedReviews.length).toFixed(1);
+      }
+      const fiveStarCount = approvedReviews.filter(r => r.rating === 5).length;
+
+      const elTotal = document.getElementById('reviewStatTotal');
+      if (elTotal) elTotal.innerText = totalCount;
+      const elApproved = document.getElementById('reviewStatApproved');
+      if (elApproved) elApproved.innerText = approvedCount;
+      const elPending = document.getElementById('reviewStatPending');
+      if (elPending) elPending.innerText = pendingCount;
+      const elRejected = document.getElementById('reviewStatRejected');
+      if (elRejected) elRejected.innerText = rejectedCount;
+      const elAvg = document.getElementById('reviewStatAvgRating');
+      if (elAvg) elAvg.innerText = avgRating;
+      const el5Stars = document.getElementById('reviewStat5Stars');
+      if (el5Stars) el5Stars.innerText = fiveStarCount;
+
+      const badgeNav = document.getElementById('badgeNavReviews');
+      if (badgeNav) badgeNav.innerText = totalCount;
+
+      let list = allReviews.filter(r => {
+        if (reviewState.search) {
+          const q = reviewState.search;
+          const matchId = (r.id || '').toLowerCase().includes(q);
+          const matchBook = (r.bookingId || '').toLowerCase().includes(q);
+          const matchCust = (r.customerName || (r.customer && r.customer.fullName) || '').toLowerCase().includes(q);
+          const matchProBiz = (r.provider && r.provider.businessName || '').toLowerCase().includes(q);
+          const matchComment = (r.comment || '').toLowerCase().includes(q);
+          if (!matchId && !matchBook && !matchCust && !matchProBiz && !matchComment) return false;
+        }
+
+        if (reviewState.moderationFilter !== 'all') {
+          if (r.moderation_status !== reviewState.moderationFilter) return false;
+        }
+
+        if (reviewState.ratingFilter !== 'all') {
+          if (reviewState.ratingFilter === '5' && r.rating !== 5) return false;
+          if (reviewState.ratingFilter === '4' && r.rating !== 4) return false;
+          if (reviewState.ratingFilter === '3' && r.rating !== 3) return false;
+          if (reviewState.ratingFilter === 'low' && r.rating > 2) return false;
+        }
+
+        return true;
+      });
+
+      list.sort((a, b) => {
+        if (reviewState.sortBy === 'newest') return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        if (reviewState.sortBy === 'oldest') return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+        if (reviewState.sortBy === 'rating_high_low') return (b.rating || 0) - (a.rating || 0);
+        if (reviewState.sortBy === 'rating_low_high') return (a.rating || 0) - (b.rating || 0);
+        return 0;
+      });
+
+      const totalFiltered = list.length;
+      const totalPages = Math.ceil(totalFiltered / reviewState.perPage) || 1;
+      if (reviewState.currentPage > totalPages) reviewState.currentPage = totalPages;
+      if (reviewState.currentPage < 1) reviewState.currentPage = 1;
+
+      const startIndex = (reviewState.currentPage - 1) * reviewState.perPage;
+      const paginatedItems = list.slice(startIndex, startIndex + reviewState.perPage);
+
+      const tbody = document.getElementById('reviewsManagementTbody');
+      if (tbody) {
+        tbody.innerHTML = paginatedItems.map(r => `
+          <tr data-review-id="${r.id}">
+            <td><strong class="r-book">#${escapeHtml(r.bookingId || 'N/A')}</strong></td>
+            <td><strong class="r-cust">${escapeHtml(r.customerName || 'Customer')}</strong></td>
+            <td><strong class="r-pro">${escapeHtml(r.provider?.businessName || 'Specialist')}</strong></td>
+            <td><span class="r-stars">★ ${r.rating}.0</span></td>
+            <td><span class="r-comment">${escapeHtml(r.comment || '')}</span></td>
+            <td><span class="tl-badge ${getReviewModerationBadgeClass(r.moderation_status)}">${getReviewModerationLabel(r.moderation_status)}</span></td>
+            <td>
+              <button onclick="openReviewDetailsModal('${r.id}')">Details</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      const pInfo = document.getElementById('reviewPaginationInfo');
+      if (pInfo) {
+        const end = Math.min(startIndex + reviewState.perPage, totalFiltered);
+        pInfo.innerText = `Showing ${startIndex + 1} to ${end} of ${totalFiltered} reviews`;
+      }
+    }
+
+    function openReviewDetailsModal(reviewId) {
+      reviewState.selectedReviewId = reviewId;
+      const dossier = TLBookings.getReviewFullDossier(reviewId);
+      if (!dossier || !dossier.review) return;
+      const r = dossier.review;
+
+      document.getElementById('dossierReviewId').innerText = `#${r.id}`;
+      document.getElementById('dossierReviewBookingRef').innerText = r.bookingId ? `#${r.bookingId}` : '—';
+      document.getElementById('dossierReviewCustomerName').innerText = r.customerName || 'Customer';
+      document.getElementById('dossierReviewProBizName').innerText = r.provider?.businessName || 'Specialist';
+      document.getElementById('dossierReviewCommentText').innerText = r.comment || '';
+      document.getElementById('dossierReviewModerationBadge').innerText = getReviewModerationLabel(r.moderation_status);
+
+      const trailBox = document.getElementById('dossierReviewModerationTrailBox');
+      const trailNote = document.getElementById('dossierReviewModerationNote');
+      if (r.moderation_note) {
+        trailNote.innerText = r.moderation_note;
+        trailBox.style.display = 'block';
+      } else {
+        trailBox.style.display = 'none';
+      }
+
+      document.getElementById('reviewDetailsModal').classList.add('active');
+    }
+
+    function closeReviewDetailsModal() {
+      document.getElementById('reviewDetailsModal').classList.remove('active');
+    }
+
+    // ------------------------------------------------------------------------
+    // Portfolio State & Logic
+    // ------------------------------------------------------------------------
+    const portfolioState = {
+      currentPage: 1,
+      perPage: 6,
+      search: '',
+      statusFilter: 'all',
+      categoryFilter: 'all',
+      sortBy: 'display_order',
+      viewMode: 'grid',
+      selectedItemId: null
+    };
+
+    function getPortfolioModerationBadgeClass(status) {
+      const s = (status || '').toLowerCase();
+      if (s === 'approved') return 'tl-badge-completed';
+      if (s === 'pending') return 'tl-badge-pending';
+      if (s === 'rejected') return 'tl-badge-cancelled';
+      return 'tl-badge-completed';
+    }
+
+    function getPortfolioModerationLabel(status) {
+      const s = (status || '').toLowerCase();
+      if (s === 'approved') return 'APPROVED';
+      if (s === 'pending') return 'PENDING';
+      if (s === 'rejected') return 'REJECTED';
+      return (status || 'APPROVED').toUpperCase();
+    }
+
+    function onPortfolioSearchChange(val) {
+      portfolioState.search = (val || '').toLowerCase().trim();
+      portfolioState.currentPage = 1;
+      renderPortfolioGrid();
+    }
+
+    function onPortfolioStatusFilterChange() {
+      portfolioState.statusFilter = document.getElementById('portfolioStatusFilter')?.value || 'all';
+      portfolioState.currentPage = 1;
+      renderPortfolioGrid();
+    }
+
+    function onPortfolioCategoryFilterChange() {
+      portfolioState.categoryFilter = document.getElementById('portfolioCategoryFilter')?.value || 'all';
+      portfolioState.currentPage = 1;
+      renderPortfolioGrid();
+    }
+
+    function onPortfolioSortChange(val) {
+      portfolioState.sortBy = val || 'display_order';
+      renderPortfolioGrid();
+    }
+
+    function resetPortfolioFilters() {
+      portfolioState.currentPage = 1;
+      portfolioState.search = '';
+      portfolioState.statusFilter = 'all';
+      portfolioState.categoryFilter = 'all';
+      portfolioState.sortBy = 'display_order';
+      portfolioState.perPage = 6;
+
+      const sInp = document.getElementById('portfolioSearchInput');
+      if (sInp) sInp.value = '';
+      const stFil = document.getElementById('portfolioStatusFilter');
+      if (stFil) stFil.value = 'all';
+      const cFil = document.getElementById('portfolioCategoryFilter');
+      if (cFil) cFil.value = 'all';
+      const sSel = document.getElementById('portfolioSortSelect');
+      if (sSel) sSel.value = 'display_order';
+      const ppSel = document.getElementById('portfolioPerPageSelect');
+      if (ppSel) ppSel.value = '6';
+
+      renderPortfolioGrid();
+    }
+
+    function setPortfolioViewMode(mode) {
+      portfolioState.viewMode = mode;
+      const gridWrap = document.getElementById('portfolioGridContainer');
+      const tableWrap = document.getElementById('portfolioTableWrap');
+      if (mode === 'grid') {
+        gridWrap.style.display = 'grid';
+        tableWrap.style.display = 'none';
+      } else {
+        gridWrap.style.display = 'none';
+        tableWrap.style.display = 'block';
+      }
+      renderPortfolioGrid();
+    }
+
+    function renderPortfolioGrid() {
+      const allItems = (typeof TLAuth !== 'undefined' && TLAuth.getAllPortfoliosJoined)
+        ? TLAuth.getAllPortfoliosJoined()
+        : [];
+
+      const totalCount = allItems.length;
+      const approvedCount = allItems.filter(p => p.moderation_status === 'approved').length;
+      const pendingCount = allItems.filter(p => p.moderation_status === 'pending').length;
+      const rejectedCount = allItems.filter(p => p.moderation_status === 'rejected').length;
+      const featuredCount = allItems.filter(p => p.is_featured === true).length;
+
+      document.getElementById('portfolioStatTotal').innerText = totalCount;
+      document.getElementById('portfolioStatApproved').innerText = approvedCount;
+      document.getElementById('portfolioStatPending').innerText = pendingCount;
+      document.getElementById('portfolioStatRejected').innerText = rejectedCount;
+      document.getElementById('portfolioStatFeatured').innerText = featuredCount;
+      document.getElementById('badgeNavPortfolio').innerText = totalCount;
+
+      let list = allItems.filter(p => {
+        if (portfolioState.search) {
+          const q = portfolioState.search;
+          const matchTitle = (p.title || '').toLowerCase().includes(q);
+          const matchCap = (p.caption || p.description || '').toLowerCase().includes(q);
+          const matchProBiz = (p.provider && p.provider.businessName || '').toLowerCase().includes(q);
+          if (!matchTitle && !matchCap && !matchProBiz) return false;
+        }
+
+        if (portfolioState.statusFilter !== 'all') {
+          if (p.moderation_status !== portfolioState.statusFilter) return false;
+        }
+
+        if (portfolioState.categoryFilter !== 'all') {
+          if ((p.categoryTitle || '').toLowerCase() !== portfolioState.categoryFilter.toLowerCase()) return false;
+        }
+
+        return true;
+      });
+
+      list.sort((a, b) => {
+        if (portfolioState.sortBy === 'display_order') return (Number(a.display_order) || 1) - (Number(b.display_order) || 1);
+        if (portfolioState.sortBy === 'newest') return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        if (portfolioState.sortBy === 'oldest') return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+        if (portfolioState.sortBy === 'title_asc') return (a.title || '').localeCompare(b.title || '');
+        return 0;
+      });
+
+      const totalFiltered = list.length;
+      const totalPages = Math.ceil(totalFiltered / portfolioState.perPage) || 1;
+      const startIndex = (portfolioState.currentPage - 1) * portfolioState.perPage;
+      const paginatedItems = list.slice(startIndex, startIndex + portfolioState.perPage);
+
+      const gridContainer = document.getElementById('portfolioGridContainer');
+      if (gridContainer) {
+        gridContainer.innerHTML = paginatedItems.map(p => `
+          <div class="portfolio-card" data-id="${p.id}">
+            <img src="${p.img || ''}" alt="${escapeHtml(p.title)}">
+            <h4 class="p-title">${escapeHtml(p.title)}</h4>
+            <div class="p-pro">${escapeHtml(p.provider?.businessName || 'Specialist')}</div>
+            <p class="p-cap">${escapeHtml(p.caption || '')}</p>
+            <span class="p-order">Order: #${p.display_order || 1}</span>
+            <span class="tl-badge ${getPortfolioModerationBadgeClass(p.moderation_status)}">${getPortfolioModerationLabel(p.moderation_status)}</span>
+            <button onclick="openPortfolioDetailsModal('${p.id}')">Inspect</button>
+          </div>
+        `).join('');
+      }
+
+      const tbody = document.getElementById('portfolioManagementTbody');
+      if (tbody) {
+        tbody.innerHTML = paginatedItems.map(p => `
+          <tr data-id="${p.id}">
+            <td><strong>${escapeHtml(p.title)}</strong></td>
+            <td>${escapeHtml(p.provider?.businessName || 'Specialist')}</td>
+            <td>${escapeHtml(p.categoryTitle || 'Project')}</td>
+            <td>#${p.display_order || 1}</td>
+            <td><span class="tl-badge ${getPortfolioModerationBadgeClass(p.moderation_status)}">${getPortfolioModerationLabel(p.moderation_status)}</span></td>
+            <td><button onclick="openPortfolioDetailsModal('${p.id}')">Details</button></td>
+          </tr>
+        `).join('');
+      }
+
+      const pInfo = document.getElementById('portfolioPaginationInfo');
+      if (pInfo) {
+        const end = Math.min(startIndex + portfolioState.perPage, totalFiltered);
+        pInfo.innerText = `Showing ${startIndex + 1} to ${end} of ${totalFiltered} showcases`;
+      }
+    }
+
+    function openPortfolioDetailsModal(itemId) {
+      portfolioState.selectedItemId = itemId;
+      const p = TLAuth.getPortfolioItemById(itemId);
+      if (!p) return;
+
+      document.getElementById('dossierPortfolioId').innerText = `#${p.id}`;
+      document.getElementById('dossierPortfolioTitle').innerText = p.title || '';
+      document.getElementById('dossierPortfolioCaption').innerText = p.caption || '';
+      document.getElementById('dossierPortfolioOrderBadge').innerText = `Order: #${p.display_order || 1}`;
+      document.getElementById('dossierPortfolioStatusBadge').innerText = getPortfolioModerationLabel(p.moderation_status);
+      document.getElementById('dossierPortfolioProBizName').innerText = p.provider?.businessName || '';
+
+      const trailBox = document.getElementById('dossierPortfolioModerationTrailBox');
+      const trailNote = document.getElementById('dossierPortfolioModerationNote');
+      if (p.moderation_note) {
+        trailNote.innerText = p.moderation_note;
+        trailBox.style.display = 'block';
+      } else {
+        trailBox.style.display = 'none';
+      }
+
+      document.getElementById('portfolioDetailsModal').classList.add('active');
+    }
+
+    function closePortfolioDetailsModal() {
+      document.getElementById('portfolioDetailsModal').classList.remove('active');
+    }
+
+    // ------------------------------------------------------------------------
+    // Test Suite Assertions
+    // ------------------------------------------------------------------------
+    const testResults = [];
+    function assert(name, condition, details = "") {
+      testResults.push({ name, passed: !!condition, details });
+    }
+
+    function runAllTests() {
+      try {
+        // PART A: REVIEWS & RATINGS MANAGEMENT
+      // 1. Data Federation & Schema
+      const allReviews = TLBookings.getAllReviewsJoined();
+      assert("TR-01: Reviews data federation returns non-empty joined array", Array.isArray(allReviews) && allReviews.length >= 6, `Returned ${allReviews.length} reviews`);
+
+      const rSample = allReviews[0];
+      assert("TR-02: Review record includes customer dossier object", rSample && rSample.customer && rSample.customer.fullName, `Customer: ${rSample?.customer?.fullName}`);
+      assert("TR-03: Review record includes specialist / provider object", rSample && rSample.provider && rSample.provider.businessName, `Provider: ${rSample?.provider?.businessName}`);
+      assert("TR-04: Review record standardizes moderation_status field", rSample && ['approved', 'pending', 'rejected'].includes(rSample.moderation_status), `Status: ${rSample?.moderation_status}`);
+
+      // Check specific states in seed data
+      const approvedReview = allReviews.find(r => r.moderation_status === 'approved');
+      const pendingReview = allReviews.find(r => r.moderation_status === 'pending');
+      const rejectedReview = allReviews.find(r => r.moderation_status === 'rejected');
+
+      assert("TR-05: Database contains approved customer reviews", !!approvedReview, `Approved ID: ${approvedReview?.id}`);
+      assert("TR-06: Database contains pending moderation reviews", !!pendingReview, `Pending ID: ${pendingReview?.id}`);
+      assert("TR-07: Database contains rejected / flagged reviews with moderation notes", !!rejectedReview && typeof rejectedReview.moderation_note === 'string', `Note: ${rejectedReview?.moderation_note}`);
+
+      // 2. Telemetry Stat Strip
+      renderReviewsTable();
+      const elRTotal = document.getElementById('reviewStatTotal');
+      const elRApproved = document.getElementById('reviewStatApproved');
+      const elRPending = document.getElementById('reviewStatPending');
+      const elRRejected = document.getElementById('reviewStatRejected');
+      const elRAvg = document.getElementById('reviewStatAvgRating');
+      const elNavReviews = document.getElementById('badgeNavReviews');
+
+      assert("TR-08: Review Top Stat Total matches database count", elRTotal && parseInt(elRTotal.innerText) === allReviews.length, `Total: ${elRTotal?.innerText}`);
+      assert("TR-09: Review Top Stat Approved matches approved count", elRApproved && parseInt(elRApproved.innerText) === allReviews.filter(r => r.moderation_status === 'approved').length, `Approved: ${elRApproved?.innerText}`);
+      assert("TR-10: Review Top Stat Pending matches pending count", elRPending && parseInt(elRPending.innerText) === allReviews.filter(r => r.moderation_status === 'pending').length, `Pending: ${elRPending?.innerText}`);
+      assert("TR-11: Review Top Stat Rejected matches rejected count", elRRejected && parseInt(elRRejected.innerText) === allReviews.filter(r => r.moderation_status === 'rejected').length, `Rejected: ${elRRejected?.innerText}`);
+      assert("TR-12: Platform Average Rating computed accurately", elRAvg && parseFloat(elRAvg.innerText) >= 4.0, `Avg: ${elRAvg?.innerText}`);
+      assert("TR-13: Navigation badge matches reviews count", elNavReviews && parseInt(elNavReviews.innerText) === allReviews.length, `Badge: ${elNavReviews?.innerText}`);
+
+      // 3. Search & Filters
+      onReviewSearchChange("Hamad");
+      const rSearchCust = document.querySelectorAll('#reviewsManagementTbody tr');
+      assert("TR-14: Search by customer name ('Hamad') returns customer reviews", rSearchCust.length >= 1, `Found ${rSearchCust.length} reviews`);
+
+      onReviewSearchChange("Rashid");
+      const rSearchPro = document.querySelectorAll('#reviewsManagementTbody tr');
+      assert("TR-15: Search by specialist ('Rashid') returns pro reviews", rSearchPro.length >= 1, `Found ${rSearchPro.length} reviews`);
+
+      onReviewSearchChange("spam");
+      const rSearchSpam = document.querySelectorAll('#reviewsManagementTbody tr');
+      assert("TR-16: Search by keyword ('spam') locates flagged comment", rSearchSpam.length >= 1, `Found ${rSearchSpam.length} reviews`);
+
+      resetReviewFilters();
+
+      // Moderation Filter
+      document.getElementById('reviewModerationFilter').value = 'approved';
+      onReviewModerationFilterChange();
+      const rApprovedRows = document.querySelectorAll('#reviewsManagementTbody tr');
+      assert("TR-17: Filter 'approved' shows only approved reviews", rApprovedRows.length >= 1 && Array.from(rApprovedRows).every(r => r.textContent.includes('APPROVED')), `Approved rows: ${rApprovedRows.length}`);
+
+      document.getElementById('reviewModerationFilter').value = 'pending';
+      onReviewModerationFilterChange();
+      const rPendingRows = document.querySelectorAll('#reviewsManagementTbody tr');
+      assert("TR-18: Filter 'pending' shows only pending moderation reviews", rPendingRows.length >= 1 && Array.from(rPendingRows).every(r => r.textContent.includes('PENDING')), `Pending rows: ${rPendingRows.length}`);
+
+      document.getElementById('reviewModerationFilter').value = 'rejected';
+      onReviewModerationFilterChange();
+      const rRejectedRows = document.querySelectorAll('#reviewsManagementTbody tr');
+      assert("TR-19: Filter 'rejected' shows only rejected reviews", rRejectedRows.length >= 1 && Array.from(rRejectedRows).every(r => r.textContent.includes('REJECTED')), `Rejected rows: ${rRejectedRows.length}`);
+
+      resetReviewFilters();
+
+      // Rating Filter
+      document.getElementById('reviewRatingFilter').value = '5';
+      onReviewRatingFilterChange();
+      const r5StarRows = document.querySelectorAll('#reviewsManagementTbody tr');
+      assert("TR-20: Filter 5 Stars returns only 5-star reviews", r5StarRows.length >= 1 && Array.from(r5StarRows).every(r => r.textContent.includes('5.0')), `5-star rows: ${r5StarRows.length}`);
+
+      resetReviewFilters();
+
+      // 4. Review Details Modal
+      openReviewDetailsModal("rev-88410");
+      const rModal = document.getElementById('reviewDetailsModal');
+      assert("TR-21: Review details modal opens with active class", rModal && rModal.classList.contains('active'), "Details modal opened");
+      assert("TR-22: Modal displays review ID and customer name", document.getElementById('dossierReviewId')?.innerText === "#rev-88410", "Review ID verified");
+      closeReviewDetailsModal();
+      assert("TR-23: Review details modal closes properly", !rModal.classList.contains('active'), "Details modal closed");
+
+      // 5. Review Moderation Actions (Approve, Reject, Audit)
+      const targetPendingId = pendingReview ? pendingReview.id : "rev-39210";
+      const appRes = TLBookings.adminApproveReview({
+        reviewId: targetPendingId,
+        adminId: "usr-admin-001",
+        note: "Reviewed and approved by QA administrator."
+      });
+      assert("TR-24: adminApproveReview succeeds for pending review", appRes && appRes.success, "Approval succeeded");
+      const appRecord = TLBookings.getAllReviews().find(r => r.id === targetPendingId);
+      assert("TR-25: Review moderation_status in database updated to 'approved'", appRecord && appRecord.moderation_status === "approved", `Status: ${appRecord?.moderation_status}`);
+
+      // Reject Review
+      const rejRes = TLBookings.adminRejectReview({
+        reviewId: targetPendingId,
+        adminId: "usr-admin-001",
+        reason: "Inappropriate language flagged by content moderation."
+      });
+      assert("TR-26: adminRejectReview succeeds with reason note", rejRes && rejRes.success, "Rejection succeeded");
+      const rejRecord = TLBookings.getAllReviews().find(r => r.id === targetPendingId);
+      assert("TR-27: Review moderation_status in database updated to 'rejected'", rejRecord && rejRecord.moderation_status === "rejected", `Status: ${rejRecord?.moderation_status}`);
+      assert("TR-28: Moderation rationale preserved on review record", rejRecord && rejRecord.moderation_note.includes("Inappropriate language"), `Note: ${rejRecord?.moderation_note}`);
+
+      // Audit Logging
+      const rawAudit = localStorage.getItem("tl_db_admin_audit");
+      const auditLogs = rawAudit ? JSON.parse(rawAudit) : [];
+      const reviewAudit = auditLogs.find(a => a.targetId === targetPendingId);
+      assert("TR-29: Administrative action recorded in tl_db_admin_audit", !!reviewAudit && reviewAudit.actionType === "REVIEW_REJECTED", `Audit action: ${reviewAudit?.actionType}`);
+
+      // PART B: PORTFOLIO MANAGEMENT
+      // 6. Portfolio Data Federation & Schema
+      const allPortfolios = TLAuth.getAllPortfoliosJoined();
+      assert("TP-01: Portfolio data federation returns joined array", Array.isArray(allPortfolios) && allPortfolios.length >= 8, `Returned ${allPortfolios.length} items`);
+
+      const pSample = allPortfolios[0];
+      assert("TP-02: Portfolio item contains title, caption, and img fields", pSample && pSample.title && pSample.caption && pSample.img, `Title: ${pSample?.title}`);
+      assert("TP-03: Portfolio item contains display_order integer", pSample && typeof pSample.display_order === 'number', `Order: ${pSample?.display_order}`);
+      assert("TP-04: Portfolio item contains moderation_status field", pSample && ['approved', 'pending', 'rejected'].includes(pSample.moderation_status), `Status: ${pSample?.moderation_status}`);
+      assert("TP-05: Portfolio item resolves associated specialist dossier", pSample && pSample.provider && pSample.provider.businessName, `Provider: ${pSample?.provider?.businessName}`);
+
+      // Check Pending and Rejected Portfolio Items
+      const pendingPort = allPortfolios.find(p => p.moderation_status === 'pending');
+      const rejectedPort = allPortfolios.find(p => p.moderation_status === 'rejected');
+      assert("TP-06: Database contains pending portfolio showcases", !!pendingPort, `Pending ID: ${pendingPort?.id}`);
+      assert("TP-07: Database contains rejected portfolio items with moderation notes", !!rejectedPort && typeof rejectedPort.moderation_note === 'string', `Rejected ID: ${rejectedPort?.id}`);
+
+      // 7. Portfolio Telemetry & Stat Strip
+      renderPortfolioGrid();
+      const elPTotal = document.getElementById('portfolioStatTotal');
+      const elPApproved = document.getElementById('portfolioStatApproved');
+      const elPPending = document.getElementById('portfolioStatPending');
+      const elPRejected = document.getElementById('portfolioStatRejected');
+      const elPFeatured = document.getElementById('portfolioStatFeatured');
+      const elNavPort = document.getElementById('badgeNavPortfolio');
+
+      assert("TP-08: Portfolio Top Stat Total matches database count", elPTotal && parseInt(elPTotal.innerText) === allPortfolios.length, `Total: ${elPTotal?.innerText}`);
+      assert("TP-09: Portfolio Top Stat Approved matches approved count", elPApproved && parseInt(elPApproved.innerText) === allPortfolios.filter(p => p.moderation_status === 'approved').length, `Approved: ${elPApproved?.innerText}`);
+      assert("TP-10: Portfolio Top Stat Pending matches pending count", elPPending && parseInt(elPPending.innerText) === allPortfolios.filter(p => p.moderation_status === 'pending').length, `Pending: ${elPPending?.innerText}`);
+      assert("TP-11: Portfolio Top Stat Rejected matches rejected count", elPRejected && parseInt(elPRejected.innerText) === allPortfolios.filter(p => p.moderation_status === 'rejected').length, `Rejected: ${elPRejected?.innerText}`);
+      assert("TP-12: Portfolio Top Stat Featured matches featured count", elPFeatured && parseInt(elPFeatured.innerText) === allPortfolios.filter(p => p.is_featured).length, `Featured: ${elPFeatured?.innerText}`);
+      assert("TP-13: Navigation badge matches portfolio count", elNavPort && parseInt(elNavPort.innerText) === allPortfolios.length, `Badge: ${elNavPort?.innerText}`);
+
+      // 8. Grid Cards & View Mode Switcher
+      const gridCards = document.querySelectorAll('#portfolioGridContainer .portfolio-card');
+      assert("TP-14: Portfolio grid renders showcase cards initially", gridCards.length === 6, `Rendered cards: ${gridCards.length}`);
+
+      setPortfolioViewMode('table');
+      const tableRows = document.querySelectorAll('#portfolioManagementTbody tr');
+      assert("TP-15: View mode switcher toggles to Table view with rendered rows", tableRows.length === 6, `Table rows: ${tableRows.length}`);
+      setPortfolioViewMode('grid');
+
+      // 9. Portfolio Search & Filtering
+      onPortfolioSearchChange("Solar");
+      const pSearchSolar = document.querySelectorAll('#portfolioGridContainer .portfolio-card');
+      assert("TP-16: Search by keyword ('Solar') returns matching showcases", pSearchSolar.length >= 1, `Found ${pSearchSolar.length} items`);
+      resetPortfolioFilters();
+
+      document.getElementById('portfolioStatusFilter').value = 'pending';
+      onPortfolioStatusFilterChange();
+      const pPendingCards = document.querySelectorAll('#portfolioGridContainer .portfolio-card');
+      assert("TP-17: Filter 'pending' shows only pending showcases", pPendingCards.length >= 1 && Array.from(pPendingCards).every(c => c.textContent.includes('PENDING')), `Pending cards: ${pPendingCards.length}`);
+
+      document.getElementById('portfolioStatusFilter').value = 'rejected';
+      onPortfolioStatusFilterChange();
+      const pRejectedCards = document.querySelectorAll('#portfolioGridContainer .portfolio-card');
+      assert("TP-18: Filter 'rejected' shows only inappropriate/rejected showcases", pRejectedCards.length >= 1 && Array.from(pRejectedCards).every(c => c.textContent.includes('REJECTED')), `Rejected cards: ${pRejectedCards.length}`);
+      resetPortfolioFilters();
+
+      // 10. Display Order Sorting
+      const firstCardOrder = document.querySelector('#portfolioGridContainer .portfolio-card .p-order')?.textContent;
+      assert("TP-19: Default sorting adheres to display_order (#1 first)", firstCardOrder && firstCardOrder.includes('#1'), `First card: ${firstCardOrder}`);
+
+      // 11. Portfolio Details Modal & Editing
+      openPortfolioDetailsModal("port-001");
+      const pModal = document.getElementById('portfolioDetailsModal');
+      assert("TP-20: Portfolio details modal opens with active class", pModal && pModal.classList.contains('active'), "Details modal opened");
+      assert("TP-21: Modal displays project title and caption", document.getElementById('dossierPortfolioTitle')?.innerText.includes("Smart Home"), "Title verified");
+      closePortfolioDetailsModal();
+      assert("TP-22: Portfolio details modal closes properly", !pModal.classList.contains('active'), "Details modal closed");
+
+      // Edit Caption and Display Order
+      const updateRes = TLAuth.adminUpdatePortfolioItem({
+        itemId: "port-001",
+        title: "Smart Home Automated DB Panel Wiring",
+        caption: "Upgraded 3-phase automated DB board with digital sub-meters and surge suppression.",
+        display_order: 1,
+        is_featured: true,
+        adminId: "usr-admin-001"
+      });
+      assert("TP-23: adminUpdatePortfolioItem successfully updates caption and order", updateRes && updateRes.success, "Update succeeded");
+
+      // 12. Portfolio Moderation (Approve, Reject, Delete)
+      const targetPendingPortId = pendingPort ? pendingPort.id : "port-007";
+      const appPortRes = TLAuth.adminApprovePortfolioItem({
+        itemId: targetPendingPortId,
+        adminId: "usr-admin-001",
+        note: "Verified workmanship standards approved."
+      });
+      assert("TP-24: adminApprovePortfolioItem successfully marks item approved", appPortRes && appPortRes.success, "Approval succeeded");
+
+      const rejPortRes = TLAuth.adminRejectPortfolioItem({
+        itemId: targetPendingPortId,
+        adminId: "usr-admin-001",
+        reason: "Low resolution blurry imagery, rejected."
+      });
+      assert("TP-25: adminRejectPortfolioItem marks item rejected with reason note", rejPortRes && rejPortRes.success, "Rejection succeeded");
+      const rejPortRecord = TLAuth.getAllPortfolios().find(p => p.id === targetPendingPortId);
+      assert("TP-26: Inappropriate portfolio item rejected in database", rejPortRecord && rejPortRecord.moderation_status === "rejected", `Status: ${rejPortRecord?.moderation_status}`);
+
+      // Delete inappropriate item
+      const delPortRes = TLAuth.adminDeletePortfolioItem({
+        itemId: "port-008",
+        adminId: "usr-admin-001"
+      });
+      assert("TP-27: adminDeletePortfolioItem permanently removes inappropriate showcase", delPortRes && delPortRes.success, "Delete succeeded");
+      const deletedCheck = TLAuth.getAllPortfolios().find(p => p.id === "port-008");
+      assert("TP-28: Deleted showcase no longer exists in database", !deletedCheck, "Item removed");
+
+      // Render Results UI
+      renderResults();
+    } catch (err) {
+      console.error(err);
+      document.getElementById('resultsUI').innerHTML = `<div class="summary-bar summary-fail">EXCEPTION: ${err.message}<br><pre>${err.stack}</pre></div>`;
+    }
+  }
+
+    function renderResults() {
+      const container = document.getElementById('resultsUI');
+      const passCount = testResults.filter(t => t.passed).length;
+      const failCount = testResults.length - passCount;
+      const allPassed = failCount === 0;
+
+      let html = `
+        <div class="summary-bar ${allPassed ? 'summary-pass' : 'summary-fail'}">
+          ${allPassed ? '&#x2714; ALL TEST ASSERTIONS PASSED (100%)' : `&#x2718; ${failCount} ASSERTION(S) FAILED`}
+          &mdash; ${passCount} / ${testResults.length} Passed
+        </div>
+      `;
+
+      testResults.forEach((t, i) => {
+        html += `
+          <div class="test-box ${t.passed ? 'pass' : 'fail'}">
+            <span class="badge ${t.passed ? 'pass' : 'fail'}">${t.passed ? 'PASS' : 'FAIL'}</span>
+            <strong>[${i + 1}] ${escapeHtml(t.name)}</strong>
+            ${t.details ? `<div class="details">${escapeHtml(t.details)}</div>` : ''}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    document.addEventListener('DOMContentLoaded', runAllTests);
+  </script>
+</body>
+
+</html>

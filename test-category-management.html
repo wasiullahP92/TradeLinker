@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TradeLinker Category Management Verification Suite</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 24px; background: #0F172A; color: #F8FAFC; margin: 0; }
+    h1 { color: #01AD8F; margin-top: 0; font-size: 1.5rem; }
+    .summary-bar { padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 700; font-size: 1.1rem; }
+    .summary-pass { background: #064E3B; color: #34D399; border: 1px solid #059669; }
+    .summary-fail { background: #7F1D1D; color: #F87171; border: 1px solid #DC2626; }
+    .test-box { background: #1E293B; border-radius: 6px; padding: 12px 16px; margin-bottom: 8px; border-left: 4px solid #64748B; font-size: 0.9rem; }
+    .test-box.pass { border-left-color: #10B981; }
+    .test-box.fail { border-left-color: #EF4444; }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 8px; }
+    .badge.pass { background: #064E3B; color: #34D399; }
+    .badge.fail { background: #7F1D1D; color: #F87171; }
+    .details { font-size: 0.8rem; color: #94A3B8; margin-top: 4px; }
+    iframe { width: 100%; height: 750px; border: 1px solid #334155; border-radius: 8px; background: #FFF; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>TradeLinker Category Management System Verification</h1>
+  <div id="resultsUI">Executing assertions...</div>
+  <iframe id="testFrame" src="admin-dashboard.html?dev_admin=true"></iframe>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+
+  <script>
+    const tests = [];
+
+    function record(name, pass, details) {
+      tests.push({ name, pass: Boolean(pass), details });
+      console.log(`[TEST] ${name}: ${pass ? 'PASS' : 'FAIL'} - ${details}`);
+    }
+
+    function renderSummary() {
+      const container = document.getElementById('resultsUI');
+      const passedCount = tests.filter(t => t.pass).length;
+      const totalCount = tests.length;
+      const allPassed = passedCount === totalCount;
+
+      container.innerHTML = `
+        <div class="summary-bar ${allPassed ? 'summary-pass' : 'summary-fail'}">
+          ${allPassed ? '✓ ALL TESTS PASSED' : '✗ TEST SUITE FAILED'}: ${passedCount} / ${totalCount} Assertions Passing
+        </div>
+        ${tests.map(t => `
+          <div class="test-box ${t.pass ? 'pass' : 'fail'}">
+            <span class="badge ${t.pass ? 'pass' : 'fail'}">${t.pass ? 'PASS' : 'FAIL'}</span>
+            <strong>${t.name}</strong>
+            <div class="details">${t.details}</div>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    // Step 1: Database Engine Verification
+    TLAuth.init();
+    TLServices.init();
+    TLBookings.init();
+    TLCommunication.init();
+
+    const adminUser = {
+      id: "usr-admin-001",
+      fullName: "System Administrator",
+      email: "admin@tradelinker.pk",
+      role: "admin",
+      status: "active",
+      city: "Islamabad"
+    };
+    TLAuth.createSession(adminUser, true);
+
+    const categories = TLCommunication.getAllCategories();
+    record("Initial Category Seed Loaded", categories.length >= 6, `Found ${categories.length} core trade categories.`);
+
+    const sample = categories[0];
+    const fields = ['id', 'name', 'slug', 'description', 'image', 'display_order', 'is_active', 'created_at', 'updated_at'];
+    const fieldsPresent = fields.every(f => sample && sample[f] !== undefined);
+    record("Database Schema (All 9 Fields)", fieldsPresent, `Verified fields on '${sample?.slug}': ${fields.join(', ')}`);
+
+    const aliasOk = sample.name === sample.title && sample.display_order === sample.displayOrder && sample.is_active === sample.isActive;
+    record("Backward Compatible Dual Aliases", aliasOk, `name/title, display_order/displayOrder, is_active/isActive mapped.`);
+
+    const elecUsage = TLCommunication.getCategoryUsage('electrical');
+    record("Dependency Scanner on 'electrical'", elecUsage.serviceCount === 2 && elecUsage.bookingCount === 2, `Electrical: ${elecUsage.serviceCount} services, ${elecUsage.bookingCount} bookings.`);
+
+    const dupNameRes = TLCommunication.addCategory({ name: "Solar Energy Services", slug: "unique-slug-test" });
+    record("Duplicate Category Name Guard", dupNameRes.error && dupNameRes.error.includes("already exists"), dupNameRes.error);
+
+    const dupSlugRes = TLCommunication.addCategory({ name: "Unique Trade Name", slug: "solar" });
+    record("Duplicate URL Slug Guard", dupSlugRes.error && dupSlugRes.error.includes("already exists"), dupSlugRes.error);
+
+    const testSlug = "paint-finishes-" + Date.now();
+    const createRes = TLCommunication.addCategory({
+      name: "Painting & Wall Finishes Test",
+      slug: testSlug,
+      description: "Interior and exterior painting, drywall finishing, and wall wallpapering.",
+      display_order: 7,
+      icon: "paint",
+      image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f",
+      is_active: true
+    }, "admin");
+    record("Add Category Form Execution", createRes && createRes.success, `Created category '${createRes?.category?.id}'.`);
+
+    const createdCat = TLCommunication.getCategoryById(testSlug);
+    record("Category Persisted in Database", createdCat && createdCat.display_order === 7 && createdCat.image.includes('unsplash'), `Persisted order: ${createdCat?.display_order}, image URL: ${createdCat?.image}`);
+
+    const editRes = TLCommunication.updateCategory(testSlug, {
+      description: "Updated premium textured wallpapering and spray painting.",
+      display_order: 9
+    }, "admin");
+    const updatedCat = TLCommunication.getCategoryById(testSlug);
+    record("Edit Category Execution", updatedCat && updatedCat.display_order === 9 && updatedCat.description.includes('textured'), `Updated order: ${updatedCat?.display_order}`);
+
+    const toggleRes = TLCommunication.toggleCategoryStatus(testSlug, "admin");
+    const toggledCat = TLCommunication.getCategoryById(testSlug);
+    record("Toggle Category Active Status", toggledCat && toggledCat.is_active === false, `Active state is now: ${toggledCat?.is_active}`);
+
+    const safeDelBlock = TLCommunication.deleteCategory('electrical', { force: false }, "admin");
+    record("Safety Block on In-Use Category Deletion", safeDelBlock.inUse === true && safeDelBlock.error, safeDelBlock.error);
+
+    const safeDelRes = TLCommunication.deleteCategory(testSlug, { force: false }, "admin");
+    const deletedCat = TLCommunication.getCategoryById(testSlug);
+    record("Safe Permanent Deletion of Unused Category", safeDelRes && safeDelRes.success && !deletedCat, `Category deleted: ${safeDelRes?.success}`);
+
+    const logs = TLCommunication.getAllAdminAuditLogs();
+    const hasAllLogs = logs.some(l => l.actionType === 'CATEGORY_CREATED') &&
+                       logs.some(l => l.actionType === 'CATEGORY_UPDATED') &&
+                       logs.some(l => l.actionType === 'CATEGORY_DEACTIVATED') &&
+                       logs.some(l => l.actionType === 'CATEGORY_DELETED');
+    record("Admin Audit Trail Category Events", hasAllLogs, `All 4 audit event types recorded.`);
+
+    // Render Database asserts first
+    renderSummary();
+
+    // Step 2: Live Iframe UI Verification
+    window.addEventListener('load', () => {
+      const frame = document.getElementById('testFrame');
+      frame.onload = () => {
+        setTimeout(() => {
+          try {
+            const fWin = frame.contentWindow;
+            const fDoc = frame.contentDocument || fWin.document;
+
+            fWin.switchAdminSection('categories');
+
+            const catStatTotal = parseInt(fDoc.getElementById('catStatTotal')?.textContent, 10);
+            const catStatActive = parseInt(fDoc.getElementById('catStatActive')?.textContent, 10);
+            const catStatServices = parseInt(fDoc.getElementById('catStatServices')?.textContent, 10);
+            record("UI Category Summary Stat Strip", catStatTotal >= 6 && catStatActive >= 6 && catStatServices >= 6, `Total: ${catStatTotal}, Active: ${catStatActive}, Services: ${catStatServices}`);
+
+            const tbody = fDoc.getElementById('categoriesManagementTbody');
+            const rows = tbody ? tbody.querySelectorAll('tr') : [];
+            record("Category Table DOM Rows (Page 1 = 5 items)", rows.length === 5, `Rendered ${rows.length} rows.`);
+
+            const firstRow = rows[0];
+            const hasOrderBadge = firstRow && firstRow.querySelector('.cat-order-badge') !== null;
+            const hasThumb = firstRow && firstRow.querySelector('.cat-thumb-box') !== null;
+            const hasSlugCode = firstRow && firstRow.querySelector('code') !== null;
+            const hasListingsBadge = firstRow && firstRow.querySelectorAll('.tl-badge').length >= 2;
+            const hasActionBtns = firstRow && firstRow.querySelectorAll('button').length >= 3;
+            record("Table Row Structure (Order, Thumb, Slug, Badges, Actions)", hasOrderBadge && hasThumb && hasSlugCode && hasListingsBadge && hasActionBtns, "Row contains Order #, Image Thumb, Slug, Listings/Bookings, and Action Buttons.");
+
+            // Search filter
+            fWin.onCategorySearchChange('solar');
+            const solarRows = fDoc.getElementById('categoriesManagementTbody').querySelectorAll('tr');
+            record("Search Filter ('solar')", solarRows.length === 1 && solarRows[0].textContent.includes('Solar'), `Filtered to ${solarRows.length} row(s) for 'solar'.`);
+            fWin.resetCategoryFilters();
+
+            // Safety modal in UI
+            fWin.handleDeleteCategoryClick('electrical');
+            const safetyModal = fDoc.getElementById('categorySafetyModal');
+            const safetyOpen = safetyModal && safetyModal.classList.contains('active');
+            const safetyBody = fDoc.getElementById('safetyModalBody')?.textContent;
+            record("Safety Modal In UI Blocks Deletion", safetyOpen && safetyBody.includes('Active Marketplace Dependencies'), `Safety modal blocked 'electrical': ${safetyBody?.substring(0, 80)}...`);
+            fWin.closeCategorySafetyModal();
+
+          } catch (e) {
+            record("Live UI Verification Error", false, e.message);
+          } finally {
+            renderSummary();
+          }
+        }, 500);
+      };
+    });
+  </script>
+</body>
+</html>

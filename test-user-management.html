@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TradeLinker User Management Verification Suite</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; padding: 24px; background: #0F172A; color: #F8FAFC; margin: 0; }
+    h1 { color: #01AD8F; margin-top: 0; font-size: 1.5rem; }
+    .summary-bar { padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 700; font-size: 1.1rem; }
+    .summary-pass { background: #064E3B; color: #34D399; border: 1px solid #059669; }
+    .summary-fail { background: #7F1D1D; color: #F87171; border: 1px solid #DC2626; }
+    .test-box { background: #1E293B; border-radius: 6px; padding: 12px 16px; margin-bottom: 8px; border-left: 4px solid #64748B; font-size: 0.9rem; }
+    .test-box.pass { border-left-color: #10B981; }
+    .test-box.fail { border-left-color: #EF4444; }
+    .badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-right: 8px; }
+    .badge.pass { background: #064E3B; color: #34D399; }
+    .badge.fail { background: #7F1D1D; color: #F87171; }
+    .details { font-size: 0.8rem; color: #94A3B8; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <h1>TradeLinker User Accounts & Access Governance Verification</h1>
+  <div id="resultsUI">Running automated test assertions...</div>
+
+  <!-- Direct In-DOM Container with User UI Elements -->
+  <div id="testDomWrapper" style="display:none;">
+    <div id="userStatTotal">0</div>
+    <div id="userStatCustomers">0</div>
+    <div id="userStatPros">0</div>
+    <div id="userStatAdmins">0</div>
+    <div id="userStatSuspended">0</div>
+    <div id="badgeNavUsers">0</div>
+
+    <input type="text" id="userSearchInput">
+    <select id="userRoleFilter">
+      <option value="all">All Roles</option>
+      <option value="customer">Customers</option>
+      <option value="provider">Professionals</option>
+      <option value="admin">Administrators</option>
+    </select>
+    <select id="userStatusFilter">
+      <option value="all">All Statuses</option>
+      <option value="active">Active</option>
+      <option value="suspended">Suspended</option>
+    </select>
+    <select id="userSortSelect">
+      <option value="newest">Newest</option>
+      <option value="oldest">Oldest</option>
+      <option value="name_asc">Name Asc</option>
+      <option value="name_desc">Name Desc</option>
+      <option value="role">Role</option>
+    </select>
+    <select id="userPerPageSelect">
+      <option value="5" selected>5</option>
+      <option value="10">10</option>
+      <option value="20">20</option>
+    </select>
+
+    <table>
+      <tbody id="usersManagementTbody"></tbody>
+    </table>
+
+    <div id="userPaginationInfo"></div>
+    <div id="userPaginationControls"></div>
+
+    <!-- Modals -->
+    <div id="userDetailsModal" class="tl-modal-backdrop">
+      <div id="userDetailsModalContent"></div>
+      <button id="modalUserDetailToggleBtn"></button>
+      <button id="modalUserDetailEditBtn"></button>
+    </div>
+
+    <div id="userEditModal" class="tl-modal-backdrop">
+      <div id="modalUserEditError" style="display:none;"></div>
+      <div id="modalUserResetNotice" style="display:none;"></div>
+      <form id="userEditForm">
+        <input type="hidden" id="modalUserEditId">
+        <input type="text" id="modalUserEditName">
+        <input type="email" id="modalUserEditEmail">
+        <input type="tel" id="modalUserEditPhone">
+        <select id="modalUserEditCity">
+          <option value="Islamabad">Islamabad</option>
+          <option value="Rawalpindi">Rawalpindi</option>
+          <option value="Lahore">Lahore</option>
+        </select>
+        <select id="modalUserEditRole">
+          <option value="customer">customer</option>
+          <option value="provider">provider</option>
+          <option value="admin">admin</option>
+        </select>
+        <select id="modalUserEditStatus">
+          <option value="active">active</option>
+          <option value="suspended">suspended</option>
+        </select>
+      </form>
+    </div>
+
+    <div id="userCreateModal" class="tl-modal-backdrop">
+      <div id="modalUserCreateError" style="display:none;"></div>
+      <form id="userCreateForm">
+        <input type="text" id="modalUserCreateName">
+        <input type="email" id="modalUserCreateEmail">
+        <input type="tel" id="modalUserCreatePhone">
+        <select id="modalUserCreateCity">
+          <option value="Islamabad">Islamabad</option>
+        </select>
+        <select id="modalUserCreateRole">
+          <option value="customer">customer</option>
+        </select>
+        <select id="modalUserCreateStatus">
+          <option value="active">active</option>
+        </select>
+        <input type="text" id="modalUserCreatePassword">
+      </form>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/bookings.js"></script>
+  <script src="js/communication.js"></script>
+
+  <script>
+    let currentAdminUser = { id: "usr-admin-001", fullName: "System Administrator", role: "admin" };
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function getUserInitials(name) {
+      if (!name) return 'U';
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    const userState = {
+      currentPage: 1,
+      perPage: 5,
+      search: '',
+      roleFilter: 'all',
+      statusFilter: 'all',
+      sortBy: 'newest',
+      selectedUserId: null
+    };
+
+    function renderUsersTable() {
+      const allUsers = (typeof TLAuth !== 'undefined' && TLAuth.getAllUsersSafe)
+        ? TLAuth.getAllUsersSafe()
+        : [];
+
+      const totalCount = allUsers.length;
+      const customersCount = allUsers.filter(u => u.role === 'customer').length;
+      const prosCount = allUsers.filter(u => u.role === 'provider' || u.role === 'professional').length;
+      const adminsCount = allUsers.filter(u => u.role === 'admin').length;
+      const suspendedCount = allUsers.filter(u => u.status === 'suspended').length;
+
+      const elTotal = document.getElementById('userStatTotal');
+      const elCust = document.getElementById('userStatCustomers');
+      const elPros = document.getElementById('userStatPros');
+      const elAdmins = document.getElementById('userStatAdmins');
+      const elSusp = document.getElementById('userStatSuspended');
+      if (elTotal) elTotal.textContent = totalCount;
+      if (elCust) elCust.textContent = customersCount;
+      if (elPros) elPros.textContent = prosCount;
+      if (elAdmins) elAdmins.textContent = adminsCount;
+      if (elSusp) elSusp.textContent = suspendedCount;
+
+      const bUsers = document.getElementById('badgeNavUsers');
+      if (bUsers) bUsers.textContent = totalCount;
+
+      const searchInp = document.getElementById('userSearchInput');
+      const q = (searchInp ? searchInp.value : userState.search).toLowerCase().trim();
+      userState.search = q;
+
+      const roleSelect = document.getElementById('userRoleFilter');
+      const roleFilter = roleSelect ? roleSelect.value : userState.roleFilter;
+      userState.roleFilter = roleFilter;
+
+      const statusSelect = document.getElementById('userStatusFilter');
+      const statusFilter = statusSelect ? statusSelect.value : userState.statusFilter;
+      userState.statusFilter = statusFilter;
+
+      const sortSelect = document.getElementById('userSortSelect');
+      const sortBy = sortSelect ? sortSelect.value : userState.sortBy;
+      userState.sortBy = sortBy;
+
+      const perPageSelect = document.getElementById('userPerPageSelect');
+      const perPage = perPageSelect ? parseInt(perPageSelect.value, 10) : userState.perPage;
+      userState.perPage = perPage || 5;
+
+      let filtered = allUsers.filter(u => {
+        const name = (u.fullName || '').toLowerCase();
+        const email = (u.email || '').toLowerCase();
+        const phone = (u.phone || '').toLowerCase();
+        const city = (u.city || '').toLowerCase();
+        const id = (u.id || '').toLowerCase();
+
+        const matchesSearch = !q || name.includes(q) || email.includes(q) || phone.includes(q) || city.includes(q) || id.includes(q);
+
+        const uRole = (u.role || '').toLowerCase();
+        const matchesRole = roleFilter === 'all' ||
+          (roleFilter === 'customer' && uRole === 'customer') ||
+          (roleFilter === 'provider' && (uRole === 'provider' || uRole === 'professional')) ||
+          (roleFilter === 'admin' && uRole === 'admin');
+
+        const matchesStatus = statusFilter === 'all' || u.status === statusFilter;
+
+        return matchesSearch && matchesRole && matchesStatus;
+      });
+
+      filtered.sort((a, b) => {
+        if (sortBy === 'newest') return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        if (sortBy === 'oldest') return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+        if (sortBy === 'name_asc') return (a.fullName || '').localeCompare(b.fullName || '');
+        if (sortBy === 'name_desc') return (b.fullName || '').localeCompare(a.fullName || '');
+        if (sortBy === 'role') return (a.role || '').localeCompare(b.role || '');
+        return 0;
+      });
+
+      const totalFiltered = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(totalFiltered / userState.perPage));
+      if (userState.currentPage > totalPages) userState.currentPage = totalPages;
+      if (userState.currentPage < 1) userState.currentPage = 1;
+
+      const startIndex = (userState.currentPage - 1) * userState.perPage;
+      const endIndex = Math.min(startIndex + userState.perPage, totalFiltered);
+      const currentSlice = filtered.slice(startIndex, endIndex);
+
+      const tbody = document.getElementById('usersManagementTbody');
+      if (!tbody) return;
+
+      if (currentSlice.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8">No Users Found</td></tr>';
+      } else {
+        tbody.innerHTML = currentSlice.map(u => {
+          const initials = getUserInitials(u.fullName);
+          const safeName = escapeHtml(u.fullName || 'Unnamed');
+          const safeEmail = escapeHtml(u.email || '—');
+          const safePhone = escapeHtml(u.phone || '—');
+          const safeCity = escapeHtml(u.city || 'Islamabad');
+          const safeId = escapeHtml(u.id || '');
+          const isCurrentAdmin = (currentAdminUser && currentAdminUser.id === u.id);
+
+          return `
+            <tr>
+              <td>
+                <div class="user-table-avatar">${initials}</div>
+                <strong>${safeName}</strong>
+                <code>${safeId}</code>
+              </td>
+              <td><a href="mailto:${safeEmail}">${safeEmail}</a></td>
+              <td>${safePhone}</td>
+              <td><span class="badge-role">${u.role}</span></td>
+              <td><span class="badge-status">${u.status}</span></td>
+              <td>${safeCity}</td>
+              <td>${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
+              <td>
+                <button onclick="openUserDetailsModal('${u.id}')">View</button>
+                <button onclick="openEditUserModal('${u.id}')">Edit</button>
+                <button onclick="toggleUserSuspension('${u.id}')">${u.status === 'active' ? 'Suspend' : 'Activate'}</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      const paginationInfo = document.getElementById('userPaginationInfo');
+      if (paginationInfo) {
+        paginationInfo.textContent = `Showing ${startIndex + 1} to ${endIndex} of ${totalFiltered} users`;
+      }
+    }
+
+    function onUserSearchChange(val) {
+      const searchInp = document.getElementById('userSearchInput');
+      if (searchInp && searchInp.value !== val) searchInp.value = val;
+      userState.search = (val || '').toLowerCase().trim();
+      userState.currentPage = 1;
+      renderUsersTable();
+    }
+
+    function onUserRoleFilterChange() {
+      const sel = document.getElementById('userRoleFilter');
+      userState.roleFilter = sel ? sel.value : 'all';
+      userState.currentPage = 1;
+      renderUsersTable();
+    }
+
+    function onUserStatusFilterChange() {
+      const sel = document.getElementById('userStatusFilter');
+      userState.statusFilter = sel ? sel.value : 'all';
+      userState.currentPage = 1;
+      renderUsersTable();
+    }
+
+    function onUserSortChange(val) {
+      userState.sortBy = val || 'newest';
+      renderUsersTable();
+    }
+
+    function onUserPerPageChange(val) {
+      userState.perPage = parseInt(val, 10) || 5;
+      userState.currentPage = 1;
+      renderUsersTable();
+    }
+
+    function resetUserFilters() {
+      userState.search = '';
+      userState.roleFilter = 'all';
+      userState.statusFilter = 'all';
+      userState.sortBy = 'newest';
+      userState.currentPage = 1;
+      const searchInp = document.getElementById('userSearchInput');
+      if (searchInp) searchInp.value = '';
+      const roleSel = document.getElementById('userRoleFilter');
+      if (roleSel) roleSel.value = 'all';
+      const statusSel = document.getElementById('userStatusFilter');
+      if (statusSel) statusSel.value = 'all';
+      renderUsersTable();
+    }
+
+    function openUserDetailsModal(userId) {
+      const summary = TLAuth.getUserActivitySummary(userId);
+      if (!summary) return;
+      document.getElementById('userDetailsModalContent').textContent = `Details for ${summary.user.fullName} (${summary.user.id}). Customer bookings: ${summary.customerBookings.length}`;
+      document.getElementById('userDetailsModal').classList.add('active');
+    }
+    function closeUserDetailsModal() {
+      document.getElementById('userDetailsModal').classList.remove('active');
+    }
+
+    function openEditUserModal(userId) {
+      const u = TLAuth.getUserById(userId);
+      if (!u) return;
+      document.getElementById('modalUserEditId').value = u.id;
+      document.getElementById('modalUserEditName').value = u.fullName;
+      document.getElementById('modalUserEditEmail').value = u.email;
+      document.getElementById('modalUserEditRole').value = u.role;
+      document.getElementById('modalUserEditStatus').value = u.status;
+      document.getElementById('userEditModal').classList.add('active');
+    }
+    function closeEditUserModal() {
+      document.getElementById('userEditModal').classList.remove('active');
+    }
+
+    function toggleUserSuspension(userId) {
+      const res = TLAuth.toggleUserStatus(userId, currentAdminUser.id);
+      renderUsersTable();
+      return res;
+    }
+
+    // ------------------------------------------------------------------------
+    // RUN TEST ASSERTIONS
+    // ------------------------------------------------------------------------
+    const tests = [];
+    function record(name, pass, details) {
+      tests.push({ name, pass: Boolean(pass), details });
+    }
+
+    async function runTests() {
+      try {
+        TLAuth.init();
+        TLServices.init();
+        TLBookings.init();
+        TLCommunication.init();
+
+        const users = TLAuth.getUsers();
+        record("Database Users Loaded", users.length >= 13, `Loaded ${users.length} registered accounts across roles.`);
+
+        const safeUsers = TLAuth.getAllUsersSafe();
+        const noHashesExposed = safeUsers.every(u => u.passwordHash === undefined);
+        record("Password Hash Concealment", noHashesExposed, `Verified that passwordHash is stripped from all ${safeUsers.length} user safe objects.`);
+
+        const custCount = users.filter(u => u.role === 'customer').length;
+        const provCount = users.filter(u => u.role === 'provider').length;
+        const adminCount = users.filter(u => u.role === 'admin').length;
+        record("Role Multiplicity (Customer, Pro, Admin)", custCount >= 6 && provCount >= 6 && adminCount >= 1, `Found ${custCount} customers, ${provCount} professionals, and ${adminCount} administrator(s).`);
+
+        const custSummary = TLAuth.getUserActivitySummary("usr-cust-001");
+        record("Customer Activity Aggregation", custSummary && custSummary.customerBookings.length >= 2, `Customer 'usr-cust-001' has ${custSummary?.customerBookings?.length} booking records.`);
+
+        const provSummary = TLAuth.getUserActivitySummary("usr-prov-001");
+        record("Professional Activity Aggregation", provSummary && provSummary.providerProfile && provSummary.providerBookings.length >= 2, `Provider has profile '${provSummary?.providerProfile?.businessName}' and ${provSummary?.providerBookings?.length} bookings.`);
+
+        const dupEmailRes = TLAuth.updateUserByAdmin("usr-cust-002", {
+          fullName: "Ayesha Malik",
+          email: "admin@tradelinker.com"
+        }, "usr-admin-001");
+        record("Duplicate Email Prevention", dupEmailRes.error && dupEmailRes.error.includes("already registered"), dupEmailRes.error);
+
+        const shortNameRes = TLAuth.updateUserByAdmin("usr-cust-002", {
+          fullName: "Al",
+          email: "ayesha.unique@gmail.com"
+        }, "usr-admin-001");
+        record("Full Name Minlength Guard", shortNameRes.error && shortNameRes.error.includes("at least 3 characters"), shortNameRes.error);
+
+        const selfSuspendRes = TLAuth.toggleUserStatus("usr-admin-001", "usr-admin-001");
+        record("Self-Suspension Protection", selfSuspendRes.error && selfSuspendRes.error.includes("Security restriction"), selfSuspendRes.error);
+
+        const editRes = TLAuth.updateUserByAdmin("usr-cust-002", {
+          fullName: "Ayesha Malik (Updated)",
+          email: "ayesha.m@gmail.com",
+          phone: "0321-9988776",
+          city: "Rawalpindi",
+          role: "customer",
+          status: "active"
+        }, "usr-admin-001");
+        const updatedUser = TLAuth.getUserById("usr-cust-002");
+        record("Edit User Attributes & Persistence", updatedUser && updatedUser.fullName.includes("Updated") && updatedUser.city === "Rawalpindi", `Updated user city to '${updatedUser?.city}'.`);
+
+        const toggleRes1 = TLAuth.toggleUserStatus("usr-cust-005", "usr-admin-001");
+        record("Suspend User Account", toggleRes1.success && toggleRes1.status === "suspended", `Account status changed to: ${toggleRes1.status}`);
+
+        const toggleRes2 = TLAuth.toggleUserStatus("usr-cust-005", "usr-admin-001");
+        record("Reactivate User Account", toggleRes2.success && toggleRes2.status === "active", `Account status reactivated to: ${toggleRes2.status}`);
+
+        const newEmail = "testuser." + Date.now() + "@tradelinker.pk";
+        const createRes = await TLAuth.createUserByAdmin({
+          fullName: "Zubair Hashmi",
+          email: newEmail,
+          phone: "0300-5544332",
+          city: "Lahore",
+          role: "customer",
+          status: "active",
+          password: "ZubairSecurePass2026!"
+        }, "usr-admin-001");
+        record("Provision New User with Vault Hash", createRes.success && createRes.user && createRes.user.id, `Provisioned user ID '${createRes.user?.id}'.`);
+
+        const createdInDb = TLAuth.getUsers().find(u => u.email === newEmail);
+        record("Cryptographic Salted Hash Created", createdInDb && createdInDb.passwordHash && createdInDb.passwordHash.length === 64, `Generated 64-char SHA-256 hash.`);
+
+        const resetRes = TLAuth.requestPasswordReset(newEmail);
+        record("Generate Password Reset Token", resetRes.success && resetRes.resetToken && resetRes.resetToken.startsWith("rst_"), `Issued reset token: ${resetRes.resetToken}`);
+
+        const logs = TLCommunication.getAllAdminAuditLogs();
+        const hasUserLogs = logs.some(l => l.actionType === 'USER_UPDATED') &&
+                            logs.some(l => l.actionType === 'USER_SUSPENDED') &&
+                            logs.some(l => l.actionType === 'USER_ACTIVATED') &&
+                            logs.some(l => l.actionType === 'USER_CREATED');
+        record("Admin Audit Trail Logs User Lifecycle Events", hasUserLogs, `Recorded UPDATED, SUSPENDED, ACTIVATED, and CREATED audit logs.`);
+
+        // Direct DOM Table Rendering
+        renderUsersTable();
+        const totalStat = parseInt(document.getElementById('userStatTotal').textContent, 10);
+        const custStat = parseInt(document.getElementById('userStatCustomers').textContent, 10);
+        const proStat = parseInt(document.getElementById('userStatPros').textContent, 10);
+        const adminStat = parseInt(document.getElementById('userStatAdmins').textContent, 10);
+        record("UI User Statistics Strip KPIs", totalStat >= 14 && custStat >= 7 && proStat >= 6 && adminStat >= 1, `Total: ${totalStat}, Customers: ${custStat}, Pros: ${proStat}, Admins: ${adminStat}`);
+
+        const tbody = document.getElementById('usersManagementTbody');
+        const rows = tbody.querySelectorAll('tr');
+        record("Users Table DOM Rows (Page 1 = 5 items)", rows.length === 5, `Rendered ${rows.length} rows.`);
+
+        onUserRoleFilterChange.bind({ value: 'provider' });
+        document.getElementById('userRoleFilter').value = 'provider';
+        onUserRoleFilterChange();
+        const proRows = tbody.querySelectorAll('tr');
+        const allPros = Array.from(proRows).every(r => r.textContent.includes('provider') || r.textContent.includes('Professional'));
+        record("Role Filter ('provider')", proRows.length >= 1 && allPros, `Filtered to ${proRows.length} professional specialist rows.`);
+        resetUserFilters();
+
+        onUserSearchChange('kamran');
+        const kamranRows = tbody.querySelectorAll('tr');
+        record("Search Filter ('kamran')", kamranRows.length === 1 && kamranRows[0].textContent.includes('Kamran'), `Search yielded Dr. Kamran Qureshi.`);
+        resetUserFilters();
+
+        openUserDetailsModal('usr-cust-001');
+        const detailsOpen = document.getElementById('userDetailsModal').classList.contains('active');
+        record("User Details Modal Display", detailsOpen && document.getElementById('userDetailsModalContent').textContent.includes('Hamad Ullah'), `Details modal opened with activity counts.`);
+        closeUserDetailsModal();
+
+        openEditUserModal('usr-cust-001');
+        const editOpen = document.getElementById('userEditModal').classList.contains('active');
+        const editNameVal = document.getElementById('modalUserEditName').value;
+        record("Edit User Modal Pre-filled Form", editOpen && editNameVal.includes('Hamad'), `Edit modal pre-filled: '${editNameVal}'.`);
+        closeEditUserModal();
+
+      } catch (e) {
+        record("Synchronous Test Suite Execution", false, e.message);
+      }
+
+      // Summary Render
+      const container = document.getElementById('resultsUI');
+      const passedCount = tests.filter(t => t.pass).length;
+      const totalCount = tests.length;
+      const allPassed = passedCount === totalCount;
+
+      container.innerHTML = `
+        <div class="summary-bar ${allPassed ? 'summary-pass' : 'summary-fail'}">
+          ${allPassed ? '✓ ALL TESTS PASSED' : '✗ TEST SUITE FAILED'}: ${passedCount} / ${totalCount} Assertions Passing
+        </div>
+        ${tests.map(t => `
+          <div class="test-box ${t.pass ? 'pass' : 'fail'}">
+            <span class="badge ${t.pass ? 'pass' : 'fail'}">${t.pass ? 'PASS' : 'FAIL'}</span>
+            <strong>${t.name}</strong>
+            <div class="details">${t.details}</div>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    runTests();
+  </script>
+</body>
+</html>
