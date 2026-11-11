@@ -319,35 +319,6 @@
       margin-bottom: var(--tl-space-16);
     }
 
-    /* Mobile Drawer */
-    .tl-mobile-drawer {
-      position: fixed;
-      top: 76px;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: #FFFFFF;
-      z-index: var(--tl-z-fixed);
-      display: none;
-      flex-direction: column;
-      padding: var(--tl-space-6);
-      gap: var(--tl-space-4);
-      border-top: 1px solid var(--tl-border-subtle);
-      overflow-y: auto;
-    }
-
-    .tl-mobile-drawer.active {
-      display: flex;
-    }
-
-    .tl-mobile-nav-link {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--tl-navy-800);
-      padding: 10px 0;
-      border-bottom: 1px solid var(--tl-border-subtle);
-    }
-
     /* Search Results Live Container */
     #liveSearchResults {
       margin-top: var(--tl-space-8);
@@ -405,7 +376,8 @@
           </button>
         </div>
       </div>
-    </div>
+    </div></header>
+
 
     <!-- Mobile Drawer Navigation -->
     <div class="tl-mobile-drawer" id="mobileDrawer">
@@ -420,7 +392,6 @@
         <a href="auth.html?mode=register&role=provider" class="tl-btn tl-btn-secondary" onclick="toggleMobileMenu()">Register as Service Provider</a>
       </div>
     </div>
-  </header>
 
   <!-- =========================================================================
        4. Hero Section with Value Proposition
@@ -1035,7 +1006,9 @@
     // Mobile Navigation Drawer Toggle
     function toggleMobileMenu() {
       const drawer = document.getElementById('mobileDrawer');
-      drawer.classList.toggle('active');
+      const toggleBtn = document.getElementById('navMobileToggle');
+      if (drawer) drawer.classList.toggle('active');
+      if (toggleBtn) toggleBtn.classList.toggle('active');
     }
 
     // Render Featured Professionals from TLData

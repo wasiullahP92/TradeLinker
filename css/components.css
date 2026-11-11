@@ -240,6 +240,56 @@
   transition: all var(--tl-transition-fast);
 }
 
+.tl-hamburger.active span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.tl-hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.tl-hamburger.active span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile Drawer Navigation (Fixed on top of all page elements) */
+.tl-mobile-drawer {
+  position: fixed;
+  top: 76px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #FFFFFF;
+  z-index: var(--tl-z-modal, 1050);
+  display: none;
+  flex-direction: column;
+  padding: var(--tl-space-6);
+  gap: var(--tl-space-4);
+  border-top: 1px solid var(--tl-border-subtle);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.tl-mobile-drawer.active {
+  display: flex;
+}
+
+.tl-mobile-nav-link {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--tl-navy-800);
+  padding: 12px 0;
+  border-bottom: 1px solid var(--tl-border-subtle);
+  text-decoration: none;
+  transition: color var(--tl-transition-fast);
+}
+
+.tl-mobile-nav-link:hover,
+.tl-mobile-nav-link.active {
+  color: var(--tl-teal-600);
+}
+
 /* --------------------------------------------------------------------------
    3. Buttons
    -------------------------------------------------------------------------- */

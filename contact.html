@@ -29,10 +29,30 @@
         <div class="tl-nav-actions">
           <a href="auth.html?mode=login" class="tl-btn tl-btn-ghost tl-btn-sm">Sign In</a>
           <a href="auth.html?mode=register" class="tl-btn tl-btn-primary tl-btn-sm">Register</a>
+                  <!-- Mobile Hamburger -->
+          <button class="tl-hamburger" id="navMobileToggle" aria-label="Toggle navigation menu" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
         </div>
       </div>
     </div>
   </header>
+
+  <!-- Mobile Drawer Navigation -->
+  <div class="tl-mobile-drawer" id="mobileDrawer">
+    <a href="index.html" class="tl-mobile-nav-link" onclick="toggleMobileMenu()">Home</a>
+    <a href="categories.html" class="tl-mobile-nav-link" onclick="toggleMobileMenu()">Services (6 Categories)</a>
+    <a href="search.html" class="tl-mobile-nav-link" onclick="toggleMobileMenu()">Find Professionals</a>
+    <a href="index.html#about" class="tl-mobile-nav-link" onclick="toggleMobileMenu()">About TradeLinker</a>
+    <a href="contact.html" class="tl-mobile-nav-link active" onclick="toggleMobileMenu()">Contact & Support</a>
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+      <a href="auth.html?mode=login" class="tl-btn tl-btn-outline" onclick="toggleMobileMenu()">Sign In</a>
+      <a href="auth.html?mode=register" class="tl-btn tl-btn-primary" onclick="toggleMobileMenu()">Register as Customer</a>
+      <a href="auth.html?mode=register&role=provider" class="tl-btn tl-btn-secondary" onclick="toggleMobileMenu()">Register as Service Provider</a>
+    </div>
+  </div>
 
   <!-- Banner -->
   <section style="background: var(--tl-navy-900); color: #FFF; padding: 3.5rem 0; border-bottom: 3px solid var(--tl-teal-500);">
@@ -92,5 +112,14 @@
   </footer>
 
   <script src="js/icons.js"></script>
+
+  <script>
+    function toggleMobileMenu() {
+      const drawer = document.getElementById('mobileDrawer');
+      const toggleBtn = document.getElementById('navMobileToggle');
+      if (drawer) drawer.classList.toggle('active');
+      if (toggleBtn) toggleBtn.classList.toggle('active');
+    }
+  </script>
 </body>
 </html>
